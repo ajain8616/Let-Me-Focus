@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:theme="@style/Base.Theme.ActivityTracker"
+    tools:showIn = "navigation_view">
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_active"
+            android:icon="@drawable/ic_active"
+            android:title="Active Activities"/>
+
+
+        <item
+            android:id="@+id/nav_details"
+            android:icon="@drawable/ic_data_details"
+            android:title="Activities Details "/>
+
+        <item
+            android:id="@+id/nav_analysis"
+            android:icon="@drawable/ic_analytics"
+            android:title="Activities Analysis Data"/>
+
+        <item
+            android:id="@+id/nav_filtered"
+            android:icon="@drawable/ic_analytics"
+            android:title="Activities Filtered Data"
+            android:visible="false"/>
+
+
+        <item
+            android:id="@+id/nav_login"
+            android:icon="@drawable/ic_login"
+            android:title="Login"
+            android:visible="false"/>
+
+        <item
+            android:id="@+id/nav_signUp"
+            android:icon="@drawable/ic_signup"
+            android:title="SignUp"
+            android:visible="false"/>
+
+    </group>
+    <item
+        android:title="">
+
+        <menu>
+
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_logout"
+                android:title="Logout"/>
+        </menu>
+
+    </item>
+
+</menu>

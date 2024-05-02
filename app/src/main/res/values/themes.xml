@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ActivityTracker" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <item name="colorPrimary">@color/colorRoyalBlue</item>
+        <item name="colorPrimaryVariant">@color/colorDodgerBlue</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/colorRoyalBlue</item>
+        <item name="colorSecondaryVariant">@color/colorLightYellow</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" >@color/colorBoundaryBlue</item>
+    </style>
+
+    <style name="Theme.ActivityTracker" parent="Base.Theme.ActivityTracker" />
+</resources>
