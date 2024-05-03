@@ -27,7 +27,7 @@ Activity Tracker is crafted using Android Studio, leveraging the robust capabili
 ![Screenshot 2024-05-03 135203](https://github.com/ajain8616/Activity_Tracker/assets/106903991/af5d3ba3-7f90-498e-9ac5-33e3075cf620)
 
 ## Download
-You can download the latest version of Activity Tracker from the following link: [APK File]()
+You can download the latest version of Activity Tracker from the following link: [APK File](https://github.com/ajain8616/Activity_Tracker/blob/07c14a8f49b22e9a31406ac616f66b45bdac6480/app-debug.apk)
 
 ## Feedback
 We value your feedback! Please feel free to reach out to us with any comments, suggestions, or inquiries regarding Activity Tracker. You can contact us via email at [ajain8616@gmail.com](mailto:ajain8616@gmail.com) or connect with us on LinkedIn: [LinkedIn Profile](https://www.linkedin.com/in/arihant-jain-aa2535232/)
