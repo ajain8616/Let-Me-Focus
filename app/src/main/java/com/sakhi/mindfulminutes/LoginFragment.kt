@@ -1,4 +1,4 @@
-package com.example.activitytracker
+package com.sakhi.mindfulminutes
 
 import android.content.Intent
 import android.os.Bundle

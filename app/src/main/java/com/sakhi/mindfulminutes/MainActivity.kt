@@ -1,4 +1,4 @@
-package com.example.activitytracker
+package com.sakhi.mindfulminutes
 
 import android.os.Bundle
 import android.widget.Toast

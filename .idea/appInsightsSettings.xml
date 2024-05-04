@@ -9,14 +9,14 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.activitytracker" />
-                  <option name="mobileSdkAppId" value="1:1081756889190:android:965305098c99d17b36fda7" />
+                  <option name="appId" value="com.sakhi.mindfulminutes" />
+                  <option name="mobileSdkAppId" value="1:1081756889190:android:c82dcec580a2474036fda7" />
                   <option name="projectId" value="activity-tracker-6f87e" />
                   <option name="projectNumber" value="1081756889190" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
-              <option name="timeIntervalDays" value="NINETY_DAYS" />
+              <option name="timeIntervalDays" value="THIRTY_DAYS" />
               <option name="visibilityType" value="ALL" />
             </InsightsFilterSettings>
           </value>

@@ -1,4 +1,4 @@
-package com.example.activitytracker
+package com.sakhi.mindfulminutes
 
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet

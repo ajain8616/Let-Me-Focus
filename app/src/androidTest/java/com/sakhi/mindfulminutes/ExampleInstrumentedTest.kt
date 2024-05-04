@@ -1,4 +1,4 @@
-package com.example.activitytracker
+package com.sakhi.mindfulminutes
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.example.activitytracker
+package com.sakhi.mindfulminutes
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
 
 
 class ActivitiesDetailsFragment : Fragment() {

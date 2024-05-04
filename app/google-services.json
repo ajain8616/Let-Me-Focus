@@ -1,23 +1,24 @@
 {
   "project_info": {
     "project_number": "1081756889190",
+    "firebase_url": "https://activity-tracker-6f87e-default-rtdb.firebaseio.com",
     "project_id": "activity-tracker-6f87e",
     "storage_bucket": "activity-tracker-6f87e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1081756889190:android:965305098c99d17b36fda7",
+        "mobilesdk_app_id": "1:1081756889190:android:c82dcec580a2474036fda7",
         "android_client_info": {
-          "package_name": "com.example.activitytracker"
+          "package_name": "com.sakhi.mindfulminutes"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1081756889190-fojie7rrori0tmq2bhckea7gar68a3rc.apps.googleusercontent.com",
+          "client_id": "1081756889190-j6hive2u702uvbfqfmrgbcj4jbicl6l0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.activitytracker",
+            "package_name": "com.sakhi.mindfulminutes",
             "certificate_hash": "38603ab336fe559e21484f1045c6d054f30f2b9a"
           }
         },
