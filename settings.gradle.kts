@@ -15,7 +15,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Activity Tracker"
+rootProject.name = "Mindful Minutes"
 include(":app")
 
 

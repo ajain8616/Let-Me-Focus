@@ -1,9 +1,7 @@
 <resources>
-    <string name="app_name">Activity Tracker</string>
+    <string name="app_name">Mindful Minutes</string>
     <string name="open_nav">Open Navigation Drawer</string>
     <string name="close_nav">Close Navigation Drawer</string>
     <string name="default_web_client_id" translatable="false">1081756889190-85cmo0al2a90ugeqs592t0i3bc9jt3re.apps.googleusercontent.com</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

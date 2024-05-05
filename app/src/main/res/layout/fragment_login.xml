@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/Base.Theme.ActivityTracker"
     tools:context=".LoginFragment">
 
@@ -59,47 +60,52 @@
             android:layout_height="wrap_content"
             android:text="Login"
             android:textColor="@color/white"
-            android:layout_marginTop="24dp"/>
+            android:layout_marginTop="24dp" />
 
-        <!-- Forgot Password & Sign Up -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Forgot Password -->
+        <TextView
+            android:id="@+id/forget_password_textview"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:text="Forgot Password?"
+            android:textStyle="bold"
+            android:textSize="19sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center_horizontal" />
 
-            <!-- Forgot Password -->
-            <TextView
-                android:id="@+id/forget_password_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Forgot Password?"
-                android:textStyle="bold"
-                android:textSize="19sp"
-                android:textColor="@color/white"
-                android:layout_marginTop="16dp" />
-
-            <!-- Sign Up -->
-            <TextView
-                android:id="@+id/signup_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Don't have an Account? Sign Up"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="19sp"
-                android:layout_marginTop="16dp"/>
-        </LinearLayout>
+        <!-- "Or Continue With" Text -->
+        <TextView
+            android:id="@+id/or_continue_with_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="━━━━━Or Continue With━━━━━"
+            android:textStyle="bold"
+            android:textSize="19sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center_horizontal" />
 
         <!-- Google Sign In Button -->
         <com.google.android.gms.common.SignInButton
             android:id="@+id/google_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            android:textSize="18sp" />
+            android:layout_centerInParent="true"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- Sign Up -->
+        <TextView
+            android:id="@+id/signup_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Don't have an Account? Sign Up"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="19sp"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
 
