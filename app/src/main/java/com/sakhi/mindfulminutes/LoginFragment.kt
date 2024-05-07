@@ -22,6 +22,9 @@ class LoginFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var usernameEditText: EditText
+    private lateinit var passwordEditText: EditText
+    private lateinit var ErrorTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,9 +32,10 @@ class LoginFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_login, container, false)
-        val usernameEditText = view.findViewById<EditText>(R.id.username_edittext)
-        val passwordEditText = view.findViewById<EditText>(R.id.password_edittext)
+        usernameEditText = view.findViewById(R.id.useremail_edittext)
+        passwordEditText = view.findViewById(R.id.password_edittext)
         val loginButton = view.findViewById<Button>(R.id.login_button)
+        ErrorTextView = view.findViewById(R.id.error_textview)
         val forgetPasswordTextView = view.findViewById<TextView>(R.id.forget_password_textview)
         val signUpButton = view.findViewById<TextView>(R.id.signup_button)
         val googleButton = view.findViewById<com.google.android.gms.common.SignInButton>(R.id.google_button)
@@ -47,25 +51,7 @@ class LoginFragment : Fragment() {
 
         // Set click listeners
         loginButton.setOnClickListener {
-            val username = usernameEditText.text.toString()
-            val password = passwordEditText.text.toString()
-
-            if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(requireContext(), "Username or Password cannot be blank", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Perform login process
-            auth.signInWithEmailAndPassword(username, password)
-                .addOnCompleteListener(requireActivity()) { task ->
-                    if (task.isSuccessful) {
-                        // Login successful, navigate to HomeFragment
-                        navigateToHomeFragment()
-                    } else {
-                        // Login failed, display error message
-                        Toast.makeText(requireContext(), "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            checkLoginCondition()
         }
 
         forgetPasswordTextView.setOnClickListener {
@@ -73,7 +59,8 @@ class LoginFragment : Fragment() {
             if (email.isNotEmpty()) {
                 sendPasswordResetEmail(email)
             } else {
-                Toast.makeText(requireContext(), "Please enter your email", Toast.LENGTH_SHORT).show()
+                ErrorTextView.visibility = View.VISIBLE
+                ErrorTextView.text = "Please enter your email address to reset your password"
             }
         }
 
@@ -86,6 +73,40 @@ class LoginFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun checkLoginCondition() {
+        val currentUser = auth.currentUser
+        if (currentUser != null && !currentUser.isEmailVerified) {
+            ErrorTextView.visibility = View.VISIBLE
+            ErrorTextView.text = "Please verify your email address before logging in for security purposes."
+
+        } else {
+            loginUser()
+        }
+    }
+
+    private fun loginUser() {
+        val username = usernameEditText.text.toString()
+        val password = passwordEditText.text.toString()
+
+        if (username.isEmpty() || password.isEmpty()) {
+            ErrorTextView.visibility = View.VISIBLE
+            ErrorTextView.text = "Please enter your email and password , these fields are required to fill and login"
+            return
+        }
+
+        // Perform login process
+        auth.signInWithEmailAndPassword(username, password)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    // Login successful, navigate to HomeFragment
+                    navigateToHomeFragment()
+                } else {
+                    // Login failed, display error message
+                    Toast.makeText(requireContext(), "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun sendPasswordResetEmail(email: String) {
@@ -152,4 +173,3 @@ class LoginFragment : Fragment() {
         private const val RC_SIGN_IN = 9001
     }
 }
-

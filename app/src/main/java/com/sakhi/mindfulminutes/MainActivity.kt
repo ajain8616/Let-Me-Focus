@@ -1,6 +1,7 @@
 package com.sakhi.mindfulminutes
 
 import android.os.Bundle
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -9,12 +10,14 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var currentFragment: Fragment
+    private lateinit var userEmailTextView: TextView
 
     // Firebase Authentication instance
     private lateinit var auth: FirebaseAuth
@@ -25,6 +28,9 @@ class MainActivity : AppCompatActivity() {
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.nav_view)
+
+        val headerView = navigationView.getHeaderView(0)
+        userEmailTextView = headerView.findViewById(R.id.userEmailTextView)
 
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -56,21 +62,18 @@ class MainActivity : AppCompatActivity() {
                     }
                     true
                 }
-
                 R.id.nav_analysis -> {
                     if (auth.currentUser != null) {
                         replaceFragment(PieChartFragment())
                     }
                     true
                 }
-
                 R.id.nav_filtered -> {
                     if (auth.currentUser != null) {
                         replaceFragment(FilteredActivitiesFragment())
                     }
                     true
                 }
-
                 R.id.nav_login -> {
                     if (auth.currentUser == null) {
                         replaceFragment(LoginFragment())
@@ -105,6 +108,11 @@ class MainActivity : AppCompatActivity() {
         }
         showToastBasedOnLoginStatus(isLoggedIn)
 
+        // Display user's name and email if logged in
+        if (isLoggedIn) {
+            val currentUser = auth.currentUser
+            currentUser?.let { updateUserProfileUI(it) }
+        }
     }
 
     private fun showToastBasedOnLoginStatus(isLoggedIn: Boolean) {
@@ -136,6 +144,9 @@ class MainActivity : AppCompatActivity() {
         navigationView.setCheckedItem(R.id.nav_login)
     }
 
+    private fun updateUserProfileUI(user: FirebaseUser) {
+        userEmailTextView.text = user.email
+    }
 
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {

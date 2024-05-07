@@ -1,15 +1,16 @@
 package com.sakhi.mindfulminutes
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import java.text.SimpleDateFormat
-import java.util.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,8 +21,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ActiveActivitiesFragment : Fragment() {
+
 
     // UI components
     private lateinit var itemNameEditText: EditText
@@ -34,9 +38,8 @@ class ActiveActivitiesFragment : Fragment() {
     private lateinit var activityRecyclerView: RecyclerView
     private lateinit var addItemLayout: RelativeLayout
     private lateinit var searchItemLayout: RelativeLayout
-    private lateinit var activityNameView:TextView
-    private lateinit var activityNameLayout:LinearLayout
-
+    private lateinit var activityNameView: TextView
+    private lateinit var activityNameLayout: LinearLayout
 
     // Firebase
     private lateinit var auth: FirebaseAuth
@@ -48,6 +51,7 @@ class ActiveActivitiesFragment : Fragment() {
     private val inactiveActivityList: MutableList<Pair<String, String>> = mutableListOf()
 
     private var showInactiveActivities = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,7 +77,6 @@ class ActiveActivitiesFragment : Fragment() {
         return view
     }
 
-
     private fun initializeViews(view: View) {
         itemNameEditText = view.findViewById(R.id.itemName)
         sendButton = view.findViewById(R.id.sendButton)
@@ -86,7 +89,7 @@ class ActiveActivitiesFragment : Fragment() {
         addItemLayout = view.findViewById(R.id.addItemLayout)
         searchItemLayout = view.findViewById(R.id.searchItemLayout)
         activityNameView = view.findViewById(R.id.activityNameView)
-        activityNameLayout= view.findViewById(R.id.activityNameLayout)
+        activityNameLayout = view.findViewById(R.id.activityNameLayout)
 
         // RecyclerView setup
         activityRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -119,13 +122,17 @@ class ActiveActivitiesFragment : Fragment() {
             fetchDataFromDatabase()
         }
 
-
         sendButton.setOnClickListener {
             val activityName = itemNameEditText.text.toString().trim()
             if (activityName.isNotEmpty()) {
                 duplicateActivities(activityName) { canAddActivity ->
                     if (canAddActivity) {
                         saveActivityToDatabase()
+                        // Hide addItemLayout
+                        addItemLayout.visibility = View.GONE
+                        // Hide keyboard
+                        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        inputMethodManager.hideSoftInputFromWindow(itemNameEditText.windowToken, 0)
                     } else {
                         Toast.makeText(context, "Cannot add activity with the same name!", Toast.LENGTH_SHORT).show()
                     }
@@ -134,8 +141,6 @@ class ActiveActivitiesFragment : Fragment() {
                 Toast.makeText(context, "Please enter activity name!", Toast.LENGTH_SHORT).show()
             }
         }
-
-
 
         // TextWatcher for itemSearchEditText
         itemSearchEditText.addTextChangedListener(object : TextWatcher {
@@ -162,15 +167,17 @@ class ActiveActivitiesFragment : Fragment() {
         addActionButton.visibility = visibility
     }
 
-
     private fun toggleAddItemLayoutVisibility() {
-        val addItemVisibility = if (addItemLayout.visibility == View.GONE) View.VISIBLE else View.GONE
-        addItemLayout.visibility = addItemVisibility
+        addItemLayout.visibility = when (addItemLayout.visibility) {
+            View.VISIBLE -> View.GONE
+            else -> View.VISIBLE
+        }
         searchItemLayout.visibility = View.GONE
     }
 
     private fun toggleSearchItemLayoutVisibility() {
-        val searchItemVisibility = if (searchItemLayout.visibility == View.GONE) View.VISIBLE else View.GONE
+        val searchItemVisibility =
+            if (searchItemLayout.visibility == View.GONE) View.VISIBLE else View.GONE
         searchItemLayout.visibility = searchItemVisibility
         addItemLayout.visibility = View.GONE
     }
@@ -216,7 +223,11 @@ class ActiveActivitiesFragment : Fragment() {
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(context, "Failed to retrieve activities: ${error.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Failed to retrieve activities: ${error.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 })
             } else {
@@ -226,7 +237,6 @@ class ActiveActivitiesFragment : Fragment() {
             Toast.makeText(context, "Please enter activity name!", Toast.LENGTH_SHORT).show()
         }
     }
-
 
     private fun getCurrentIndianTime(): String {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy hh:mm:ss a", Locale.ENGLISH)
@@ -255,10 +265,23 @@ class ActiveActivitiesFragment : Fragment() {
                 activityAdapter.notifyDataSetChanged()
 
                 if (activityList.isEmpty()) {
-                    Toast.makeText(context, "No Activities found!", Toast.LENGTH_SHORT).show()
+                    // If no activities are found, show the alternative message
+                    activityNameView.visibility = View.VISIBLE
+                    val capitalizedAppName = getString(R.string.app_name).toUpperCase()
+                    activityNameView.text = "WELCOME TO $capitalizedAppName" +
+                            "\n• There are no activities." +
+                            "\n• You can add activities by clicking on the Fab Action Button or Add Action Button." +
+                            "\n• To search for activities, click on the Search Action Button." +
+                            "\n• You can clear the search by clicking on the Clear Button."
+                    activityNameView.gravity = Gravity.CENTER
+
+
                 } else {
-                    Toast.makeText(context, "You can add more activities!", Toast.LENGTH_SHORT).show()
+                    // If activities are found, show the default message
+                    activityNameView.visibility = View.VISIBLE
+                    activityNameView.text = "Active Activities"
                 }
+
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -268,8 +291,9 @@ class ActiveActivitiesFragment : Fragment() {
         })
     }
 
+
     private fun setupEditText() {
- // Editor action listener for itemNameEditText
+        // Editor action listener for itemNameEditText
         itemNameEditText.setOnEditorActionListener { _, actionId, event ->
             if (actionId == KeyEvent.KEYCODE_ENTER || event.action == KeyEvent.ACTION_DOWN) {
                 val activityName = itemNameEditText.text.toString().trim()
@@ -279,7 +303,11 @@ class ActiveActivitiesFragment : Fragment() {
                             saveActivityToDatabase()
                             fetchDataFromDatabase()
                         } else {
-                            Toast.makeText(context, "Cannot add activity with the same name!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Cannot add activity with the same name!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 } else {
@@ -289,7 +317,6 @@ class ActiveActivitiesFragment : Fragment() {
             }
             return@setOnEditorActionListener false
         }
-
 
         // TextWatcher for itemSearchEditText
         itemSearchEditText.addTextChangedListener(object : TextWatcher {
@@ -304,7 +331,6 @@ class ActiveActivitiesFragment : Fragment() {
         })
     }
 
-
     private fun searchActivity(query: String) {
         val filteredList = if (showInactiveActivities) {
             inactiveActivityList.filter { it.second.contains(query, true) }
@@ -313,7 +339,6 @@ class ActiveActivitiesFragment : Fragment() {
         }
         activityAdapter.updateList(filteredList.toMutableList())
     }
-
 
     private fun duplicateActivities(activityName: String, callback: (Boolean) -> Unit) {
         // Check if the activityName contains only letters and spaces, and not starting or ending with space
@@ -392,6 +417,4 @@ class ActiveActivitiesFragment : Fragment() {
             }
         })
     }
-
-
 }

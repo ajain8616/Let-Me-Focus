@@ -34,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Name "
+            android:textColor="@color/white"
             android:textColorHint="@color/white" />
 
         <EditText
@@ -42,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="Email id "
+            android:textColor="@color/white"
             android:textColorHint="@color/white" />
 
         <EditText
@@ -50,6 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="Password"
+            android:textColor="@color/white"
             android:textColorHint="@android:color/white"
             android:inputType="textPassword"/>
 
@@ -60,6 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="Confirm Password"
+            android:textColor="@color/white"
             android:textColorHint="@android:color/white"
             android:inputType="textPassword" />
 
@@ -71,6 +75,17 @@
             android:text="Sign Up"
             android:textColor="@color/white"
             android:layout_marginTop="24dp"/>
+
+        <TextView
+            android:id="@+id/verification_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:visibility="gone"
+            android:textStyle="italic"
+            android:textSize="19sp"
+            android:textColor="@color/red"
+            android:layout_marginTop="16dp"/>
 
         <TextView
             android:id="@+id/login_textview"

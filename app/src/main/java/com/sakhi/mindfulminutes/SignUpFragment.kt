@@ -19,6 +19,7 @@ class SignUpFragment : Fragment() {
     private lateinit var confirmUserPasswordEditText: EditText
     private lateinit var signUpButton: Button
     private lateinit var loginTextView: TextView
+    private lateinit var verification_textview:TextView
     private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreateView(
@@ -35,6 +36,7 @@ class SignUpFragment : Fragment() {
         confirmUserPasswordEditText = view.findViewById(R.id.confirmUserPassword)
         signUpButton = view.findViewById(R.id.signup_button)
         loginTextView = view.findViewById(R.id.login_textview)
+        verification_textview = view.findViewById(R.id.verification_textview)
 
         firebaseAuth = FirebaseAuth.getInstance()
 
@@ -61,13 +63,15 @@ class SignUpFragment : Fragment() {
 
         // Check if any field is empty
         if (userName.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            verification_textview.visibility = View.VISIBLE
+            verification_textview.text = "Please fill in all fields for sign up and verification"
             return
         }
 
         // Check if passwords match
         if (password != confirmPassword) {
-            Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT).show()
+            verification_textview.visibility = View.VISIBLE
+            verification_textview.text = "Passwords do not match. Please try again and ensure that the passwords match."
             return
         }
 
@@ -80,12 +84,14 @@ class SignUpFragment : Fragment() {
                         ?.addOnCompleteListener { verificationTask ->
                             if (verificationTask.isSuccessful) {
                                 // Verification email sent successfully
-                                Toast.makeText(requireContext(), "Verification email sent to $userEmail", Toast.LENGTH_SHORT).show()
+                                verification_textview.visibility = View.VISIBLE
+                                verification_textview.text = "A verification email has been successfully sent to $userEmail. Please check your inbox and follow the instructions to verify your email address."
                                 // Navigate to login fragment
                                 navigateToLoginFragment()
                             } else {
                                 // Failed to send verification email
-                                Toast.makeText(requireContext(), "Failed to send verification email", Toast.LENGTH_SHORT).show()
+                                verification_textview.visibility = View.VISIBLE
+                                verification_textview.text = "Failed to send the verification link to $userEmail. Please ensure that your email address is correct and try again later."
                             }
                         }
                 } else {

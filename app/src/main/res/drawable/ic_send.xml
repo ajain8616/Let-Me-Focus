@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<vector android:autoMirrored="true"
-    android:height="24dp"
-    android:tint="#ffffff"
-    android:viewportHeight="24"
-    android:viewportWidth="24"
-    android:width="24dp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <path
-        android:fillColor="@android:color/white"
-        android:pathData="M2.01,21L23,12 2.01,3 2,10l15,2 -15,2z" />
-</vector>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Background oval -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/colorLightYellow" />
+            <size
+                android:width="40dp"
+                android:height="40dp" />
+        </shape>
+    </item>
+
+    <!-- Border -->
+    <item android:left="2dp" android:right="2dp" android:top="2dp" android:bottom="2dp">
+        <shape android:shape="oval">
+            <stroke
+                android:width="3dp"
+                android:color="@color/teal_700" />
+        </shape>
+    </item>
+
+    <!-- Icon -->
+    <item android:left="9dp" android:right="6dp" android:top="6dp" android:bottom="6dp">
+        <vector
+            android:height="24dp"
+            android:width="24dp"
+            android:viewportHeight="20"
+            android:viewportWidth="20"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+            <path
+                android:fillColor="@color/green"
+                android:pathData="M1.61,17L18,10 1.61,3 1.6,8l12,1.6 -12,1.6z" />
+        </vector>
+    </item>
+
+</layer-list>
