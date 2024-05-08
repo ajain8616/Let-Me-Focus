@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector android:height="24dp"
-    android:tint="#ffffff"
-    android:viewportHeight="24"
-    android:viewportWidth="24"
-    android:width="24dp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <path
-        android:fillColor="@android:color/white"
-        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM17,13h-4v4h-2v-4L7,13v-2h4L11,7h2v4h4v2z" />
-</vector>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Background oval -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/colorLightYellow" />
+            <size
+                android:width="40dp"
+                android:height="40dp" />
+        </shape>
+    </item>
+
+    <!-- Border -->
+    <item android:left="2dp" android:right="2dp" android:top="2dp" android:bottom="2dp">
+        <shape android:shape="oval">
+            <stroke
+                android:width="3dp"
+                android:color="@color/teal_700" />
+        </shape>
+    </item>
+
+    <!-- Vector Icon with Padding -->
+    <item android:top="5dp" android:left="5dp" android:right="5dp" android:bottom="5dp">
+        <vector android:height="24dp"
+            android:viewportHeight="24"
+            android:viewportWidth="24"
+            android:width="24dp"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+            <path
+                android:fillColor="@color/green"
+                android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM17,13h-4v4h-2v-4L7,13v-2h4L11,7h2v4h4v2z" />
+        </vector>
+    </item>
+
+</layer-list>
+

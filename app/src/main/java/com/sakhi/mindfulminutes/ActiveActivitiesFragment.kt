@@ -14,7 +14,6 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -26,15 +25,13 @@ import java.util.*
 
 class ActiveActivitiesFragment : Fragment() {
 
-
     // UI components
     private lateinit var itemNameEditText: EditText
     private lateinit var sendButton: ImageButton
     private lateinit var itemSearchEditText: EditText
     private lateinit var clearButton: ImageButton
-    private lateinit var fabActionButton: FloatingActionButton
-    private lateinit var addActionButton: FloatingActionButton
-    private lateinit var searchActionButton: FloatingActionButton
+    private lateinit var addActionButton: ImageButton
+    private lateinit var searchActionButton: ImageButton
     private lateinit var activityRecyclerView: RecyclerView
     private lateinit var addItemLayout: RelativeLayout
     private lateinit var searchItemLayout: RelativeLayout
@@ -51,6 +48,7 @@ class ActiveActivitiesFragment : Fragment() {
     private val inactiveActivityList: MutableList<Pair<String, String>> = mutableListOf()
 
     private var showInactiveActivities = false
+    private var isActivityViewVisible = true
 
 
     override fun onCreateView(
@@ -82,7 +80,6 @@ class ActiveActivitiesFragment : Fragment() {
         sendButton = view.findViewById(R.id.sendButton)
         itemSearchEditText = view.findViewById(R.id.itemSearch)
         clearButton = view.findViewById(R.id.clearButton)
-        fabActionButton = view.findViewById(R.id.fabActionButton)
         addActionButton = view.findViewById(R.id.addActionButton)
         searchActionButton = view.findViewById(R.id.searchActionButton)
         activityRecyclerView = view.findViewById(R.id.activityRecyclerView)
@@ -114,8 +111,12 @@ class ActiveActivitiesFragment : Fragment() {
     }
 
     private fun setListeners() {
-        fabActionButton.setOnClickListener { toggleButtonsVisibility() }
-        addActionButton.setOnClickListener { toggleAddItemLayoutVisibility() }
+        addActionButton.setOnClickListener {
+            toggleAddItemLayoutVisibility()
+            if (activityList.isEmpty()) {
+                toggleActivityNameViewVisibility()
+            }
+        }
         searchActionButton.setOnClickListener { toggleSearchItemLayoutVisibility() }
         clearButton.setOnClickListener {
             itemSearchEditText.text.clear()
@@ -131,16 +132,25 @@ class ActiveActivitiesFragment : Fragment() {
                         // Hide addItemLayout
                         addItemLayout.visibility = View.GONE
                         // Hide keyboard
-                        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                        inputMethodManager.hideSoftInputFromWindow(itemNameEditText.windowToken, 0)
+                        val inputMethodManager =
+                            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        inputMethodManager.hideSoftInputFromWindow(
+                            itemNameEditText.windowToken,
+                            0
+                        )
                     } else {
-                        Toast.makeText(context, "Cannot add activity with the same name!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Cannot add activity with the same name!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             } else {
                 Toast.makeText(context, "Please enter activity name!", Toast.LENGTH_SHORT).show()
             }
         }
+
 
         // TextWatcher for itemSearchEditText
         itemSearchEditText.addTextChangedListener(object : TextWatcher {
@@ -161,12 +171,6 @@ class ActiveActivitiesFragment : Fragment() {
 
     }
 
-    private fun toggleButtonsVisibility() {
-        val visibility = if (searchActionButton.visibility == View.GONE) View.VISIBLE else View.GONE
-        searchActionButton.visibility = visibility
-        addActionButton.visibility = visibility
-    }
-
     private fun toggleAddItemLayoutVisibility() {
         addItemLayout.visibility = when (addItemLayout.visibility) {
             View.VISIBLE -> View.GONE
@@ -180,6 +184,11 @@ class ActiveActivitiesFragment : Fragment() {
             if (searchItemLayout.visibility == View.GONE) View.VISIBLE else View.GONE
         searchItemLayout.visibility = searchItemVisibility
         addItemLayout.visibility = View.GONE
+    }
+
+    private fun toggleActivityNameViewVisibility() {
+        activityNameView.visibility = if (isActivityViewVisible) View.GONE else View.VISIBLE
+        isActivityViewVisible = !isActivityViewVisible
     }
 
     private fun saveActivityToDatabase() {
@@ -214,11 +223,19 @@ class ActiveActivitiesFragment : Fragment() {
                         // Push the new activity to the correct position
                         activityRef.child(activityRef.push().key ?: "").setValue(newActivityData)
                             .addOnSuccessListener {
-                                Toast.makeText(context, "Activity saved successfully!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Activity saved successfully!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 itemNameEditText.text.clear()
                             }
                             .addOnFailureListener {
-                                Toast.makeText(context, "Failed to save activity!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Failed to save activity!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                     }
 
@@ -274,7 +291,14 @@ class ActiveActivitiesFragment : Fragment() {
                             "\n• To search for activities, click on the Search Action Button." +
                             "\n• You can clear the search by clicking on the Clear Button."
                     activityNameView.gravity = Gravity.CENTER
+                    activityNameView.setPadding(16, 16, 16, 16) // Set padding
 
+                    val params = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    params.setMargins(16, 16, 16, 16) // Set margins
+                    activityNameView.layoutParams = params
 
                 } else {
                     // If activities are found, show the default message
@@ -417,4 +441,6 @@ class ActiveActivitiesFragment : Fragment() {
             }
         })
     }
+
 }
+

@@ -53,24 +53,32 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_active -> {
                     if (auth.currentUser != null) {
                         replaceFragment(ActiveActivitiesFragment())
+                    } else {
+                        checkLoginState()
                     }
                     true
                 }
                 R.id.nav_details -> {
                     if (auth.currentUser != null) {
                         replaceFragment(ActivitiesDetailsFragment())
+                    } else {
+                        checkLoginState()
                     }
                     true
                 }
                 R.id.nav_analysis -> {
                     if (auth.currentUser != null) {
                         replaceFragment(PieChartFragment())
+                    } else {
+                        checkLoginState()
                     }
                     true
                 }
                 R.id.nav_filtered -> {
                     if (auth.currentUser != null) {
                         replaceFragment(FilteredActivitiesFragment())
+                    } else {
+                        checkLoginState()
                     }
                     true
                 }
@@ -102,8 +110,7 @@ class MainActivity : AppCompatActivity() {
                 replaceFragment(ActiveActivitiesFragment(), addToBackStack = false)
                 navigationView.setCheckedItem(R.id.nav_active)
             } else {
-                replaceFragment(LoginFragment(), addToBackStack = false)
-                navigationView.setCheckedItem(R.id.nav_login)
+                checkLoginState()
             }
         }
         showToastBasedOnLoginStatus(isLoggedIn)
@@ -146,6 +153,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateUserProfileUI(user: FirebaseUser) {
         userEmailTextView.text = user.email
+    }
+
+    private fun checkLoginState() {
+        // If user is not logged in, navigate to SignUpFragment
+        if (auth.currentUser == null) {
+            replaceFragment(SignUpFragment(), addToBackStack = false)
+            navigationView.setCheckedItem(R.id.nav_signUp)
+        } else if (currentFragment is ActiveActivitiesFragment) {
+            // If the current fragment is ActiveActivitiesFragment and user email is not registered,
+            // navigate to SignUpFragment
+            val currentUser = auth.currentUser
+            if (currentUser != null && currentUser.email.isNullOrEmpty()) {
+                replaceFragment(SignUpFragment(), addToBackStack = false)
+                navigationView.setCheckedItem(R.id.nav_signUp)
+            }
+        }
     }
 
     override fun onBackPressed() {

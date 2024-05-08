@@ -80,7 +80,6 @@ class LoginFragment : Fragment() {
         if (currentUser != null && !currentUser.isEmailVerified) {
             ErrorTextView.visibility = View.VISIBLE
             ErrorTextView.text = "Please verify your email address before logging in for security purposes."
-
         } else {
             loginUser()
         }
@@ -92,7 +91,7 @@ class LoginFragment : Fragment() {
 
         if (username.isEmpty() || password.isEmpty()) {
             ErrorTextView.visibility = View.VISIBLE
-            ErrorTextView.text = "Please enter your email and password , these fields are required to fill and login"
+            ErrorTextView.text = "Please enter your email and password, these fields are required to fill and login."
             return
         }
 
@@ -100,14 +99,25 @@ class LoginFragment : Fragment() {
         auth.signInWithEmailAndPassword(username, password)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-                    // Login successful, navigate to HomeFragment
-                    navigateToHomeFragment()
+                    // Check if the user's email is verified
+                    val currentUser = auth.currentUser
+                    if (currentUser != null && currentUser.isEmailVerified) {
+                        // Login successful and email is verified, navigate to HomeFragment
+                        navigateToHomeFragment()
+                    } else {
+                        // Email is not verified, display error message
+                        ErrorTextView.visibility = View.VISIBLE
+                        ErrorTextView.text = "Please verify your email address before logging in for security purposes."
+                        // Sign out the user as email is not verified
+                        auth.signOut()
+                    }
                 } else {
                     // Login failed, display error message
                     Toast.makeText(requireContext(), "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
 
     private fun sendPasswordResetEmail(email: String) {
         auth.sendPasswordResetEmail(email)
