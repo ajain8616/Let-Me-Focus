@@ -22,7 +22,9 @@ class FilteredActivitiesFragment : Fragment() {
     private lateinit var countTimeTextView: TextView
     private lateinit var totalSpentTimeTextView: TextView
     private lateinit var maximumTimeTextView: TextView
+    private lateinit var minimumTimeTextView: TextView
     private lateinit var endTimeTextView: TextView
+    private lateinit var pauseTimeTextView: TextView
     private lateinit var auth: FirebaseAuth
     private var activityName: String? = null
 
@@ -61,7 +63,9 @@ class FilteredActivitiesFragment : Fragment() {
         countTimeTextView = view.findViewById(R.id.countTimeTextView)
         totalSpentTimeTextView = view.findViewById(R.id.totalTimeTextView)
         maximumTimeTextView = view.findViewById(R.id.maximumTimeTextView)
+        minimumTimeTextView = view.findViewById(R.id.minimumTimeTextView)
         endTimeTextView = view.findViewById(R.id.endTimeTextView)
+        pauseTimeTextView = view.findViewById(R.id.pauseTimeTextView)
 
         // Retrieve the activity name passed as an argument
         activityName = arguments?.getString("activityName")
@@ -73,21 +77,29 @@ class FilteredActivitiesFragment : Fragment() {
             .child(auth.currentUser?.uid ?: "")
 
         activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
+
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     val startTimeList = mutableListOf<String>()
                     val endTimeList = mutableListOf<String>()
+                    var pauseTime: String? = null // Initialize pauseTime variable
 
                     for (activitySnapshot in snapshot.children) {
-                        val activityNameSnapshot = activitySnapshot.child("activity").value.toString()
+                        val activityNameSnapshot =
+                            activitySnapshot.child("activity").value.toString()
                         val activityID = activitySnapshot.key
 
                         if (activityNameSnapshot == activityName) {
-                            val instancesSnapshot = activitySnapshot.child("instances")
+                            pauseTime = activitySnapshot.child("pauseTime").value.toString()
+
+                            val instancesSnapshot =
+                                activitySnapshot.child("instances")
 
                             for (instanceSnapshot in instancesSnapshot.children) {
-                                val startTime = instanceSnapshot.child("startTime").value.toString()
-                                val endTime = instanceSnapshot.child("stopTime").value.toString()
+                                val startTime =
+                                    instanceSnapshot.child("startTime").value.toString()
+                                val endTime =
+                                    instanceSnapshot.child("stopTime").value.toString()
 
                                 // Add startTime and endTime to lists
                                 startTimeList.add(startTime)
@@ -95,16 +107,20 @@ class FilteredActivitiesFragment : Fragment() {
                             }
                             findMinMaxTimes(startTimeList, endTimeList)
                             calculateTotalSpentTime(activityID, instancesSnapshot)
+                            // Pass instancesSnapshot to calculatePauseTimes
+                            pauseTime?.let { calculatePauseTimes(it) }
                         }
                     }
                 }
             }
+
 
             override fun onCancelled(error: DatabaseError) {
                 // Handle onCancelled
             }
         })
     }
+
 
     private fun findMinMaxTimes(startTimeList: List<String>, endTimeList: List<String>) {
         // Find maximum time from endTimeList
@@ -129,6 +145,7 @@ class FilteredActivitiesFragment : Fragment() {
         calculateMedianTime(totalSpentTime, instancesSnapshot)
         calculateCountTime(instancesSnapshot)
         calculateMaximumTime(instancesSnapshot)
+        calculateMinimumTime(instancesSnapshot)
     }
 
     private fun calculateMeanTime(totalSpentTime: Int, instancesSnapshot: DataSnapshot) {
@@ -173,11 +190,32 @@ class FilteredActivitiesFragment : Fragment() {
         maximumTimeTextView.text = if (maxTime != Long.MIN_VALUE) formatTime(maxTime.toInt()) else "NA"
     }
 
+    private fun calculateMinimumTime(instancesSnapshot: DataSnapshot) {
+        var minTime = Long.MAX_VALUE // Initialize minTime to maximum possible value
+
+        for (instanceSnapshot in instancesSnapshot.children) {
+            val instanceTime = instanceSnapshot.child("totalSpentTime").value as Long
+            if (instanceTime < minTime) {
+                minTime = instanceTime
+            }
+        }
+
+        // Update the TextView with the minimum time if it exists, else show "NA"
+        minimumTimeTextView.text = if (minTime != Long.MAX_VALUE) formatTime(minTime.toInt()) else "NA"
+    }
+
+    private fun calculatePauseTimes(pauseTime: String) {
+        // Update TextView
+        pauseTimeTextView.text = pauseTime
+    }
+
+
+
+
     private fun formatTime(seconds: Int): String {
         val hours = TimeUnit.SECONDS.toHours(seconds.toLong())
         val minutes = TimeUnit.SECONDS.toMinutes(seconds.toLong() - TimeUnit.HOURS.toSeconds(hours))
         val remainingSeconds = seconds - TimeUnit.HOURS.toSeconds(hours) - TimeUnit.MINUTES.toSeconds(minutes)
         return String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
     }
-
 }

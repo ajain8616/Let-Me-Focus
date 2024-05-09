@@ -116,25 +116,36 @@ class ActiveActivityAdapter(private var activityList: MutableList<Pair<String, S
                     if (status != "Inactive") {
                         // Set onClickListener for the card front
                         cardFront.setOnClickListener {
-                            if (isTimerRunning) {
-                                stopStopwatch()
-                                stopTime = System.currentTimeMillis()
-                                calculateTotalTime(System.currentTimeMillis())
-                                updateStatus(activityId, "Stop")
-                                main_CardView.setBackgroundResource(R.color.red)
-                                Handler().postDelayed({
-                                    updateStopwatchUI(0)
-                                    main_CardView.setBackgroundResource(android.R.color.transparent) // Change background to clear
-                                }, 3000)
+                            val dialogMessage = if (isTimerRunning) {
+                                "Are you sure you wish to stop the timing for $activityName?"
                             } else {
-                                startTime = System.currentTimeMillis()
-                                startStopwatch()
-                                updateStatus(activityId, "Start")
-                                main_CardView.setBackgroundResource(R.color.green)
+                                "Are you sure you wish to start the timing for $activityName?"
                             }
+
+                            AlertDialog.Builder(context)
+                                .setMessage(dialogMessage)
+                                .setPositiveButton("Yes") { _, _ ->
+                                    if (isTimerRunning) {
+                                        stopStopwatch()
+                                        stopTime = System.currentTimeMillis()
+                                        calculateTotalTime(System.currentTimeMillis())
+                                        updateStatus(activityId, "Stop")
+                                        main_CardView.setBackgroundResource(R.color.red)
+                                        Handler().postDelayed({
+                                            updateStopwatchUI(0)
+                                            main_CardView.setBackgroundResource(android.R.color.transparent) // Change background to clear
+                                        }, 3000)
+                                    } else {
+                                        startTime = System.currentTimeMillis()
+                                        startStopwatch()
+                                        updateStatus(activityId, "Start")
+                                        stopwatchTextView.text = getCurrentTime() // Set the current time as the start time
+                                        main_CardView.setBackgroundResource(R.color.green)
+                                    }
+                                }
+                                .setNegativeButton("No", null)
+                                .show()
                         }
-
-
                     } else {
                         // If status is "Inactive", do not set the OnClickListener
                         cardFront.setOnClickListener(null)
@@ -146,6 +157,7 @@ class ActiveActivityAdapter(private var activityList: MutableList<Pair<String, S
                     showToast("Failed to fetch status: ${error.message}")
                 }
             })
+
 
             // Set onLongClickListener for the card front
             cardFront.setOnLongClickListener {
@@ -389,6 +401,11 @@ class ActiveActivityAdapter(private var activityList: MutableList<Pair<String, S
             val alertDialog = alertDialogBuilder.create()
             alertDialog.show()
         }
-
+        private fun getCurrentTime(): String {
+            val currentTime = System.currentTimeMillis()
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH)
+            dateFormat.timeZone = TimeZone.getTimeZone("Asia/Kolkata") // Set Indian time zone
+            return dateFormat.format(Date(currentTime))
+        }
     }
 }

@@ -1,27 +1,22 @@
 package com.sakhi.mindfulminutes
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.Gravity
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class ActiveActivitiesFragment : Fragment() {
 
@@ -50,7 +45,6 @@ class ActiveActivitiesFragment : Fragment() {
     private var showInactiveActivities = false
     private var isActivityViewVisible = true
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -73,6 +67,28 @@ class ActiveActivitiesFragment : Fragment() {
         setupEditText()
 
         return view
+    }
+
+    override fun onPause() {
+        super.onPause()
+        showPauseDialog()
+    }
+
+    private fun showPauseDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Pause Activity?")
+            .setMessage("Do you want to pause the activity?")
+            .setPositiveButton("Yes") { dialog, _ ->
+                dialog.dismiss()
+                // Your logic to stop the stopwatch, update status, and push pause time to Firebase
+                val pauseTime = getCurrentIndianTime() // Get current time
+                updateStatusAndPushPauseTime(pauseTime) // Update status to pause and push pause time
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+            .show()
     }
 
     private fun initializeViews(view: View) {
@@ -101,7 +117,7 @@ class ActiveActivitiesFragment : Fragment() {
     }
 
     private fun arrangeActivityList() {
-        activityList.sortBy { it.second.toLowerCase(Locale.getDefault()) }
+        activityList.sortBy { it.second.toLowerCase() }
     }
 
     private fun clearTextShowList() {
@@ -150,7 +166,6 @@ class ActiveActivitiesFragment : Fragment() {
                 Toast.makeText(context, "Please enter activity name!", Toast.LENGTH_SHORT).show()
             }
         }
-
 
         // TextWatcher for itemSearchEditText
         itemSearchEditText.addTextChangedListener(object : TextWatcher {
@@ -287,8 +302,8 @@ class ActiveActivitiesFragment : Fragment() {
                     val capitalizedAppName = getString(R.string.app_name).toUpperCase()
                     activityNameView.text = "WELCOME TO $capitalizedAppName" +
                             "\n• There are no activities." +
-                            "\n• You can add activities by clicking on the Fab Action Button or Add Action Button." +
-                            "\n• To search for activities, click on the Search Action Button." +
+                            "\n• You can add activities by clicking on Add Button." +
+                            "\n• To search for activities, click on the Search  Button." +
                             "\n• You can clear the search by clicking on the Clear Button."
                     activityNameView.gravity = Gravity.CENTER
                     activityNameView.setPadding(16, 16, 16, 16) // Set padding
@@ -378,8 +393,8 @@ class ActiveActivitiesFragment : Fragment() {
 
         // Check if the activityName is not already in the database with a different case
         var isNotDuplicateCase = true // Assuming initially it's not a duplicate case
-        val lowercaseActivityName = activityName.toLowerCase(Locale.getDefault())
-        val uppercaseActivityName = activityName.toUpperCase(Locale.getDefault())
+        val lowercaseActivityName = activityName.toLowerCase()
+        val uppercaseActivityName = activityName.toUpperCase()
         val activityRef = databaseReference.orderByChild("activity")
             .startAt(lowercaseActivityName)
             .endAt(lowercaseActivityName + "\uf8ff")
@@ -442,5 +457,78 @@ class ActiveActivitiesFragment : Fragment() {
         })
     }
 
-}
+    private fun updateStatusAndPushPauseTime(pauseTime: String) {
+        // Check if there are any activities with status other than "Inactive"
+        databaseReference.orderByChild("status").startAt("A").endAt("z").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    // If there are such activities, proceed with updating their status and pause time
+                    val activityRef = databaseReference.orderByChild("status").startAt("A").endAt("z")
+                    activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            for (postSnapshot in snapshot.children) {
+                                val activityId = postSnapshot.key ?: ""
+                                val activityName = postSnapshot.child("activity").value.toString()
+                                val creationTime = postSnapshot.child("creationTime").value.toString()
+                                val status = "Pause"
+                                val pauseTimeData = hashMapOf(
+                                    "activity" to activityName,
+                                    "creationTime" to creationTime,
+                                    "pauseTime" to pauseTime,
+                                    "status" to status
+                                )
 
+                                // Update the status and push the pause time data to the database
+                                databaseReference.child(activityId).updateChildren(pauseTimeData as Map<String, Any>)
+                                    .addOnSuccessListener {
+                                        // Show toast on successful update
+                                        Toast.makeText(
+                                            context,
+                                            "$activityName paused successfully!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    .addOnFailureListener {
+                                        // Show toast on failure
+                                        Toast.makeText(
+                                            context,
+                                            "Failed to pause activity!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            // Handle database error
+                            Toast.makeText(
+                                context,
+                                "Failed to pause activity: ${error.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    })
+                } else {
+                    // Show toast indicating there are no activities to pause
+                    Toast.makeText(
+                        context,
+                        "No activities to pause!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle database error
+                Toast.makeText(
+                    context,
+                    "Failed to check activity status: ${error.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+    }
+
+
+
+}
