@@ -17,14 +17,15 @@ Activity Tracker is crafted using Android Studio, leveraging the robust capabili
 
 ## Screenshots
 
-![Screenshot 2024-05-03 135134](https://github.com/ajain8616/Activity_Tracker/assets/106903991/419f700a-7e08-48ec-b983-f7b18eaac563)
-![Screenshot 2024-05-03 135120](https://github.com/ajain8616/Activity_Tracker/assets/106903991/1e6f8927-5d2f-4149-ac83-1e4afe2659a3)
-![Screenshot 2024-05-03 135335](https://github.com/ajain8616/Activity_Tracker/assets/106903991/47468dc4-29a4-4fda-be12-05ea8562b196)
-![Screenshot 2024-05-03 135242](https://github.com/ajain8616/Activity_Tracker/assets/106903991/7cef09c8-975e-4616-b817-8c34f4790c30)
-![Screenshot 2024-05-03 135234](https://github.com/ajain8616/Activity_Tracker/assets/106903991/ad95dfe4-b921-4a2e-999f-94b2bef4b9d5)
-![Screenshot 2024-05-03 135226](https://github.com/ajain8616/Activity_Tracker/assets/106903991/b0b0f6dd-69b0-4d1b-b3b6-ad1f87761c5c)
-![Screenshot 2024-05-03 135214](https://github.com/ajain8616/Activity_Tracker/assets/106903991/7176b2b5-3723-4b54-9369-3b51d994b5e0)
-![Screenshot 2024-05-03 135203](https://github.com/ajain8616/Activity_Tracker/assets/106903991/af5d3ba3-7f90-498e-9ac5-33e3075cf620)
+![Screenshot 2024-05-03 135134](https://github.com/ajain8616/Activity_Tracker/assets/106903991/01d7f65c-86d2-4ca3-989a-3559af4bda8a)
+![Screenshot 2024-05-03 135203](https://github.com/ajain8616/Activity_Tracker/assets/106903991/5fc0895a-f5d2-4717-8928-e671b2f97879)
+![Screenshot 2024-05-03 135214](https://github.com/ajain8616/Activity_Tracker/assets/106903991/9028d5fb-5d8a-48a2-adbb-421758db4401)
+![Screenshot 2024-05-03 135234](https://github.com/ajain8616/Activity_Tracker/assets/106903991/39b53fea-f18b-4416-86b5-66e233164666)
+![Screenshot 2024-05-03 135242](![Screenshot 2024-05-03 135335](https://github.com/ajain8616/Activity_Tracker/assets/106903991/7c38377a-4ac6-42ba-9719-a3afd80b59dd)
+![Screenshot 2024-05-03 135226](https://github.com/ajain8616/Activity_Tracker/assets/106903991/24086aec-19ae-4ffc-8107-fef1568b303d)
+![Screenshot 2024-05-03 135120](https://github.com/ajain8616/Activity_Tracker/assets/106903991/03f799f1-bcba-4639-aaa4-8023ef1037b8)
+https://github.com/ajain8616/Activity_Tracker/assets/106903991/a29434ab-3efa-4066-9133-6e82d788fc5b)
+
 
 ## Download
 You can download the latest version of Activity Tracker from the following link: [APK File](https://github.com/ajain8616/Activity_Tracker/blob/07c14a8f49b22e9a31406ac616f66b45bdac6480/app-debug.apk)
