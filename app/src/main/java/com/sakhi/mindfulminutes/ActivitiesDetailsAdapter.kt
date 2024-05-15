@@ -59,6 +59,7 @@ class ActivitiesDetailsAdapter(
             "Inactive" -> R.color.red
             "Stop" -> R.color.yellow
             "Start" -> R.color.green
+            "Pause" -> R.color.colorBlue
             else -> android.R.color.black
         }
         statusTextView.setTextColor(context.resources.getColor(color))

@@ -210,8 +210,6 @@ class FilteredActivitiesFragment : Fragment() {
     }
 
 
-
-
     private fun formatTime(seconds: Int): String {
         val hours = TimeUnit.SECONDS.toHours(seconds.toLong())
         val minutes = TimeUnit.SECONDS.toMinutes(seconds.toLong() - TimeUnit.HOURS.toSeconds(hours))

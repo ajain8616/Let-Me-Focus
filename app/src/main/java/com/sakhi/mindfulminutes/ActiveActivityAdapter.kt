@@ -364,7 +364,7 @@ class ActiveActivityAdapter(private var activityList: MutableList<Pair<String, S
                             // Display totalSpentTime in backTextView3
                             val formattedTotalSpentTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
                             backTextView3.visibility = View.VISIBLE
-                            backTextView3.text = "Total Spent Time: $formattedTotalSpentTime"
+                            backTextView3.text = "Last Spent Time of TotalTime: $formattedTotalSpentTime"
                         }
                     } else {
                         // Handle case where no data exists

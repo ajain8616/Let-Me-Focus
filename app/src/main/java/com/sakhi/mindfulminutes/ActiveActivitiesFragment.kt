@@ -71,24 +71,7 @@ class ActiveActivitiesFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        showPauseDialog()
-    }
-
-    private fun showPauseDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Pause Activity?")
-            .setMessage("Do you want to pause the activity?")
-            .setPositiveButton("Yes") { dialog, _ ->
-                dialog.dismiss()
-                // Your logic to stop the stopwatch, update status, and push pause time to Firebase
-                val pauseTime = getCurrentIndianTime() // Get current time
-                updateStatusAndPushPauseTime(pauseTime) // Update status to pause and push pause time
-            }
-            .setNegativeButton("No") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .setCancelable(false)
-            .show()
+        pauseActivities()
     }
 
     private fun initializeViews(view: View) {
@@ -457,62 +440,32 @@ class ActiveActivitiesFragment : Fragment() {
         })
     }
 
-    private fun updateStatusAndPushPauseTime(pauseTime: String) {
-        // Check if there are any activities with status other than "Inactive"
-        databaseReference.orderByChild("status").startAt("A").endAt("z").addListenerForSingleValueEvent(object : ValueEventListener {
+    private fun showPauseDialog(activityId: String, activityName: String) {
+        val activityRef = databaseReference.child(activityId)
+
+        activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    // If there are such activities, proceed with updating their status and pause time
-                    val activityRef = databaseReference.orderByChild("status").startAt("A").endAt("z")
-                    activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            for (postSnapshot in snapshot.children) {
-                                val activityId = postSnapshot.key ?: ""
-                                val activityName = postSnapshot.child("activity").value.toString()
-                                val creationTime = postSnapshot.child("creationTime").value.toString()
-                                val status = "Pause"
-                                val pauseTimeData = hashMapOf(
-                                    "activity" to activityName,
-                                    "creationTime" to creationTime,
-                                    "pauseTime" to pauseTime,
-                                    "status" to status
-                                )
+                val status = snapshot.child("status").value.toString()
 
-                                // Update the status and push the pause time data to the database
-                                databaseReference.child(activityId).updateChildren(pauseTimeData as Map<String, Any>)
-                                    .addOnSuccessListener {
-                                        // Show toast on successful update
-                                        Toast.makeText(
-                                            context,
-                                            "$activityName paused successfully!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                    .addOnFailureListener {
-                                        // Show toast on failure
-                                        Toast.makeText(
-                                            context,
-                                            "Failed to pause activity!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                            }
+                if (status == "Start") {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Pause Activity?")
+                        .setMessage("Do you want to pause the activity?")
+                        .setPositiveButton("Yes") { dialog, _ ->
+                            dialog.dismiss()
+                            // Your logic to stop the stopwatch, update status, and push pause time to Firebase
+                            val pauseTime = getCurrentIndianTime() // Get current time
+                            updateStatusAndPushPauseTime(activityId, activityName, pauseTime) // Update status to pause and push pause time
                         }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            // Handle database error
-                            Toast.makeText(
-                                context,
-                                "Failed to pause activity: ${error.message}",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        .setNegativeButton("No") { dialog, _ ->
+                            dialog.dismiss()
                         }
-                    })
+                        .setCancelable(false)
+                        .show()
                 } else {
-                    // Show toast indicating there are no activities to pause
                     Toast.makeText(
                         context,
-                        "No activities to pause!",
+                        "Cannot pause activity. It's not in 'Start' status.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -522,13 +475,84 @@ class ActiveActivitiesFragment : Fragment() {
                 // Handle database error
                 Toast.makeText(
                     context,
-                    "Failed to check activity status: ${error.message}",
+                    "Failed to retrieve activity status: ${error.message}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
         })
     }
 
+    private fun updateStatusAndPushPauseTime(activityId: String, activityName: String, pauseTime: String) {
+        // Update the status and push the pause time data to the database
+        val pauseTimeData = hashMapOf(
+            "pauseTime" to pauseTime,
+            "status" to "Pause"
+        )
+
+        databaseReference.child(activityId).updateChildren(pauseTimeData as Map<String, Any>)
+            .addOnSuccessListener {
+                // Show toast on successful update
+                Toast.makeText(
+                    context,
+                    "$activityName paused successfully!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .addOnFailureListener {
+                // Show toast on failure
+                Toast.makeText(
+                    context,
+                    "Failed to pause activity!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
+    private fun pauseActivities() {
+        // Loop through the activityList and pause each activity if its status is "Start"
+        for (activity in activityList) {
+            val activityId = activity.first
+            val activityName = activity.second
+            fetchDataFromFirebase(activityName) { startTimeList ->
+                showPauseDialog(activityId, activityName)
+            }
+        }
+    }
+
+    private fun fetchDataFromFirebase(activityName: String, callback: (List<String>) -> Unit) {
+        val activityRef = FirebaseDatabase.getInstance().reference.child("Activities")
+            .child(auth.currentUser?.uid ?: "")
+
+        activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val startTimeList = mutableListOf<String>()
+                for (activitySnapshot in snapshot.children) {
+                    val currentActivityName =
+                        activitySnapshot.child("activity").value.toString()
+
+                    if (currentActivityName == activityName) {
+                        val instancesSnapshot =
+                            activitySnapshot.child("instances")
+
+                        for (instanceSnapshot in instancesSnapshot.children) {
+                            val startTime =
+                                instanceSnapshot.child("startTime").value.toString()
+
+                            // Add startTime to the list
+                            startTimeList.add(startTime)
+                        }
+                    }
+                }
+                callback(startTimeList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle database error
+                // For simplicity, just pass an empty list in case of error
+                callback(emptyList())
+            }
+        })
+    }
 
 
 }

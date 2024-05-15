@@ -17,10 +17,10 @@
     <color name="colorDodgerBlue">#1E90FF</color>
     <color name="red">#C93737</color>
     <color name="green">#3BBB70</color>
-    <color name="yellow">#FBD301</color>
+    <color name="yellow">#FFD600</color>
     <color name="colorBoundaryBlue">#1E88E5</color>
     <color name="blue_light">#2196F3</color>
     <color name="colorAccent">#00FF6A</color>
-    <color name="dividerColor">#FF000000</color>
+    <color name="dividerColor">#000000</color>
 </resources>
 
