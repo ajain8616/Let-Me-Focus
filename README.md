@@ -5,7 +5,9 @@
 
 ## Description
 
-"Let me focus" is an Android application designed to help users manage their time more effectively by analyzing the time spent on various tasks and presenting the results in a clear, visual format using pie charts. This app is particularly beneficial for working professionals, industrial professionals, and college students who struggle with time management and productivity.## Problem Statement
+"Let me focus" is an Android application designed to help users manage their time more effectively by analyzing the time spent on various tasks and presenting the results in a clear, visual format using pie charts. This app is particularly beneficial for working professionals, industrial professionals, and college students who struggle with time management and productivity. 
+
+## Problem Statement
 
 Many users struggle with managing their time effectively, which leads to reduced productivity. This application addresses this real-time problem by providing an easy-to-use solution for tracking and analyzing time spent on different activities.
 
