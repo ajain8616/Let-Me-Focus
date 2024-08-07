@@ -68,7 +68,7 @@ To get a local copy up and running, follow these steps:
 
 1. Clone the repository:
     ```sh
-    [ git clone](https://github.com/ajain8616/Let-Me-Focus.git)
+    git clone https://github.com/ajain8616/Let-Me-Focus.git
     ```
 2. Open the project in Android Studio.
 3. Sync the project with Gradle files.
