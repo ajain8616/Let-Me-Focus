@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Base.Theme.ActivityTracker"
-    tools:context=".SignUpFragment">
+    tools:context=".fragments.SignUpFragment">
 
     <ImageView
         android:id="@+id/signup_page_background"

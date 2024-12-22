@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <!-- Scale the button down by 5% when pressed -->
+        <objectAnimator
+            android:duration="150"
+            android:propertyName="scaleX"
+            android:valueFrom="1.0"
+            android:valueTo="0.95"
+            android:valueType="floatType" />
+
+    </item>
+    <item>
+        <!-- Default scale when not pressed -->
+        <objectAnimator
+            android:duration="150"
+            android:propertyName="scaleX"
+            android:valueFrom="0.95"
+            android:valueTo="1.0"
+            android:valueType="floatType" />
+
+    </item>
+</selector>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-rotate
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromDegrees="0"
+    android:toDegrees="360"
+    android:pivotX="50%"
+    android:pivotY="50%">
+
+    <!-- Ring Shape with modern gradient and thickness -->
+    <shape
+        android:innerRadiusRatio="3"
+        android:shape="ring"
+        android:thicknessRatio="6"
+        android:useLevel="false">
+
+        <size
+            android:width="16dp"
+            android:height="16dp" />
+
+        <gradient
+            android:angle="0"
+            android:startColor="@color/primary_color"
+            android:centerColor="@color/primary_light_color"
+            android:endColor="@color/primary_dark_color"
+            android:type="sweep"
+            android:useLevel="false" />
+    </shape>
+
+</animated-rotate>

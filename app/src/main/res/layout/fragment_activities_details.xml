@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Base.Theme.ActivityTracker"
-    tools:context=".ActivitiesDetailsFragment">
+    tools:context=".fragments.ActivitiesDetailsFragment">
 
     <TextView
         android:id="@+id/activityNameView"
@@ -24,5 +24,4 @@
         android:layout_marginTop="10dp"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp" />
-
 </RelativeLayout>

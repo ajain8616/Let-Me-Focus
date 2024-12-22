@@ -3,58 +3,60 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:theme="@style/Base.Theme.ActivityTracker"
-    tools:showIn = "navigation_view">
+    tools:showIn="navigation_view">
 
+    <!-- Activities Section -->
     <group
-        android:checkableBehavior="single">
+        android:checkableBehavior="single"
+        android:title="@string/menu_activities">
 
         <item
             android:id="@+id/nav_active"
             android:icon="@drawable/ic_active"
-            android:title="Active Activities"/>
-
+            android:title="@string/active_activities" />
 
         <item
             android:id="@+id/nav_details"
             android:icon="@drawable/ic_data_details"
-            android:title="Activities Details "/>
+            android:title="@string/activities_details" />
 
         <item
             android:id="@+id/nav_analysis"
             android:icon="@drawable/ic_analytics"
-            android:title="Activities Analysis Data"/>
+            android:title="@string/activities_analysis_data" />
 
         <item
             android:id="@+id/nav_filtered"
-            android:icon="@drawable/ic_analytics"
-            android:title="Activities Filtered Data"
-            android:visible="false"/>
+            android:icon="@drawable/ic_filtered"
+            android:title="@string/activities_filtered_data" />
+    </group>
 
+    <!-- Authentication Section -->
+    <group
+        android:title="@string/menu_authentication">
 
         <item
             android:id="@+id/nav_login"
             android:icon="@drawable/ic_login"
-            android:title="Login"
-            android:visible="false"/>
+            android:title="@string/login"
+            android:visible="false" />
 
         <item
             android:id="@+id/nav_signUp"
             android:icon="@drawable/ic_signup"
-            android:title="SignUp"
-            android:visible="false"/>
-
+            android:title="@string/signup"
+            android:visible="false" />
     </group>
+
+    <!-- Other Section -->
     <item
-        android:title="">
+        android:title="@string/menu_other">
 
         <menu>
-
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_logout"
-                android:title="Logout"/>
+                android:title="@string/logout" />
         </menu>
-
     </item>
-
 </menu>

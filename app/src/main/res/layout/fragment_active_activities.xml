@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Base.Theme.ActivityTracker"
-    tools:context=".ActiveActivitiesFragment">
+    tools:context=".fragments.ActiveActivitiesFragment">
 
+    <!-- Search Item Layout -->
     <LinearLayout
         android:id="@+id/activityNameLayout"
         android:layout_width="match_parent"
@@ -27,7 +28,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_add" />
@@ -36,9 +36,9 @@
                 android:id="@+id/searchActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_search" />
@@ -50,11 +50,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:textSize="25sp"/>
+            android:textSize="25sp" />
 
     </LinearLayout>
 
-    <!-- Search Item Layout -->
     <RelativeLayout
         android:id="@+id/searchItemLayout"
         android:layout_width="match_parent"

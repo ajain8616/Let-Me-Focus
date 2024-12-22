@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background_success"
+    android:gravity="center">
+
+    <!-- Close Icon (X) at the top right corner -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/closeIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_clear"
+        android:contentDescription="Close"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"/>
+
+    </RelativeLayout>
+
+    <!-- Title TextView -->
+    <TextView
+        android:id="@+id/successTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Success!"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Success Message TextView -->
+    <TextView
+        android:id="@+id/successMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your registration was successful!"
+        android:layout_marginBottom="8dp"
+        android:textColor="@android:color/white"
+        android:textSize="14sp" />
+
+</LinearLayout>

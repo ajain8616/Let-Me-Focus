@@ -1,38 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
-    android:padding="16dp"
-    android:theme="@style/Base.Theme.ActivityTracker"
-    android:background="@drawable/headerbkg"
-    android:layout_margin="9dp">
+    android:layout_height="wrap_content"
+    android:background="@color/primary"
+    android:elevation="6dp">
 
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="90dp"
-        android:src="@drawable/icon"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="16dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- User Profile Section -->
+    <LinearLayout
+        android:id="@+id/userProfileSection"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="@color/white"
-        android:textSize="19sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Profile Image Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/profileImageCard"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="60dp"
+            app:cardElevation="8dp"
+            app:cardMaxElevation="12dp"
+            android:layout_marginTop="18dp"
+            android:layout_gravity="center">
 
-    <!-- User Email TextView -->
-    <TextView
-        android:id="@+id/userEmailTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="user@example.com"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:layout_marginBottom="8dp"/>
+            <!-- Frame Layout to hold both profile image and edit icon -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-</LinearLayout>
+                <!-- Profile Image -->
+                <ImageView
+                    android:id="@+id/avatarImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/profile_picture"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_profile"
+                    android:layout_gravity="center" />
+
+                <!-- Edit Icon -->
+                <ImageView
+                    android:id="@+id/editProfileIcon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="end|bottom"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_edit"
+                    android:contentDescription="@string/edit_profile"
+                    android:padding="4dp" />
+
+            </FrameLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- User Name -->
+        <TextView
+            android:id="@+id/userNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:fontFamily="@font/robotomedium"
+            android:text="John Doe"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp" />
+
+        <!-- User Email -->
+        <TextView
+            android:id="@+id/userEmailTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="user@example.com"
+            android:textColor="@color/black"
+            android:fontFamily="@font/robotoregular"
+            android:textSize="12sp"
+            android:layout_marginBottom="10dp" />
+
+        <!-- Optional User Status -->
+        <TextView
+            android:id="@+id/userStatusTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/active_now"
+            android:textColor="@color/green"
+            android:fontFamily="@font/robotoregular"
+            android:textSize="12sp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/dividerColor" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

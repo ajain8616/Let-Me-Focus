@@ -4,4 +4,32 @@
     <string name="close_nav">Close Navigation Drawer</string>
     <string name="default_web_client_id" translatable="false">1081756889190-ffull8jtkqvva0md5bgaa3li8u518536.apps.googleusercontent.com</string>
 
+    <!-- Menu Items -->
+    <string name="active_activities">Active Activities</string>
+    <string name="activities_details">Activities Details</string>
+    <string name="activities_analysis_data">Activities Analysis Data</string>
+    <string name="activities_filtered_data">Activities Filtered Data</string>
+    <string name="login">Login</string>
+    <string name="signup">Sign Up</string>
+    <string name="logout">Logout</string>
+
+    <!-- Section Titles -->
+    <string name="menu_activities">Activities</string>
+    <string name="menu_authentication">Authentication</string>
+    <string name="menu_other">Other</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="profile_picture">User Profile</string>
+    <string name="welcome_to_letmefocus">Welcome to LetMeFocus!</string>
+    <string name="user_example_com">user@example.com</string>
+    <string name="app_logo">App Logo</string>
+    <string name="active_now">Active Now</string>
+    <string name="edit_profile">Edit Profile</string>
+
+    <string name="close">Close</string>
+    <string name="profile_image">Profile Image</string>
+    <string name="edit_profile_image">Edit Profile Image</string>
+    <string name="username">Enter your name</string>
+    <string name="email">Enter your email</string>
+    <string name="save">Save</string>
 </resources>

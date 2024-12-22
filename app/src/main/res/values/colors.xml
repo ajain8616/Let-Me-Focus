@@ -5,8 +5,6 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
     <color name="lavender">#8692f7</color>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
@@ -22,5 +20,112 @@
     <color name="blue_light">#2196F3</color>
     <color name="colorAccent">#00FF6A</color>
     <color name="dividerColor">#000000</color>
-</resources>
 
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Primary Colors -->
+    <color name="primary">#3F51B5</color>
+    <color name="primaryVariant">#3700B3</color>
+    <color name="primaryLight">#BB86FC</color>
+    <color name="primaryDark">#31009E</color>
+
+    <!-- Secondary Colors -->
+    <color name="secondary">#03DAC5</color>
+    <color name="secondaryVariant">#018786</color>
+    <color name="secondaryLight">#66FFF9</color>
+    <color name="secondaryDark">#00574B</color>
+
+    <!-- Background and Surface Colors -->
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surfaceDark">#E0E0E0</color>
+
+    <!-- Text Colors -->
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+    <color name="textOnPrimary">#FFFFFF</color>
+    <color name="textOnSecondary">#000000</color>
+    <color name="textHint">#9E9E9E</color>
+    <color name="textDisabled">#BDBDBD</color>
+
+    <!-- Buttons -->
+    <color name="buttonPrimaryBackground">#6200EE</color>
+    <color name="buttonPrimaryText">#FFFFFF</color>
+    <color name="buttonSecondaryBackground">#03DAC5</color>
+    <color name="buttonSecondaryText">#000000</color>
+
+    <!-- Error Colors -->
+    <color name="error">#B00020</color>
+    <color name="errorLight">#FFCDD2</color>
+    <color name="errorDark">#D32F2F</color>
+    <color name="errorText">#FFFFFF</color>
+
+    <!-- Accents -->
+    <color name="accentPink">#FF4081</color>
+    <color name="accentBlue">#2196F3</color>
+    <color name="accentGreen">#4CAF50</color>
+    <color name="accentYellow">#FFEB3B</color>
+    <color name="accentOrange">#FF9800</color>
+    <color name="accentPurple">#673AB7</color>
+
+    <!-- Divider and Border -->
+    <color name="dividerLight">#E0E0E0</color>
+    <color name="dividerDark">#757575</color>
+    <color name="borderGray">#BDBDBD</color>
+
+    <!-- Card Colors -->
+    <color name="cardBackground">#F9F9F9</color>
+    <color name="cardShadow">#000000</color>
+    <color name="cardBorder">#E0E0E0</color>
+
+    <!-- Status Colors -->
+    <color name="statusSuccess">#4CAF50</color>
+    <color name="statusWarning">#FFC107</color>
+    <color name="statusError">#F44336</color>
+    <color name="statusInfo">#2196F3</color>
+
+    <!-- Special Highlights -->
+    <color name="highlightPurple">#7E57C2</color>
+    <color name="highlightBlue">#42A5F5</color>
+    <color name="highlightGreen">#66BB6A</color>
+    <color name="highlightYellow">#FFD54F</color>
+    <color name="highlightOrange">#FF7043</color>
+
+    <!-- Gradients -->
+    <color name="gradientStart">#6200EE</color>
+    <color name="gradientEnd">#03DAC5</color>
+    <color name="gradientMiddle">#FF4081</color>
+
+    <!-- Neutral Palette -->
+    <color name="neutralLight">#F5F5F5</color>
+    <color name="neutralMedium">#9E9E9E</color>
+    <color name="neutralDark">#424242</color>
+    <color name="neutralBlack">#000000</color>
+    <color name="neutralWhite">#FFFFFF</color>
+
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="onSecondary">#000000</color>
+    <color name="onBackground">#212121</color>
+    <color name="onSurface">#424242</color>
+    <color name="onError">#FFFFFF</color>
+
+    <color name="accent">#FF4081</color>
+    <color name="accentDark">#C51162</color>
+
+    <color name="buttonBackground">#6200EE</color>
+    <color name="buttonRipple">#BB86FC</color>
+
+    <color name="colorFire">#FF5722</color>
+    <color name="colorWater">#03A9F4</color>
+    <color name="colorEarth">#4CAF50</color>
+    <color name="colorMetal">#BDBDBD</color>
+
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="gray">#808080</color>
+    <color name="primary_color">#3F51B5</color>
+    <color name="primary_light_color">#66b2b2</color>
+    <color name="primary_dark_color">#b2d8d8</color>
+    <color name="colorTextPrimary">#212121</color>
+</resources>

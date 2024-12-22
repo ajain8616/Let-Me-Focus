@@ -6,7 +6,7 @@
     android:padding="16dp"
     android:orientation="vertical"
     android:theme="@style/Base.Theme.ActivityTracker"
-    tools:context=".PieChartFragment">
+    tools:context=".fragments.PieChartFragment">
 
     <com.anychart.AnyChartView
         android:id="@+id/any_chart_view"

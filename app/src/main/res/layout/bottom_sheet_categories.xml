@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_background"
+    android:padding="16dp">
+
+    <!-- Cross icon (ImageView) at the top right -->
+    <ImageView
+        android:id="@+id/crossIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_clear"
+        android:contentDescription="Close"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" />
+
+    <!-- TextView for category selection -->
+    <TextView
+        android:id="@+id/chooseCategoryText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose your category"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        android:layout_below="@id/crossIcon"
+        android:layout_alignParentLeft="true" />
+
+    <!-- RadioGroup for RadioButtons -->
+    <RadioGroup
+        android:id="@+id/radioGroupCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/chooseCategoryText"
+        android:layout_marginTop="16dp">
+
+        <RadioButton
+            android:id="@+id/radioButtonCompleteList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Complete List" />
+
+        <RadioButton
+            android:id="@+id/radioButtonActive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Active" />
+
+        <RadioButton
+            android:id="@+id/radioButtonInactive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Inactive" />
+
+        <RadioButton
+            android:id="@+id/radioButtonPause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pause" />
+
+        <RadioButton
+            android:id="@+id/radioButtonStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stop" />
+
+    </RadioGroup>
+
+    <!-- Fetch Data Button -->
+    <Button
+        android:id="@+id/fetchDataButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fetch Data"
+        android:layout_marginTop="16dp"
+        android:layout_below="@id/radioGroupCategories" />
+
+    <!-- ProgressBar (Initially Visible) -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/circular_progress"
+        android:visibility="gone" />
+
+</RelativeLayout>

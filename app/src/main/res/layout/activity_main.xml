@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true"
     android:theme="@style/Base.Theme.ActivityTracker"
     tools:openDrawer="start"
-    tools:context=".MainActivity">
+    tools:context=".base.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
