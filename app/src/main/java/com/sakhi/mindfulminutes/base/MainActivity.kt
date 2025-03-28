@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.util.Patterns
 import android.widget.Button
 import android.widget.ImageView
@@ -32,7 +33,6 @@ import com.sakhi.mindfulminutes.fragments.ErrorBottomSheetFragment
 import com.sakhi.mindfulminutes.fragments.LoginFragment
 import com.sakhi.mindfulminutes.fragments.PieChartFragment
 import com.sakhi.mindfulminutes.fragments.SignUpFragment
-import com.sakhi.mindfulminutes.fragments.StatisticsActivitiesFragment
 import com.sakhi.mindfulminutes.fragments.SuccessBottomSheetFragment
 import com.squareup.picasso.Picasso
 
@@ -48,10 +48,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var profileImageView: ImageView
     private lateinit var userNameTextView: TextView
     private lateinit var editProfileIcon: ImageView
-
+    private lateinit var userStatusTextView: TextView
     private lateinit var bottomSheetDialog: BottomSheetDialog
     private lateinit var progressBar: ProgressBar
     private val IMAGE_PICK_CODE = 1000
+    private val TAG = "MainActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -60,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         navigationView = findViewById(R.id.nav_view)
         val headerView = navigationView.getHeaderView(0)
         userEmailTextView = headerView.findViewById(R.id.userEmailTextView)
+        userStatusTextView = headerView.findViewById(R.id.userStatusTextView)
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
         storage = FirebaseStorage.getInstance()
@@ -78,10 +81,10 @@ class MainActivity : AppCompatActivity() {
         val profileImageEdit = bottomSheetView.findViewById<ImageView>(R.id.img_profile_picture)
         progressBar = bottomSheetView.findViewById(R.id.progress_bar)
 
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            updateUserProfileUI(currentUser)
-            emailEditText.setText(currentUser.email)
+        val currentUser  = auth.currentUser
+        if (currentUser  != null) {
+            fetchUserDetails(currentUser )
+            emailEditText.setText(currentUser .email)
         }
 
         editProfileIcon.setOnClickListener {
@@ -102,10 +105,10 @@ class MainActivity : AppCompatActivity() {
                     updateUserProfile(userName, email)
                     bottomSheetDialog.dismiss()
                 } else {
-                    showBottomSheet("No internet connection.",true)
+                    showBottomSheet("No internet connection.", true)
                 }
             } else {
-                showBottomSheet("Please enter a valid name and email.",true)
+                showBottomSheet("Please enter a valid name and email.", true)
             }
         }
 
@@ -117,10 +120,6 @@ class MainActivity : AppCompatActivity() {
 
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-
-        // Initialize Firebase Authentication
-        auth = FirebaseAuth.getInstance()
 
         val toggle = ActionBarDrawerToggle(
             this,
@@ -135,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_active -> {
-                    if (auth.currentUser != null) {
+                    if (auth.currentUser  != null) {
                         replaceFragment(ActiveActivitiesFragment())
                     } else {
                         checkLoginState()
@@ -143,7 +142,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_details -> {
-                    if (auth.currentUser != null) {
+                    if (auth.currentUser  != null) {
                         replaceFragment(ActivitiesDetailsFragment())
                     } else {
                         checkLoginState()
@@ -151,7 +150,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_analysis -> {
-                    if (auth.currentUser != null) {
+                    if (auth.currentUser  != null) {
                         replaceFragment(PieChartFragment())
                     } else {
                         checkLoginState()
@@ -159,7 +158,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_filtered -> {
-                    if (auth.currentUser != null) {
+                    if (auth.currentUser  != null) {
                         replaceFragment(ActivitiesFilteredDataFragment())
                     } else {
                         checkLoginState()
@@ -167,13 +166,13 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_login -> {
-                    if (auth.currentUser == null) {
+                    if (auth.currentUser  == null) {
                         replaceFragment(LoginFragment())
                     }
                     true
                 }
                 R.id.nav_logout -> {
-                    logoutUser()
+                    logoutUser ()
                     true
                 }
                 else -> false
@@ -195,9 +194,8 @@ class MainActivity : AppCompatActivity() {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-
     private fun checkIfUserIsLoggedIn(): Boolean {
-        return auth.currentUser != null
+        return auth.currentUser  != null
     }
 
     private fun replaceFragment(fragment: Fragment, addToBackStack: Boolean = true) {
@@ -211,24 +209,20 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.closeDrawer(GravityCompat.START)
     }
 
-    private fun logoutUser() {
+    private fun logoutUser () {
         auth.signOut()
         replaceFragment(LoginFragment())
         showBottomSheet("Logout Successful", false)
         navigationView.setCheckedItem(R.id.nav_login)
     }
 
-
     private fun checkLoginState() {
-        // If user is not logged in, navigate to SignUpFragment
-        if (auth.currentUser == null) {
+        if (auth.currentUser  == null) {
             replaceFragment(SignUpFragment(), addToBackStack = false)
             navigationView.setCheckedItem(R.id.nav_signUp)
         } else if (currentFragment is ActiveActivitiesFragment) {
-            // If the current fragment is ActiveActivitiesFragment and user email is not registered,
-            // navigate to SignUpFragment
-            val currentUser = auth.currentUser
-            if (currentUser != null && currentUser.email.isNullOrEmpty()) {
+            val currentUser  = auth.currentUser
+            if (currentUser  != null && currentUser .email.isNullOrEmpty()) {
                 replaceFragment(SignUpFragment(), addToBackStack = false)
                 navigationView.setCheckedItem(R.id.nav_signUp)
             }
@@ -267,8 +261,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateUserProfile(userName: String, email: String) {
-        val currentUser = auth.currentUser
-        currentUser?.let {
+        val currentUser  = auth.currentUser
+        currentUser ?.let {
             val userDocRef = db.collection("users").document(it.uid)
 
             // Save data to Firestore
@@ -279,9 +273,11 @@ class MainActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     userEmailTextView.text = email
                     userNameTextView.text = userName
-                    showBottomSheet("Profile updated successfully", false) // Show success message
+                    showBottomSheet("Profile updated successfully", false)
+                    Log.d(TAG, "Profile updated successfully for user: $userName")
                 } else {
-                    showBottomSheet("Email update failed.", true) // Show error message
+                    showBottomSheet("Email update failed.", true)
+                    Log.d(TAG, "Email update failed: ${task.exception?.message}")
                 }
             }
         }
@@ -295,46 +291,106 @@ class MainActivity : AppCompatActivity() {
         )
 
         db.collection("users")
-            .document(auth.currentUser!!.uid)
+            .document(auth.currentUser !!.uid)
             .set(userMap)
             .addOnSuccessListener {
-                showBottomSheet("User data saved to Firestore", false)
+                showBottomSheet("User  data saved to Firestore", false)
+                Log.d(TAG, "User  data saved to Firestore for user: $userName")
             }
             .addOnFailureListener { e ->
                 showBottomSheet("Failed to save user data: ${e.message}", true)
+                Log.d(TAG, "Failed to save user data: ${e.message}")
             }
     }
 
-    private fun updateUserProfileUI(user: FirebaseUser) {
-        userNameTextView.text = user.displayName ?: "User"
-        userEmailTextView.text = user.email ?: "No email"
-        Picasso.get().load(user.photoUrl).into(profileImageView)
+    private fun fetchUserDetails(user: FirebaseUser ) {
+        val userDocRef = db.collection("users").document(user.uid)
+        userDocRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val userName = document.getString("userName") ?: "User "
+                val userEmail = document.getString("userEmail") ?: "No email"
+                val isVerified = document.getBoolean("isVerified") ?: false
+
+                userNameTextView.text = userName
+                userEmailTextView.text = userEmail
+
+                // Update the user status text view based on email verification
+                if (isVerified) {
+                    userStatusTextView.text = "Email is verified"
+                } else {
+                    userStatusTextView.text = "Email is not verified"
+
+                }
+
+                val photoUrl = user.photoUrl
+                if (photoUrl != null) {
+                    Picasso.get().load(photoUrl).into(profileImageView)
+                }
+
+                checkEmailVerification()
+            } else {
+                showBottomSheet("User  document does not exist", true)
+                Log.d(TAG, "User  document does not exist for UID: ${user.uid}")
+            }
+        }.addOnFailureListener { e ->
+            showBottomSheet("Failed to fetch user details: ${e.message}", true)
+            Log.d(TAG, "Failed to fetch user details: ${e.message}")
+        }
     }
 
-    private fun showProgressBar(show: Boolean) {
-        progressBar.visibility = if (show) ProgressBar.VISIBLE else ProgressBar.GONE
+    private fun checkEmailVerification() {
+        val currentUser  = auth.currentUser
+        currentUser ?.reload()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                if (currentUser .isEmailVerified) {
+                    userStatusTextView.text = "Verified"
+                    updateUserVerificationStatus(true)
+                    Log.d(TAG, "Email is verified for user: ${currentUser .displayName}")
+                } else {
+                    userStatusTextView.text = "Not verified"
+                    updateUserVerificationStatus(false)
+                    Log.d(TAG, "Email is not verified for user: ${currentUser .displayName}")
+                }
+            } else {
+                Log.d(TAG, "Failed to reload user: ${task.exception?.message}")
+            }
+        }
     }
-
+    private fun updateUserVerificationStatus(isVerified: Boolean) {
+        val userDocRef = db.collection("users").document(auth.currentUser !!.uid)
+        userDocRef.update("isVerified", isVerified).addOnSuccessListener {
+            Log.d(TAG, "Successfully updated verification status to $isVerified")
+        }.addOnFailureListener { e ->
+            showBottomSheet("Failed to update verification status: ${e.message}", true)
+            Log.d(TAG, "Failed to update verification status: ${e.message}")
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_PICK_CODE && resultCode == RESULT_OK && data != null) {
             val imageUri = data.data
             Picasso.get().load(imageUri).into(profileImageView)
-            val storageRef = storage.reference.child("profile_pictures/${auth.currentUser?.uid}.jpg")
+            val storageRef = storage.reference.child("profile_pictures/${auth.currentUser ?.uid}.jpg")
             storageRef.putFile(imageUri!!).addOnSuccessListener {
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    val currentUser = auth.currentUser
-                    val userDocRef = db.collection("users").document(currentUser?.uid ?: "")
+                    val currentUser  = auth.currentUser
+                    val userDocRef = db.collection("users").document(currentUser ?.uid ?: "")
                     userDocRef.update("photoUrl", uri.toString())
-                    currentUser?.updateProfile(
+                    currentUser ?.updateProfile(
                         UserProfileChangeRequest.Builder().setPhotoUri(uri).build()
                     )
                     showProgressBar(false)
+                    Log.d(TAG, "Profile picture updated successfully for user: ${currentUser ?.displayName}")
                 }
+            }.addOnFailureListener { e ->
+                showProgressBar(false)
+                Log.d(TAG, "Failed to upload profile picture: ${e.message}")
             }
         }
     }
 
-
+    private fun showProgressBar(show: Boolean) {
+        progressBar.visibility = if (show) ProgressBar.VISIBLE else ProgressBar.GONE
+    }
 }

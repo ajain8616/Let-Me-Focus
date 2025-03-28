@@ -128,4 +128,5 @@
     <color name="primary_light_color">#66b2b2</color>
     <color name="primary_dark_color">#b2d8d8</color>
     <color name="colorTextPrimary">#212121</color>
+    <color name="shadow_color">#22000000</color>
 </resources>
