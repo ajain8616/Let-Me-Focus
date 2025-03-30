@@ -19,10 +19,6 @@
         android:theme="@style/Theme.ActivityTracker"
         tools:targetApi="34">
 
-        <service
-            android:name=".services.ForegroundService"
-            android:foregroundServiceType="location" />
-
         <activity
             android:name=".base.MainActivity"
             android:exported="true">

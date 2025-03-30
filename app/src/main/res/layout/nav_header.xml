@@ -68,9 +68,9 @@
             android:fontFamily="@font/robotomedium"
             android:text="@string/android_developer"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginBottom="6dp" />
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/userEmailTextView"
@@ -81,7 +81,7 @@
             android:textColor="@color/black"
             android:fontFamily="@font/robotoregular"
             android:textSize="14sp"
-            android:layout_marginBottom="10dp" />
+            android:layout_marginBottom="6dp" />
 
         <TextView
             android:id="@+id/userStatusTextView"
@@ -96,7 +96,7 @@
             android:layout_marginBottom="12dp" />
 
         <View
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="12dp"
             android:background="@color/dividerColor" />

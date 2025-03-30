@@ -3,14 +3,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     android:padding="16dp"
-    android:orientation="vertical"
-    android:theme="@style/Base.Theme.ActivityTracker"
     tools:context=".fragments.PieChartFragment">
 
-    <com.anychart.AnyChartView
-        android:id="@+id/any_chart_view"
+    <!-- Title Text -->
+    <TextView
+        android:id="@+id/chart_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:text="@string/activity_distribution"
+        android:textColor="@color/primary"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="20dp"
+        android:paddingTop="10dp" />
+
+    <!-- CardView for the Chart -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/chart_title"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp" >
+
+        <!-- Pie Chart -->
+        <com.anychart.AnyChartView
+            android:id="@+id/any_chart_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp" />
+
+    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>

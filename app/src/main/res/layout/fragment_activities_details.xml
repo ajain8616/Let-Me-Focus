@@ -4,17 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Base.Theme.ActivityTracker"
-    tools:context=".fragments.ActivitiesDetailsFragment">
+    tools:context=".fragments.ActivitiesDetailsFragment"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/activityNameView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Activities List View"
+        android:text="@string/activities_details"
         android:gravity="center"
-        android:textSize="25sp"
+        android:textSize="26sp"
         android:textStyle="bold"
-        android:layout_centerHorizontal="true" />
+        android:textColor="#3F51B5"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/activityDetailsView"
@@ -23,5 +26,8 @@
         android:layout_below="@id/activityNameView"
         android:layout_marginTop="10dp"
         android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp" />
+        android:layout_marginEnd="5dp"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp" />
+
 </RelativeLayout>

@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Base.Theme.ActivityTracker"
-    tools:context=".fragments.ActivitiesFilteredDataFragment">
+    tools:context=".fragments.ActivitiesFilteredDataFragment"
+    android:padding="16dp">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -13,16 +14,17 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp">
-
+        android:layout_marginTop="16dp"
+        tools:ignore="UseCompoundDrawables">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Filtered Activities List"
+            android:text="@string/filtered_activities_list"
             android:gravity="center"
-            android:textSize="25sp"
+            android:textSize="26sp"
             android:textStyle="bold"
+            android:textColor="#3F51B5"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_weight="1" />
@@ -32,7 +34,8 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_filtered"
-            android:layout_marginRight="16dp" />
+            android:contentDescription="@string/filter_icon"
+            android:layout_marginEnd="16dp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -42,5 +45,7 @@
         android:layout_below="@id/linearLayout"
         android:layout_marginTop="10dp"
         android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp" />
+        android:layout_marginEnd="5dp"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp" />
 </RelativeLayout>
