@@ -1,5 +1,8 @@
 <resources>
-    <string name="app_name">LetMeFocus</string>
+    <string name="app_name">Mindful Minutes</string>
+    <string name="app_tagline">Your Professional Trading Companion</string>
+    <string name="version_info">Version 1.0.0</string>
+    <string name="app_logo">App Logo</string>
     <string name="open_nav">Open Navigation Drawer</string>
     <string name="close_nav">Close Navigation Drawer</string>
     <string name="default_web_client_id" translatable="false">1081756889190-ffull8jtkqvva0md5bgaa3li8u518536.apps.googleusercontent.com</string>
@@ -22,7 +25,6 @@
     <string name="profile_picture">User Profile</string>
     <string name="welcome_to_letmefocus">Welcome to LetMeFocus!</string>
     <string name="user_example_com">user@example.com</string>
-    <string name="app_logo">App Logo</string>
     <string name="active_now">Active Now</string>
     <string name="edit_profile">Edit Profile</string>
 

@@ -22,6 +22,10 @@ android {
         schemaDirectory("$projectDir/schemas")
     }
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
