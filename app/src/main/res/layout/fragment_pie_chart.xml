@@ -156,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:background="@drawable/background_glass"
+                    android:background="@color/white"
                     android:layout_marginEnd="16dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp">
@@ -322,7 +322,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    android:background="@drawable/background_glass"
+                    android:background="@color/white"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="4dp">
 
