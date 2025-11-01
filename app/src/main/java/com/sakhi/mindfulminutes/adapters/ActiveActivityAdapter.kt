@@ -4,405 +4,313 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.app.AlertDialog
 import android.content.Context
-import android.os.Handler
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
 import com.sakhi.mindfulminutes.R
+import com.sakhi.mindfulminutes.databinding.ActivityCardItemBinding
+import com.sakhi.mindfulminutes.model.Activity
+import com.sakhi.mindfulminutes.model.ActivityInstance
+import com.sakhi.mindfulminutes.repository.ActivityRepository
+import com.sakhi.mindfulminutes.services.StopwatchService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.jvm.java
 
-class ActiveActivityAdapter(private var activityList: MutableList<Pair<String, String>>) :
-    RecyclerView.Adapter<ActiveActivityAdapter.ActivityViewHolder>() {
+class ActiveActivityAdapter(
+    private var activityList: MutableList<Activity>,
+    private val stopwatchService: StopwatchService?,
+    private val onActivityUpdate: () -> Unit
+) : RecyclerView.Adapter<ActiveActivityAdapter.ActivityViewHolder>() {
 
-    fun updateList(newList: MutableList<Pair<String, String>>) {
+    private val repository = ActivityRepository()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+
+    fun updateList(newList: List<Activity>) {
         activityList.clear()
         activityList.addAll(newList)
         notifyDataSetChanged()
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActivityViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.activity_card_item, parent, false)
-        return ActivityViewHolder(view)
+        val binding = ActivityCardItemBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return ActivityViewHolder(binding)
     }
+
     override fun onBindViewHolder(holder: ActivityViewHolder, position: Int) {
-        val (activityId, activityName) = activityList[position]
-        holder.bind(activityId, activityName, position)
-        holder.main_CardView.tag = activityId
-
+        val activity = activityList[position]
+        holder.bind(activity)
     }
-    override fun getItemCount(): Int {
-        return activityList.size
-    }
-    inner class ActivityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val context: Context = itemView.context
-        private val activityNameTextView: TextView = itemView.findViewById(R.id.activityNameTextView)
-        private val closeButton: ImageButton = itemView.findViewById(R.id.closeButton)
-        private val stopwatchTextView: TextView = itemView.findViewById(R.id.stopwatchTextView)
 
-        private val backButton: ImageButton = itemView.findViewById(R.id.backButton)
-        val main_CardView : RelativeLayout = itemView.findViewById(R.id.main_CardView)
-        private val cardFront: LinearLayout = itemView.findViewById(R.id.card_front)
-        private val cardBack: LinearLayout = itemView.findViewById(R.id.card_back)
-        private val activityNameTextView1: TextView = itemView.findViewById(R.id.activityNameTextView1)
-        private val backTextView1: TextView = itemView.findViewById(R.id.backTextView1)
-        private val backTextView2: TextView = itemView.findViewById(R.id.backTextView2)
-        private val backTextView3: TextView = itemView.findViewById(R.id.backTextView3)
-        private var startTime: Long = 0
-        private var stopTime: Long = 0
-        private var totalSpentTime: Int = 0 // Changed to Int
+    override fun getItemCount(): Int = activityList.size
+
+    inner class ActivityViewHolder(private val binding: ActivityCardItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        private val context: Context = binding.root.context
+        private var currentActivity: Activity? = null
         private var isTimerRunning = false
-        private lateinit var activityId: String
-        private lateinit var databaseReference: DatabaseReference
-        private var auth = FirebaseAuth.getInstance()
-        private val handler = Handler()
-        private val stopwatchRunnable = object : Runnable {
-            override fun run() {
-                val elapsedTime = System.currentTimeMillis() - startTime
-                updateStopwatchUI(elapsedTime)
-                handler.postDelayed(this, 1000) // Update every second
-            }
+
+        init {
+            setupClickListeners()
+            setupStopwatchListener()
         }
 
-        fun bind(activityId: String, activityName: String, position: Int) {
-            this.activityId = activityId
-            // Set activity ID and name
-            activityNameTextView.text = activityName
-            activityNameTextView1.text = activityName
+        fun bind(activity: Activity) {
+            currentActivity = activity
 
-            // Initialize Firebase
-            databaseReference = FirebaseDatabase.getInstance().reference.child("Activities")
-                .child(auth.currentUser?.uid ?: "")
-                .child(activityId)
+            binding.activityNameTextView.text = activity.name
+            binding.activityNameTextView1.text = activity.name
 
-            // Fetch status from the database
-            databaseReference.child("status").addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val status = snapshot.value.toString()
-                    if (status != "Inactive") {
-                        // Set onClickListener for the close button
-                        closeButton.setOnClickListener {
-                            // Show confirmation dialog
-                            showConfirmationDialog(activityName, position, activityId)
-                        }
-                    } else {
-                        // If status is "Inactive", do not set the OnClickListener for closeButton
-                        closeButton.setOnClickListener(null)
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    // Handle error
-                    showToast("Failed to fetch status: ${error.message}")
-                }
-            })
-
-
-            // Fetch status from the database
-            databaseReference.child("status").addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val status = snapshot.value.toString()
-                    if (status != "Inactive") {
-                        // Set onClickListener for the card front
-                        cardFront.setOnClickListener {
-                            val dialogMessage = if (isTimerRunning) {
-                                "Are you sure you wish to stop the timing for $activityName?"
-                            } else {
-                                "Are you sure you wish to start the timing for $activityName?"
-                            }
-
-                            AlertDialog.Builder(context)
-                                .setMessage(dialogMessage)
-                                .setPositiveButton("Yes") { _, _ ->
-                                    if (isTimerRunning) {
-                                        stopStopwatch()
-                                        stopTime = System.currentTimeMillis()
-                                        calculateTotalTime(System.currentTimeMillis())
-                                        updateStatus(activityId, "Stop")
-                                        main_CardView.setBackgroundResource(R.color.red)
-                                        Handler().postDelayed({
-                                            updateStopwatchUI(0)
-                                            main_CardView.setBackgroundResource(android.R.color.transparent) // Change background to clear
-                                        }, 3000)
-                                    } else {
-                                        startTime = System.currentTimeMillis()
-                                        startStopwatch()
-                                        updateStatus(activityId, "Start")
-                                        stopwatchTextView.text = getCurrentTime() // Set the current time as the start time
-                                        main_CardView.setBackgroundResource(R.color.green)
-                                    }
-                                }
-                                .setNegativeButton("No", null)
-                                .show()
-                        }
-                    } else {
-                        // If status is "Inactive", do not set the OnClickListener
-                        cardFront.setOnClickListener(null)
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    // Handle error
-                    showToast("Failed to fetch status: ${error.message}")
-                }
-            })
-
-
-            // Set onLongClickListener for the card front
-            cardFront.setOnLongClickListener {
-                fetchDataFromDatabase(activityName)
-                fetchInactiveActivities()
-                flipCard()
-                totalSpentTime()
-                true
+            // Update stopwatch if this activity is currently being tracked
+            if (stopwatchService?.getCurrentActivityId() == activity.id) {
+                val currentTime = stopwatchService.getCurrentTime()
+                updateStopwatchUI(currentTime)
+                isTimerRunning = stopwatchService.isTimerRunning()
+                updateButtonStates()
+            } else {
+                binding.stopwatchTextView.text = "00:00:00"
+                isTimerRunning = false
+                updateButtonStates()
             }
 
-            // Set onClickListener for the back button
-            backButton.setOnClickListener {
+            loadActivityStats(activity.id)
+        }
+
+        private fun setupClickListeners() {
+            binding.playPauseButton.setOnClickListener {
+                currentActivity?.let { activity ->
+                    if (isTimerRunning) {
+                        pauseTimer(activity)
+                    } else {
+                        startTimer(activity)
+                    }
+                }
+            }
+
+            binding.flipButton.setOnClickListener {
                 flipCard()
             }
+
+            binding.closeButton.setOnClickListener {
+                currentActivity?.let { activity ->
+                    showDeleteConfirmation(activity)
+                }
+            }
+
+            binding.backButton.setOnClickListener {
+                flipCard()
+            }
+
+            binding.resetButton.setOnClickListener {
+                currentActivity?.let { activity ->
+                    showResetConfirmation(activity)
+                }
+            }
+
         }
 
-        private fun showToast(message: String) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
-
-        private fun deleteItem(position: Int) {
-            if (position != RecyclerView.NO_POSITION) {
-                // Remove item from the list
-                activityList.removeAt(position)
-                notifyItemRemoved(position)
+        private fun setupStopwatchListener() {
+            stopwatchService?.addListener { time, formattedTime ->
+                currentActivity?.let { activity ->
+                    if (stopwatchService.getCurrentActivityId() == activity.id) {
+                        updateStopwatchUI(time)
+                    }
+                }
             }
         }
 
-        private fun updateStatus(activityId: String, status: String) {
-            // Ensure that the database reference is not null
-            val databaseReference = FirebaseDatabase.getInstance().reference.child("Activities")
-                .child(auth.currentUser?.uid ?: "")
-                .child(activityId)
+        private fun startTimer(activity: Activity) {
+            val intent = Intent(context, StopwatchService::class.java).apply {
+                action = StopwatchService.ACTION_START
+                putExtra("activityId", activity.id)
+                putExtra("activityName", activity.name)
+            }
+            context.startService(intent)
 
-            databaseReference.child("status").setValue(status)
-                .addOnSuccessListener {
-                    showToast("$status status is updated successfully")
-                }
-                .addOnFailureListener { e ->
-                    showToast("Failed to update status: ${e.message}")
-                }
+            isTimerRunning = true
+            updateButtonStates()
         }
 
-        private fun fetchInactiveActivities() {
-            val inactiveActivitiesReference =
-                FirebaseDatabase.getInstance().reference.child("Activities")
-                    .child(auth.currentUser?.uid ?: "")
+        private fun pauseTimer(activity: Activity) {
+            val intent = Intent(context, StopwatchService::class.java).apply {
+                action = StopwatchService.ACTION_PAUSE
+            }
+            context.startService(intent)
 
-            val query = inactiveActivitiesReference.orderByChild("status").equalTo("Inactive")
+            coroutineScope.launch {
+                // Save the current session
+                saveActivityInstance(activity.id, stopwatchService?.getCurrentTime() ?: 0)
+            }
 
-            query.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val inactiveActivityList = mutableListOf<String>()
-                    for (dataSnapshot in snapshot.children) {
-                        val activityName = dataSnapshot.child("activityName").value.toString()
-                        inactiveActivityList.add(activityName)
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    // Handle error
-                    showToast("Failed to fetch inactive activities: ${error.message}")
-                }
-            })
+            isTimerRunning = false
+            updateButtonStates()
         }
 
-        private fun fetchDataFromDatabase(activityName: String) {
-            databaseReference.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        val status = snapshot.child("status").value.toString()
-                        val creationTime = snapshot.child("creationTime").value.toString()
+        private fun stopTimer() {
+            val intent = Intent(context, StopwatchService::class.java).apply {
+                action = StopwatchService.ACTION_STOP
+            }
+            context.startService(intent)
 
-                        // Update TextViews with fetched data
-                        backTextView1.text = "Status: $status"
-                        backTextView2.text = "Creation Time: $creationTime"
-                    } else {
-                        showToast("No data available")
-                    }
-                }
+            isTimerRunning = false
+            updateButtonStates()
+            binding.stopwatchTextView.text = "00:00:00"
+        }
 
-                override fun onCancelled(error: DatabaseError) {
-                    // Handle database error
-                    Toast.makeText(
-                        context,
-                        "Failed to fetch data: ${error.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+        private suspend fun saveActivityInstance(activityId: String, duration: Long) {
+            val instance = ActivityInstance(
+                activityId = activityId,
+                duration = duration / 1000, // Convert to seconds
+                endTime = Date()
+            )
+            repository.addActivityInstance(instance)
+
+            // Update activity stats
+            val totalTime = repository.getTotalActivityTime(activityId)
+            val sessionCount = repository.getActivitySessionCount(activityId)
+
+            repository.updateActivity(activityId, mapOf(
+                "totalTime" to totalTime,
+                "sessionCount" to sessionCount
+            ))
+
+            loadActivityStats(activityId)
+        }
+
+        private fun updateStopwatchUI(time: Long) {
+            val seconds = (time / 1000) % 60
+            val minutes = (time / (1000 * 60)) % 60
+            val hours = (time / (1000 * 60 * 60))
+            binding.stopwatchTextView.text = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        }
+
+        private fun updateButtonStates() {
+            if (isTimerRunning) {
+                binding.playPauseButton.setImageResource(R.drawable.ic_pause)
+                binding.playPauseButton.setBackgroundResource(R.drawable.rounded_button_outline_red)
+                binding.playPauseButton.imageTintList = context.getColorStateList(R.color.error)
+            } else {
+                binding.playPauseButton.setImageResource(R.drawable.ic_play)
+                binding.playPauseButton.setBackgroundResource(R.drawable.rounded_button_outline_green)
+                binding.playPauseButton.imageTintList = context.getColorStateList(R.color.success_dark)
+            }
+        }
+
+        private fun loadActivityStats(activityId: String) {
+            coroutineScope.launch {
+                try {
+                    val totalTime = repository.getTotalActivityTime(activityId)
+                    val sessionCount = repository.getActivitySessionCount(activityId)
+                    val lastInstance = repository.getLastActivityInstance(activityId)
+
+                    val averageTime = if (sessionCount > 0) totalTime / sessionCount else 0
+
+                    // Update back side stats
+                    binding.backTextView1.text = formatTime(totalTime)
+                    binding.backTextView2.text = sessionCount.toString()
+                    binding.backTextView3.text = formatTime(averageTime)
+                    binding.backTextView4.text = lastInstance?.let {
+                        formatTime(it.duration)
+                    } ?: "00:00:00"
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-            })
+            }
+        }
+
+        private fun formatTime(seconds: Long): String {
+            val hours = seconds / 3600
+            val minutes = (seconds % 3600) / 60
+            val secs = seconds % 60
+            return String.format("%02d:%02d:%02d", hours, minutes, secs)
         }
 
         private fun flipCard() {
             val scale = context.resources.displayMetrics.density
             val cameraDistance = 8000 * scale
-            cardFront.cameraDistance = cameraDistance
-            cardBack.cameraDistance = cameraDistance
+            binding.cardFront.cameraDistance = cameraDistance
+            binding.cardBack.cameraDistance = cameraDistance
 
-            val animIn =
-                AnimatorInflater.loadAnimator(context, R.animator.card_flip_in) as AnimatorSet
-            val animOut =
-                AnimatorInflater.loadAnimator(context, R.animator.card_flip_out) as AnimatorSet
+            val animIn = AnimatorInflater.loadAnimator(context, R.animator.card_flip_in) as AnimatorSet
+            val animOut = AnimatorInflater.loadAnimator(context, R.animator.card_flip_out) as AnimatorSet
 
-            if (cardFront.visibility == View.VISIBLE) {
-                animOut.setTarget(cardFront)
-                animIn.setTarget(cardBack)
+            if (binding.cardFront.visibility == View.VISIBLE) {
+                animOut.setTarget(binding.cardFront)
+                animIn.setTarget(binding.cardBack)
                 animOut.start()
                 animIn.start()
-                cardFront.visibility = View.GONE
-                cardBack.visibility = View.VISIBLE
+                binding.cardFront.visibility = View.GONE
+                binding.cardBack.visibility = View.VISIBLE
             } else {
-                animOut.setTarget(cardBack)
-                animIn.setTarget(cardFront)
+                animOut.setTarget(binding.cardBack)
+                animIn.setTarget(binding.cardFront)
                 animOut.start()
                 animIn.start()
-                cardBack.visibility = View.GONE
-                cardFront.visibility = View.VISIBLE
+                binding.cardBack.visibility = View.GONE
+                binding.cardFront.visibility = View.VISIBLE
             }
         }
 
-        private fun startStopwatch() {
-            isTimerRunning = true
-            handler.post(stopwatchRunnable)
-        }
-
-        private fun stopStopwatch() {
-            isTimerRunning = false
-            handler.removeCallbacks(stopwatchRunnable)
-        }
-
-        private fun updateStopwatchUI(elapsedTime: Long) {
-            val seconds = (elapsedTime / 1000) % 60
-            val minutes = (elapsedTime / (1000 * 60)) % 60
-            val hours = (elapsedTime / (1000 * 60 * 60))
-
-            val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-            stopwatchTextView.text = formattedTime
-        }
-
-        private fun calculateTotalTime(stopTime: Long) {
-            // Calculate difference in milliseconds
-            totalSpentTime = ((stopTime - startTime) / 1000).toInt() // Convert to seconds
-
-            // Convert UTC time to Indian time
-            val indianTimeFormatter =
-                SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-            indianTimeFormatter.timeZone = TimeZone.getTimeZone("Asia/Kolkata")
-            val startTimeIndian = indianTimeFormatter.format(Date(startTime))
-            val stopTimeIndian = indianTimeFormatter.format(Date(stopTime))
-
-            // Get a reference to the "instances" node
-            val instancesReference = FirebaseDatabase.getInstance().reference
-                .child("Activities")
-                .child(auth.currentUser?.uid ?: "")
-                .child(activityId)
-                .child("instances")
-
-            // Generate a unique numerical ID for the instance
-            instancesReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val instanceId = snapshot.childrenCount // Count of existing instances as ID
-                    val instanceData = mapOf(
-                        "totalSpentTime" to totalSpentTime, // Changed to Int
-                        "startTime" to startTimeIndian,
-                        "stopTime" to stopTimeIndian
-                    )
-
-                    // Set the value in the database under the generated numerical ID
-                    instancesReference.child(instanceId.toString()).setValue(instanceData)
-                        .addOnSuccessListener {
-                            showToast("Instance data stored successfully")
+        private fun showDeleteConfirmation(activity: Activity) {
+            AlertDialog.Builder(context)
+                .setTitle("Delete Activity")
+                .setMessage("Are you sure you want to delete ${activity.name}?")
+                .setPositiveButton("Delete") { _, _ ->
+                    coroutineScope.launch {
+                        try {
+                            repository.deleteActivity(activity.id)
+                            onActivityUpdate()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
-                        .addOnFailureListener { e ->
-                            showToast("Failed to store instance data: ${e.message}")
-                        }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    showToast("Failed to generate instance ID: ${error.message}")
-                }
-            })
-        }
-
-        private fun totalSpentTime() {
-            val instancesReference = FirebaseDatabase.getInstance().reference
-                .child("Activities")
-                .child(auth.currentUser?.uid ?: "")
-                .child(activityId)
-                .child("instances")
-
-            // Query to fetch the last instance
-            instancesReference.limitToLast(1).addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        for (instanceSnapshot in snapshot.children) {
-                            // Retrieve totalSpentTime from the last instance
-                            val totalSpentTimeSeconds = instanceSnapshot.child("totalSpentTime").value.toString().toIntOrNull() ?: 0
-
-                            // Convert totalSpentTime from seconds to HH:mm:ss format
-                            val hours = totalSpentTimeSeconds / 3600
-                            val minutes = (totalSpentTimeSeconds % 3600) / 60
-                            val seconds = totalSpentTimeSeconds % 60
-
-                            // Display totalSpentTime in backTextView3
-                            val formattedTotalSpentTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-                            backTextView3.visibility = View.VISIBLE
-                            backTextView3.text = "Last Spent Time of TotalTime: $formattedTotalSpentTime"
-                        }
-                    } else {
-                        // Handle case where no data exists
                     }
                 }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
 
-                override fun onCancelled(error: DatabaseError) {
-                    showToast("Failed to fetch total spent time: ${error.message}")
+        private fun showResetConfirmation(activity: Activity) {
+            AlertDialog.Builder(context)
+                .setTitle("Reset Stats")
+                .setMessage("Are you sure you want to reset statistics for ${activity.name}?")
+                .setPositiveButton("Reset") { _, _ ->
+                    coroutineScope.launch {
+                        try {
+                            // Implementation for resetting stats
+                            onActivityUpdate()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
-            })
+                .setNegativeButton("Cancel", null)
+                .show()
         }
 
+        private fun shareActivityStats() {
+            // Implement share functionality
+            currentActivity?.let { activity ->
+                val shareMessage = "Check out my activity: ${activity.name}\n" +
+                        "Total Time: ${binding.backTextView1.text}\n" +
+                        "Sessions: ${binding.backTextView2.text}"
 
-
-        private fun showConfirmationDialog(activityName: String, position: Int, activityId: String) {
-            val alertDialogBuilder = AlertDialog.Builder(context)
-            alertDialogBuilder.setTitle("Confirm")
-            alertDialogBuilder.setMessage("Are you sure you want to delete $activityName?")
-
-            alertDialogBuilder.setPositiveButton("Confirm") { dialog, which ->
-                showToast("Item deleted: $activityName")
-                deleteItem(position)
-                updateStatus(activityId, "Inactive")
-                if (isTimerRunning) {
-                    calculateTotalTime(System.currentTimeMillis())
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, shareMessage)
                 }
-                totalSpentTime()
-                dialog.dismiss()
+                context.startActivity(Intent.createChooser(intent, "Share Activity Stats"))
             }
-            alertDialogBuilder.setNegativeButton("Cancel") { dialog, which ->
-                dialog.dismiss()
-            }
+        }
 
-            val alertDialog = alertDialogBuilder.create()
-            alertDialog.show()
-        }
-        private fun getCurrentTime(): String {
-            val currentTime = System.currentTimeMillis()
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH)
-            dateFormat.timeZone = TimeZone.getTimeZone("Asia/Kolkata") // Set Indian time zone
-            return dateFormat.format(Date(currentTime))
-        }
+
     }
 }

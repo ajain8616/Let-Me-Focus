@@ -2,15 +2,26 @@
     <!-- Base application theme for Night Mode -->
     <style name="Base.Theme.ActivityTracker" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary Colors -->
-        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimary">@color/primary</item>  <!-- Same primary, but ensure contrast with onPrimary -->
         <item name="colorPrimaryVariant">@color/primaryVariant</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorOnPrimary">@color/white</item>  <!-- White text on primary for dark mode contrast -->
 
         <!-- Secondary Colors -->
         <item name="colorSecondary">@color/secondary</item>
         <item name="colorSecondaryVariant">@color/secondaryVariant</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>  <!-- White text on secondary for dark mode contrast -->
 
-        <item name="android:statusBarColor">@color/colorBoundaryBlue</item>
+        <!-- Background and Surface Colors (Dark theme: dark backgrounds) -->
+        <item name="backgroundColor">@color/dark_background</item>  <!-- Black background -->
+        <item name="colorOnBackground">@color/white</item>  <!-- White text on background -->
+        <item name="colorSurface">@color/dark_surface</item>  <!-- Dark gray surface for cards/buttons -->
+        <item name="colorOnSurface">@color/white</item>  <!-- White text on surface -->
+
+        <!-- Error Colors -->
+        <item name="colorError">@color/error</item>  <!-- Red for errors (same as light, but ensure visibility) -->
+        <item name="colorOnError">@color/errorText</item>  <!-- White text on error -->
+
+        <!-- Status Bar (Dark mode: use dark color for better integration) -->
+        <item name="android:statusBarColor">@color/dark_background</item>  <!-- Black status bar -->
     </style>
 </resources>

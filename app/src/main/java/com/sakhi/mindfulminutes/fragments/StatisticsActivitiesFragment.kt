@@ -1,220 +1,218 @@
 package com.sakhi.mindfulminutes.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.sakhi.mindfulminutes.R
+import androidx.fragment.app.Fragment
+import com.google.android.material.snackbar.Snackbar
+import com.sakhi.mindfulminutes.databinding.FragmentStatisticsActivitiesBinding
+import com.sakhi.mindfulminutes.repository.ActivityRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class StatisticsActivitiesFragment : Fragment() {
 
-    private lateinit var intentActivityView: TextView
-    private lateinit var sTimeTextView: TextView
-    private lateinit var meanTimeTextView: TextView
-    private lateinit var medianTimeTextView: TextView
-    private lateinit var countTimeTextView: TextView
-    private lateinit var totalSpentTimeTextView: TextView
-    private lateinit var maximumTimeTextView: TextView
-    private lateinit var minimumTimeTextView: TextView
-    private lateinit var endTimeTextView: TextView
-    private lateinit var pauseTimeTextView: TextView
-    private lateinit var auth: FirebaseAuth
+    private var _binding: FragmentStatisticsActivitiesBinding? = null
+    private val binding get() = _binding!!
+
+    private val repository = ActivityRepository()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+
+    private var activityId: String? = null
     private var activityName: String? = null
 
     companion object {
-        fun newInstance(activityName: String): StatisticsActivitiesFragment {
+        private const val ARG_ACTIVITY_ID = "activity_id"
+        private const val ARG_ACTIVITY_NAME = "activity_name"
+
+        fun newInstance(activityId: String, activityName: String): StatisticsActivitiesFragment {
             val fragment = StatisticsActivitiesFragment()
-            val args = Bundle()
-            args.putString("activityName", activityName)
+            val args = Bundle().apply {
+                putString(ARG_ACTIVITY_ID, activityId)
+                putString(ARG_ACTIVITY_NAME, activityName)
+            }
             fragment.arguments = args
             return fragment
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            activityId = it.getString(ARG_ACTIVITY_ID)
+            activityName = it.getString(ARG_ACTIVITY_NAME)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        // Inflate the layout for this fragment
-
-        auth = FirebaseAuth.getInstance()
-        val view = inflater.inflate(R.layout.fragment_statistics_activities, container, false)
-        initializeIds(view)
-
-        // Fetch data from Firebase
-        fetchDataFromFirebase()
-
-        return view
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentStatisticsActivitiesBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    private fun initializeIds(view: View) {
-
-        intentActivityView = view.findViewById(R.id.intentActivityView)
-        sTimeTextView = view.findViewById(R.id.sTimeTextView)
-        meanTimeTextView = view.findViewById(R.id.meanTimeTextView)
-        medianTimeTextView = view.findViewById(R.id.medianTimeTextView)
-        countTimeTextView = view.findViewById(R.id.countTimeTextView)
-        totalSpentTimeTextView = view.findViewById(R.id.totalTimeTextView)
-        maximumTimeTextView = view.findViewById(R.id.maximumTimeTextView)
-        minimumTimeTextView = view.findViewById(R.id.minimumTimeTextView)
-        endTimeTextView = view.findViewById(R.id.endTimeTextView)
-        pauseTimeTextView = view.findViewById(R.id.pauseTimeTextView)
-
-        // Retrieve the activity name passed as an argument
-        activityName = arguments?.getString("activityName")
-        activityName?.let { intentActivityView.text = it }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupUI()
+        loadStatistics()
     }
 
-    private fun fetchDataFromFirebase() {
-        val activityRef = FirebaseDatabase.getInstance().reference.child("Activities")
-            .child(auth.currentUser?.uid ?: "")
+    private fun setupUI() {
+        // Set activity name
+        binding.intentActivityView.text = activityName ?: "Activity Statistics"
 
-        activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        // Setup back button
+        binding.backButton.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+    }
 
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val startTimeList = mutableListOf<String>()
-                    val endTimeList = mutableListOf<String>()
-                    var pauseTime: String? = null // Initialize pauseTime variable
-
-                    for (activitySnapshot in snapshot.children) {
-                        val activityNameSnapshot =
-                            activitySnapshot.child("activity").value.toString()
-                        val activityID = activitySnapshot.key
-
-                        if (activityNameSnapshot == activityName) {
-                            pauseTime = activitySnapshot.child("pauseTime").value.toString()
-
-                            val instancesSnapshot =
-                                activitySnapshot.child("instances")
-
-                            for (instanceSnapshot in instancesSnapshot.children) {
-                                val startTime =
-                                    instanceSnapshot.child("startTime").value.toString()
-                                val endTime =
-                                    instanceSnapshot.child("stopTime").value.toString()
-
-                                // Add startTime and endTime to lists
-                                startTimeList.add(startTime)
-                                endTimeList.add(endTime)
-                            }
-                            findMinMaxTimes(startTimeList, endTimeList)
-                            calculateTotalSpentTime(activityID, instancesSnapshot)
-                            // Pass instancesSnapshot to calculatePauseTimes
-                            pauseTime?.let { calculatePauseTimes(it) }
-                        }
-                    }
+    private fun loadStatistics() {
+        activityId?.let { id ->
+            coroutineScope.launch {
+                try {
+                    showLoading(true)
+                    loadActivityStatistics(id)
+                } catch (e: Exception) {
+                    showError("Failed to load statistics: ${e.message}")
+                } finally {
+                    showLoading(false)
                 }
             }
+        } ?: showError("Activity ID not found")
+    }
 
+    private suspend fun loadActivityStatistics(activityId: String) {
+        try {
+            // Load activity instances from Firestore
+            val instances = repository.getActivityInstances(activityId)
 
-            override fun onCancelled(error: DatabaseError) {
-                // Handle onCancelled
+            if (instances.isEmpty()) {
+                showEmptyState()
+                return
             }
-        })
-    }
 
+            // Calculate statistics
+            calculateStatistics(instances)
 
-    private fun findMinMaxTimes(startTimeList: List<String>, endTimeList: List<String>) {
-        // Find maximum time from endTimeList
-        val maxEndTime = endTimeList.maxOrNull()
-
-        // Find minimum time from startTimeList
-        val minStartTime = startTimeList.minOrNull()
-
-        // Update TextViews with maximum and minimum times if they exist, else show "NA"
-        sTimeTextView.text = minStartTime ?: "NA"
-        endTimeTextView.text = maxEndTime ?: "NA"
-    }
-
-    private fun calculateTotalSpentTime(activityID: String?, instancesSnapshot: DataSnapshot) {
-        var totalSpentTime = 0
-        for (instanceSnapshot in instancesSnapshot.children) {
-            val instanceTime = instanceSnapshot.child("totalSpentTime").value as Long
-            totalSpentTime += instanceTime.toInt() // Accumulate total spent time
+        } catch (e: Exception) {
+            showError("Failed to load activity data: ${e.message}")
         }
-        totalSpentTimeTextView.text = if (totalSpentTime > 0) formatTime(totalSpentTime) else "NA"
-        calculateMeanTime(totalSpentTime, instancesSnapshot)
-        calculateMedianTime(totalSpentTime, instancesSnapshot)
-        calculateCountTime(instancesSnapshot)
-        calculateMaximumTime(instancesSnapshot)
-        calculateMinimumTime(instancesSnapshot)
     }
 
-    private fun calculateMeanTime(totalSpentTime: Int, instancesSnapshot: DataSnapshot) {
-        val instanceCount = instancesSnapshot.children.count()
-        val meanTime = if (instanceCount > 0) totalSpentTime.toDouble() / instanceCount else 0.0
-        meanTimeTextView.text = if (meanTime > 0) formatTime(meanTime.toInt()) else "NA"
-    }
-
-    private fun calculateMedianTime(totalSpentTime: Int, instancesSnapshot: DataSnapshot) {
-        val instanceTimes = mutableListOf<Long>()
-        for (instanceSnapshot in instancesSnapshot.children) {
-            val instanceTime = instanceSnapshot.child("totalSpentTime").value as Long
-            instanceTimes.add(instanceTime)
+    private fun calculateStatistics(instances: List<com.sakhi.mindfulminutes.model.ActivityInstance>) {
+        if (instances.isEmpty()) {
+            showEmptyState()
+            return
         }
-        instanceTimes.sort()
-        val medianTime = if (instanceTimes.isNotEmpty()) {
-            val middle = instanceTimes.size / 2
-            if (instanceTimes.size % 2 == 1) {
-                instanceTimes[middle]
-            } else {
-                (instanceTimes[middle - 1] + instanceTimes[middle]) / 2
-            }
+
+        val instanceTimes = instances.map { it.duration }
+        val startTimes = instances.map { it.startTime }
+        val endTimes = instances.mapNotNull { it.endTime }
+
+        // Calculate basic statistics
+        val totalTime = instanceTimes.sum()
+        val sessionCount = instances.size
+        val meanTime = if (sessionCount > 0) totalTime / sessionCount else 0
+        val maxTime = instanceTimes.maxOrNull() ?: 0
+        val minTime = instanceTimes.minOrNull() ?: 0
+
+        // Calculate median
+        val medianTime = calculateMedian(instanceTimes)
+
+        // Find earliest start and latest end times
+        val earliestStart = startTimes.minOrNull()
+        val latestEnd = endTimes.maxOrNull()
+
+        // Get last pause time (assuming last instance's end time as pause time)
+        val lastPauseTime = endTimes.lastOrNull()
+
+        // Update UI
+        updateStatisticsUI(
+            totalTime = totalTime,
+            sessionCount = sessionCount,
+            meanTime = meanTime,
+            medianTime = medianTime,
+            maxTime = maxTime,
+            minTime = minTime,
+            earliestStart = earliestStart,
+            latestEnd = latestEnd,
+            lastPauseTime = lastPauseTime
+        )
+    }
+
+    private fun calculateMedian(times: List<Long>): Long {
+        val sortedTimes = times.sorted()
+        return if (sortedTimes.size % 2 == 0) {
+            val mid = sortedTimes.size / 2
+            (sortedTimes[mid - 1] + sortedTimes[mid]) / 2
         } else {
-            0L
+            sortedTimes[sortedTimes.size / 2]
         }
-        medianTimeTextView.text = if (medianTime > 0) formatTime(medianTime.toInt()) else "NA"
     }
 
-    private fun calculateCountTime(instancesSnapshot: DataSnapshot) {
-        val instanceCount = instancesSnapshot.children.count()
-        countTimeTextView.text = instanceCount.toString()
+    private fun updateStatisticsUI(
+        totalTime: Long,
+        sessionCount: Int,
+        meanTime: Long,
+        medianTime: Long,
+        maxTime: Long,
+        minTime: Long,
+        earliestStart: Date?,
+        latestEnd: Date?,
+        lastPauseTime: Date?
+    ) {
+        // Update time values
+        binding.totalTimeTextView.text = formatTime(totalTime)
+        binding.countTimeTextView.text = sessionCount.toString()
+        binding.meanTimeTextView.text = formatTime(meanTime)
+        binding.medianTimeTextView.text = formatTime(medianTime)
+        binding.maximumTimeTextView.text = formatTime(maxTime)
+        binding.minimumTimeTextView.text = formatTime(minTime)
+
+        // Update date/time values
+        binding.sTimeTextView.text = earliestStart?.let { formatDateTime(it) } ?: "NA"
+        binding.endTimeTextView.text = latestEnd?.let { formatDateTime(it) } ?: "NA"
+        binding.pauseTimeTextView.text = lastPauseTime?.let { formatDateTime(it) } ?: "NA"
     }
 
-    private fun calculateMaximumTime(instancesSnapshot: DataSnapshot) {
-        var maxTime = Long.MIN_VALUE
-        for (instanceSnapshot in instancesSnapshot.children) {
-            val instanceTime = instanceSnapshot.child("totalSpentTime").value as Long
-            if (instanceTime > maxTime) {
-                maxTime = instanceTime
-            }
+    private fun formatTime(seconds: Long): String {
+        return if (seconds <= 0) {
+            "00:00:00"
+        } else {
+            val hours = TimeUnit.SECONDS.toHours(seconds)
+            val minutes = TimeUnit.SECONDS.toMinutes(seconds - TimeUnit.HOURS.toSeconds(hours))
+            val remainingSeconds = seconds - TimeUnit.HOURS.toSeconds(hours) - TimeUnit.MINUTES.toSeconds(minutes)
+            String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
         }
-        maximumTimeTextView.text = if (maxTime != Long.MIN_VALUE) formatTime(maxTime.toInt()) else "NA"
     }
 
-    private fun calculateMinimumTime(instancesSnapshot: DataSnapshot) {
-        var minTime = Long.MAX_VALUE // Initialize minTime to maximum possible value
-
-        for (instanceSnapshot in instancesSnapshot.children) {
-            val instanceTime = instanceSnapshot.child("totalSpentTime").value as Long
-            if (instanceTime < minTime) {
-                minTime = instanceTime
-            }
-        }
-
-        // Update the TextView with the minimum time if it exists, else show "NA"
-        minimumTimeTextView.text = if (minTime != Long.MAX_VALUE) formatTime(minTime.toInt()) else "NA"
+    private fun formatDateTime(date: Date): String {
+        val formatter = SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault())
+        return formatter.format(date)
     }
 
-    private fun calculatePauseTimes(pauseTime: String) {
-        // Update TextView
-        pauseTimeTextView.text = pauseTime
+    private fun showLoading(show: Boolean) {
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 
+    private fun showEmptyState() {
+        // You can add an empty state view if needed
+        Snackbar.make(binding.root, "No activity data found", Snackbar.LENGTH_LONG).show()
+    }
 
-    private fun formatTime(seconds: Int): String {
-        val hours = TimeUnit.SECONDS.toHours(seconds.toLong())
-        val minutes = TimeUnit.SECONDS.toMinutes(seconds.toLong() - TimeUnit.HOURS.toSeconds(hours))
-        val remainingSeconds = seconds - TimeUnit.HOURS.toSeconds(hours) - TimeUnit.MINUTES.toSeconds(minutes)
-        return String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

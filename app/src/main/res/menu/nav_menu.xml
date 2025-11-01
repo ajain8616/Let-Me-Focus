@@ -2,7 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:theme="@style/Base.Theme.ActivityTracker"
     tools:showIn="navigation_view">
 
     <!-- Activities Section -->
@@ -14,21 +13,25 @@
         <item
             android:id="@+id/nav_active"
             android:icon="@drawable/ic_active"
+            android:textColor="@color/white"
             android:title="@string/active_activities" />
 
         <item
             android:id="@+id/nav_details"
             android:icon="@drawable/ic_data_details"
+            android:textColor="@color/white"
             android:title="@string/activities_details" />
 
         <item
             android:id="@+id/nav_analysis"
             android:icon="@drawable/ic_analytics"
+            android:textColor="@color/white"
             android:title="@string/activities_analysis_data" />
 
         <item
             android:id="@+id/nav_filtered"
             android:icon="@drawable/ic_filtered"
+            android:textColor="@color/white"
             android:title="@string/activities_filtered_data" />
     </group>
 
@@ -41,6 +44,7 @@
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_logout"
+            android:textColor="@color/white"
             android:title="@string/logout" />
     </group>
 </menu>

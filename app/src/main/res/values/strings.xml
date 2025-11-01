@@ -5,7 +5,7 @@
     <string name="app_logo">App Logo</string>
     <string name="open_nav">Open Navigation Drawer</string>
     <string name="close_nav">Close Navigation Drawer</string>
-<!--    <string name="default_web_client_id" translatable="false">1081756889190-ffull8jtkqvva0md5bgaa3li8u518536.apps.googleusercontent.com</string>-->
+    <!--    <string name="default_web_client_id" translatable="false">1081756889190-ffull8jtkqvva0md5bgaa3li8u518536.apps.googleusercontent.com</string>-->
     <string name="default_web_client_id" translatable="false">1081756889190-ffull8jtkqvva0md5bgaa3li8u518536.apps.googleusercontent.com</string>
 
     <!-- Menu Items -->
@@ -69,4 +69,9 @@
     <string name="creation_time">Creation Time:</string>
     <string name="status">Status:</string>
     <string name="_02d_02d_02d">%02d :%02d:%02d</string>
+    <string name="email_address">Email Address</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="sign_in_to_your_trading_account">Sign in to your trading account</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="continue_with_google">Continue with Google</string>
 </resources>

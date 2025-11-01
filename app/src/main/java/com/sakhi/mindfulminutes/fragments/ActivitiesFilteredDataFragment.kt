@@ -1,153 +1,248 @@
 package com.sakhi.mindfulminutes.fragments
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.android.material.snackbar.Snackbar
 import com.sakhi.mindfulminutes.R
 import com.sakhi.mindfulminutes.adapters.CategoriesAdapter
-import com.sakhi.mindfulminutes.models.CategoriesItem
+import com.sakhi.mindfulminutes.databinding.FragmentActivitiesFilteredDataBinding
+import com.sakhi.mindfulminutes.model.Activity
+import com.sakhi.mindfulminutes.repository.ActivityRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ActivitiesFilteredDataFragment : Fragment() {
 
-    private lateinit var filterIcon: ImageView
-    private lateinit var activityDetailsView: RecyclerView
+    private var _binding: FragmentActivitiesFilteredDataBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var categoriesAdapter: CategoriesAdapter
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var databaseReference: DatabaseReference
-    private var categoriesList = mutableListOf<CategoriesItem>()
+    private val repository = ActivityRepository()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+
+    private var currentFilter: String? = null
+    private var allActivities: List<Activity> = emptyList()
+
+    // Define filter options in lowercase
+    private val filterOptions = listOf(
+        "complete list",
+        "active",
+        "inactive",
+        "pause",
+        "stop"
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_activities_filtered_data, container, false)
+    ): View {
+        _binding = FragmentActivitiesFilteredDataBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        filterIcon = view.findViewById(R.id.filterIcon)
-        activityDetailsView = view.findViewById(R.id.activityDetailsView)
-        categoriesAdapter = CategoriesAdapter(categoriesList)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupClickListeners()
+        loadAllActivities()
+    }
 
-        activityDetailsView.layoutManager = LinearLayoutManager(requireContext())
-        activityDetailsView.adapter = categoriesAdapter
+    private fun setupRecyclerView() {
+        binding.activityDetailsView.layoutManager = LinearLayoutManager(requireContext())
+        categoriesAdapter = CategoriesAdapter(mutableListOf()) { activity ->
+            navigateToActivityDetails(activity)
+        }
+        binding.activityDetailsView.adapter = categoriesAdapter
+    }
 
-        setupFirebase()
-        fetchDataFromDatabase()
+    private fun setupClickListeners() {
+        binding.filterIcon.setOnClickListener {
+            showFilterBottomSheet()
+        }
+    }
 
-        filterIcon.setOnClickListener {
-            categoryBottomSheet()
+    private fun loadAllActivities() {
+        coroutineScope.launch {
+            try {
+                showLoading(true)
+                allActivities = repository.getAllActivities()
+                applyFilter(currentFilter)
+            } catch (e: Exception) {
+                showError("Failed to load activities: ${e.message}")
+            } finally {
+                showLoading(false)
+            }
+        }
+    }
+
+    private fun applyFilter(filter: String?) {
+        currentFilter = filter
+
+        val filteredActivities = when {
+            filter == null || filter.equals("complete list", ignoreCase = true) -> {
+                allActivities
+            }
+            else -> {
+                allActivities.filter {
+                    it.status?.equals(filter, ignoreCase = true) == true
+                }
+            }
         }
 
-        return view
+        categoriesAdapter.updateData(filteredActivities, filter)
+        updateEmptyState(filteredActivities.isEmpty())
+
+        // Show filter applied message
+        if (filter != null && !filter.equals("complete list", ignoreCase = true)) {
+            showSnackbar("Showing $filter activities")
+        } else {
+            showSnackbar("Showing all activities")
+        }
     }
 
-    private fun setupFirebase() {
-        firebaseAuth = FirebaseAuth.getInstance()
-        databaseReference = FirebaseDatabase.getInstance().reference
-            .child("Activities").child(firebaseAuth.currentUser?.uid ?: "")
-    }
-
-    private fun fetchDataFromDatabase(filter: String? = null) {
-        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                categoriesList.clear()
-                for (activitySnapshot in snapshot.children) {
-                    val activityId = activitySnapshot.key.orEmpty()
-                    val activityName = activitySnapshot.child("activity").value.toString()
-                    val creationTime = activitySnapshot.child("creationTime").value.toString()
-                    val status = activitySnapshot.child("status").value.toString()
-
-                    val totalSpentTime = activitySnapshot.child("instances")
-                        .children.sumOf {
-                            it.child("totalSpentTime").value.toString().toIntOrNull() ?: 0
-                        }.toString()
-
-                    // Check if the status matches the filter
-                    if (filter == null || filter.equals(status, ignoreCase = true)) {
-                        categoriesList.add(
-                            CategoriesItem(activityId, activityName, creationTime, status, totalSpentTime)
-                        )
-                    }
-                }
-                categoriesAdapter.updateData(categoriesList, filter)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                showBottomSheet("Error fetching data", true)
-            }
-        })
-    }
-
-    private fun categoryBottomSheet() {
+    private fun showFilterBottomSheet() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
-        val sheetView = layoutInflater.inflate(R.layout.bottom_sheet_categories, null)
+        val sheetView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.bottom_sheet_categories, null)
 
-        val crossIcon = sheetView.findViewById<ImageView>(R.id.crossIcon)
+        // Initialize views
+        val crossIcon = sheetView.findViewById<View>(R.id.crossIcon)
         val radioGroupCategories = sheetView.findViewById<RadioGroup>(R.id.radioGroupCategories)
-        val radioButtonCompleteList = sheetView.findViewById<RadioButton>(R.id.radioButtonCompleteList)
         val fetchDataButton = sheetView.findViewById<View>(R.id.fetchDataButton)
         val progressBar = sheetView.findViewById<ProgressBar>(R.id.progressBar)
 
-        crossIcon.setOnClickListener { bottomSheetDialog.dismiss() }
+        // Clear all radio button selections first
+        sheetView.findViewById<RadioButton>(R.id.radioButtonCompleteList)?.isChecked = false
+        sheetView.findViewById<RadioButton>(R.id.radioButtonActive)?.isChecked = false
+        sheetView.findViewById<RadioButton>(R.id.radioButtonInactive)?.isChecked = false
+        sheetView.findViewById<RadioButton>(R.id.radioButtonPause)?.isChecked = false
+        sheetView.findViewById<RadioButton>(R.id.radioButtonStop)?.isChecked = false
 
-        fetchDataButton.setOnClickListener {
-            // Show the ProgressBar
-            progressBar.visibility = View.VISIBLE
-
-            // Add a delay (simulate network/database operation)
-            Handler().postDelayed({
-                val selectedCategoryId = radioGroupCategories.checkedRadioButtonId
-                if (selectedCategoryId != -1) {
-                    val selectedRadioButton = sheetView.findViewById<RadioButton>(selectedCategoryId)
-
-                    // If the selected radio button is 'Complete List', fetch all data
-                    if (selectedRadioButton == radioButtonCompleteList) {
-                        fetchDataFromDatabase() // Show all data if 'Complete List' is selected
-                        categoriesAdapter.updateData(categoriesList, null)
-                        showBottomSheet("Showing all data", false)
-                    } else {
-                        val filter = selectedRadioButton.text.toString()
-                        fetchDataFromDatabase(filter) // Filter data based on selected category
-                        categoriesAdapter.updateData(categoriesList, filter)
-                        showBottomSheet("Showing data for $filter", false)
-                    }
-                } else {
-                    fetchDataFromDatabase() // Show all data if no filter selected
-                    categoriesAdapter.updateData(categoriesList, null)
-                    showBottomSheet("Showing all data", true)
-                }
-
-                // Hide the ProgressBar and dismiss the BottomSheet
-                progressBar.visibility = View.GONE
-                bottomSheetDialog.dismiss()
-
-            }, 3000) // Delay for 3 seconds (you can adjust this as needed)
+        // Set current filter selection
+        when (currentFilter) {
+            null, "complete list" -> sheetView.findViewById<RadioButton>(R.id.radioButtonCompleteList)?.isChecked = true
+            "active" -> sheetView.findViewById<RadioButton>(R.id.radioButtonActive)?.isChecked = true
+            "inactive" -> sheetView.findViewById<RadioButton>(R.id.radioButtonInactive)?.isChecked = true
+            "pause" -> sheetView.findViewById<RadioButton>(R.id.radioButtonPause)?.isChecked = true
+            "stop" -> sheetView.findViewById<RadioButton>(R.id.radioButtonStop)?.isChecked = true
         }
 
+        // Handle close button
+        crossIcon.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        // Call setRadioButtonSelection instead of setupCardClickListeners
+        setRadioButtonSelection(sheetView, bottomSheetDialog)
+
+        // Handle apply filter button
+        fetchDataButton.setOnClickListener {
+            progressBar.visibility = View.VISIBLE
+            fetchDataButton.isEnabled = false
+
+            coroutineScope.launch {
+                try {
+                    val selectedId = radioGroupCategories.checkedRadioButtonId
+                    val selectedFilter = when (selectedId) {
+                        R.id.radioButtonCompleteList -> null
+                        R.id.radioButtonActive -> "active"
+                        R.id.radioButtonInactive -> "inactive"
+                        R.id.radioButtonPause -> "pause"
+                        R.id.radioButtonStop -> "stop"
+                        else -> null
+                    }
+
+                    applyFilter(selectedFilter)
+                } catch (e: Exception) {
+                    showError("Failed to apply filter: ${e.message}")
+                } finally {
+                    progressBar.visibility = View.GONE
+                    fetchDataButton.isEnabled = true
+                    bottomSheetDialog.dismiss()
+                }
+            }
+        }
 
         bottomSheetDialog.setContentView(sheetView)
         bottomSheetDialog.show()
     }
 
 
-    private fun showBottomSheet(message: String, isError: Boolean) {
-        val bottomSheetFragment = if (isError) {
-            ErrorBottomSheetFragment(message)
-        } else {
-            SuccessBottomSheetFragment(message)
-        }
+    private fun setRadioButtonSelection(sheetView: View, bottomSheetDialog: BottomSheetDialog) {
+        val cardToRadioMap = mapOf(
+            R.id.cardCompleteList to R.id.radioButtonCompleteList,
+            R.id.cardActive to R.id.radioButtonActive,
+            R.id.cardInactive to R.id.radioButtonInactive,
+            R.id.cardPause to R.id.radioButtonPause,
+            R.id.cardStop to R.id.radioButtonStop
+        )
 
-        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+        val allRadioButtons = listOf(
+            R.id.radioButtonCompleteList,
+            R.id.radioButtonActive,
+            R.id.radioButtonInactive,
+            R.id.radioButtonPause,
+            R.id.radioButtonStop
+        )
+
+        cardToRadioMap.forEach { (cardId, radioButtonId) ->
+            val card = sheetView.findViewById<androidx.cardview.widget.CardView>(cardId)
+            val radioButton = sheetView.findViewById<android.widget.RadioButton>(radioButtonId)
+
+            card?.setOnClickListener {
+                // -------------------- RADIO BUTTON FIX --------------------
+                // Ensure only one radio button is selected at a time
+                allRadioButtons.forEach { id ->
+                    sheetView.findViewById<RadioButton>(id)?.isChecked = false
+                }
+                radioButton?.isChecked = true
+            }
+        }
+    }
+
+    private fun navigateToActivityDetails(activity: Activity) {
+        val fragment = ActivitiesDetailsFragment() // Replace with your target fragment
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun showLoading(show: Boolean) {
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        binding.activityDetailsView.visibility = if (show) View.GONE else View.VISIBLE
+    }
+
+    private fun updateEmptyState(isEmpty: Boolean) {
+        if (isEmpty) {
+            binding.emptyState.visibility = View.VISIBLE
+            binding.activityDetailsView.visibility = View.GONE
+        } else {
+            binding.emptyState.visibility = View.GONE
+            binding.activityDetailsView.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun showSnackbar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
-

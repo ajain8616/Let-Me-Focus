@@ -4,14 +4,25 @@
         <!-- Primary Colors -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primaryVariant</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/white</item>  <!-- White text on primary for contrast -->
 
         <!-- Secondary Colors -->
         <item name="colorSecondary">@color/secondary</item>
         <item name="colorSecondaryVariant">@color/secondaryVariant</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" >@color/colorBoundaryBlue</item>
+        <item name="colorOnSecondary">@color/black</item>  <!-- Black text on secondary for contrast -->
+
+        <!-- Background and Surface Colors (Light theme: light backgrounds) -->
+        <item name="backgroundColor">@color/background</item>  <!-- White background -->
+        <item name="colorOnBackground">@color/onBackground</item>  <!-- Dark text on background -->
+        <item name="colorSurface">@color/surface</item>  <!-- White surface for cards/buttons -->
+        <item name="colorOnSurface">@color/onSurface</item>  <!-- Dark text on surface -->
+
+        <!-- Error Colors -->
+        <item name="colorError">@color/error</item>  <!-- Red for errors -->
+        <item name="colorOnError">@color/errorText</item>  <!-- White text on error -->
+
+        <!-- Status Bar (Light mode: keep blue, but ensure it fits) -->
+        <item name="android:statusBarColor">@color/colorBoundaryBlue</item>
     </style>
 
     <style name="Theme.ActivityTracker" parent="Base.Theme.ActivityTracker" />

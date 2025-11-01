@@ -1,51 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Base.Theme.ActivityTracker"
-    tools:context=".fragments.ActivitiesFilteredDataFragment"
-    android:padding="16dp">
+    android:background="@color/background"
+    tools:context=".fragments.ActivitiesFilteredDataFragment">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp"
-        tools:ignore="UseCompoundDrawables">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/filtered_activities_list"
-            android:gravity="center"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#3F51B5"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_weight="1" />
-
-        <ImageView
-            android:id="@+id/filterIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_filtered"
-            android:contentDescription="@string/filter_icon"
-            android:layout_marginEnd="16dp" />
-    </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/activityDetailsView"
+    <!-- Animated Gradient Background -->
+    <View
+        android:id="@+id/background_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/linearLayout"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp" />
-</RelativeLayout>
+        android:background="@drawable/gradient_background" />
+
+    <!-- Background Decorations -->
+    <ImageView
+        android:id="@+id/bg_blob_1"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="-100dp"
+        android:layout_marginEnd="-100dp"
+        android:alpha="0.08"
+        android:src="@drawable/bg_blob_1" />
+
+    <ImageView
+        android:id="@+id/bg_blob_2"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginBottom="-80dp"
+        android:layout_marginStart="-80dp"
+        android:alpha="0.08"
+        android:layout_gravity="bottom|start"
+        android:src="@drawable/bg_blob_2" />
+
+    <!-- App Bar with Fixed Position -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/appbar_background_bottom_radius"
+        android:elevation="12dp"
+        android:fitsSystemWindows="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp"
+            app:layout_scrollFlags="enterAlways|snap">
+
+            <!-- App Title -->
+            <TextView
+                android:id="@+id/activityNameView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Filtered Activities"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/actionButtonsLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:id="@+id/actionButtonsLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- Filter Button -->
+                <ImageButton
+                    android:id="@+id/filterIcon"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/rounded_button_background"
+                    android:src="@drawable/ic_filtered"
+                    android:contentDescription="Filter activities"
+                    android:scaleType="centerInside" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content Area with SwipeRefreshLayout -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Empty State View -->
+                <LinearLayout
+                    android:id="@+id/emptyState"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:padding="32dp">
+
+                    <ImageView
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/error_no_data"
+                        android:alpha="0.5" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="No filtered activities"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Try changing your filter criteria"
+                        android:textColor="@color/textHint"
+                        android:textSize="14sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="@color/modern_primary"
+                        android:text="Change Filter"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        app:cornerRadius="16dp"
+                        app:icon="@drawable/ic_filtered"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:iconTint="@color/white" />
+
+                </LinearLayout>
+
+                <!-- Activities List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/activityDetailsView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="400dp"
+                    android:clipToPadding="false"
+                    android:padding="4dp"
+                    tools:listitem="@layout/item_activities_details" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Loading Progress -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

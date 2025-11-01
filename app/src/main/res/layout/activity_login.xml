@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:gravity="center"
-                    android:text="Welcome Back"
+                    android:text="@string/welcome_back"
                     android:textColor="@color/colorPrimary"
                     android:textSize="32sp"
                     android:textStyle="bold" />
@@ -87,7 +87,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:layout_marginTop="8dp"
-                    android:text="Sign in to your trading account"
+                    android:text="@string/sign_in_to_your_trading_account"
                     android:textColor="@color/textSecondary"
                     android:textSize="14sp" />
 
@@ -111,7 +111,7 @@
                         android:id="@+id/useremail_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Email Address"
+                        android:hint="@string/email_address"
                         android:inputType="textEmailAddress"
                         android:textColor="@color/colorPrimary"
                         android:textColorHint="@color/textSecondary" />
@@ -204,7 +204,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_marginTop="16dp"
-                    android:text="Continue with Google"
+                    android:text="@string/continue_with_google"
                     android:textColor="@color/google_button_text"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -238,7 +238,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="Sign Up"
+                        android:text="@string/sign_up"
                         android:textColor="@color/colorAccent"
                         android:textSize="14sp"
                         android:textStyle="bold" />

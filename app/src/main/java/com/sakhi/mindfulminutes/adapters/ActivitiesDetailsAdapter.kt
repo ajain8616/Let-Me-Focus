@@ -5,155 +5,107 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
-import com.google.firebase.firestore.FirebaseFirestore
-import com.sakhi.mindfulminutes.models.ActivityItem
-import com.sakhi.mindfulminutes.fragments.StatisticsActivitiesFragment
 import com.sakhi.mindfulminutes.R
+import com.sakhi.mindfulminutes.model.Activity
+import com.sakhi.mindfulminutes.repository.ActivityRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ActivitiesDetailsAdapter(
     private val context: Context,
-    activityList: MutableList<ActivityItem>
-) :
-    RecyclerView.Adapter<ActivitiesDetailsAdapter.ViewHolder>() {
+    private var activityList: MutableList<Activity>,
+    private val onItemClick: (Activity) -> Unit
+) : RecyclerView.Adapter<ActivitiesDetailsAdapter.ViewHolder>() {
 
-    private lateinit var auth: FirebaseAuth
-    private val activities = mutableListOf<ActivityItem>()
+    private val repository = ActivityRepository()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
-    init {
-        setupFirebase()
+    fun updateList(newList: List<Activity>) {
+        activityList.clear()
+        activityList.addAll(newList)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =
-            LayoutInflater.from(context).inflate(R.layout.item_activities_details, parent, false)
+        val view = LayoutInflater.from(context)
+            .inflate(R.layout.item_activities_details, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val activity = activities[position]
-
-        holder.activityNameTextView.text = activity.activityName
-        holder.creationTimeTextView.text = activity.creationTime
-        holder.statusTextView.text = activity.status
-        holder.totalSpentTimeTextView.text = formatTime(activity.totalSpentTime)
-        setStatusTextColor(activity.status, holder.statusTextView)
+        val activity = activityList[position]
+        holder.bind(activity)
 
         holder.itemView.setOnClickListener {
-            val activityName = activities[position].activityName
-            val fragment = StatisticsActivitiesFragment.newInstance(activityName)
-            (context as AppCompatActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit()
+            onItemClick(activity)
         }
     }
 
-    override fun getItemCount(): Int {
-        return activities.size
-    }
+    override fun getItemCount(): Int = activityList.size
 
-    private fun setStatusTextColor(status: String, statusTextView: TextView) {
-        val color = when (status) {
-            "Inactive" -> R.color.red
-            "Stop" -> R.color.yellow
-            "Start" -> R.color.green
-            "Pause" -> R.color.colorBlue
-            else -> android.R.color.black
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val activityNameTextView: TextView = itemView.findViewById(R.id.activityNameTextView)
+        private val creationTimeTextView: TextView = itemView.findViewById(R.id.creationTimeTextView)
+        private val statusTextView: TextView = itemView.findViewById(R.id.statusTextView)
+        private val totalSpentTimeTextView: TextView = itemView.findViewById(R.id.totalSpentTimeTextView)
+        private val sessionsTextView: TextView = itemView.findViewById(R.id.sessionsTextView)
+        private val statusIndicator: View = itemView.findViewById(R.id.statusIndicator)
+
+        fun bind(activity: Activity) {
+            activityNameTextView.text = activity.name
+            creationTimeTextView.text = formatDate(activity.creationTime)
+            statusTextView.text = activity.status.replaceFirstChar { it.uppercase() }
+            totalSpentTimeTextView.text = formatTime(activity.totalTime)
+            sessionsTextView.text = activity.sessionCount.toString()
+
+            // Set status color and indicator
+            setStatusStyle(activity.status, statusTextView, statusIndicator)
+
+            // Load additional data if needed
+            loadAdditionalData(activity.id)
         }
-        statusTextView.setTextColor(context.resources.getColor(color))
-    }
 
-    private fun setupFirebase() {
-        auth = FirebaseAuth.getInstance()
-        val activityRef = FirebaseDatabase.getInstance().reference
-            .child("Activities").child(auth.currentUser?.uid ?: "")
-        activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    handleSnapshot(snapshot)
-                } else {
-                    // Handle no activities found
+        private fun loadAdditionalData(activityId: String) {
+            coroutineScope.launch {
+                try {
+                    // You can load additional real-time data here if needed
+                    // For example, current status, recent sessions, etc.
+                } catch (e: Exception) {
+                    // Handle error silently
                 }
             }
+        }
 
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error
+        private fun setStatusStyle(status: String, statusView: TextView, indicator: View) {
+            val (textColor, backgroundRes) = when (status.lowercase()) {
+                "active", "start" -> Pair(R.color.success_dark, R.drawable.status_indicator_active)
+                "inactive" -> Pair(R.color.error, R.drawable.status_indicator_inactive)
+                "pause", "stop" -> Pair(R.color.warning_dark, R.drawable.status_indicator_paused)
+                else -> Pair(R.color.textSecondary, R.drawable.status_indicator_inactive)
             }
-        })
-    }
 
-    private fun handleSnapshot(snapshot: DataSnapshot) {
-        val updatedActivities = mutableListOf<ActivityItem>() // Create a temporary list
-        for (activitySnapshot in snapshot.children) {
-            val activityId = activitySnapshot.key.orEmpty()
-            if (activityId.isNotEmpty()) {
-                val activityData = activitySnapshot.child("activity").value.toString()
-                val creationTime = activitySnapshot.child("creationTime").value.toString()
-                val status = activitySnapshot.child("status").value.toString()
+            statusView.setTextColor(context.getColor(textColor))
+            indicator.setBackgroundResource(backgroundRes)
+        }
 
-                val instancesSnapshot = activitySnapshot.child("instances")
-                val totalSpentTimeList = mutableListOf<String>()
-                for (instanceSnapshot in instancesSnapshot.children) {
-                    val totalSpentTime =
-                        instanceSnapshot.child("totalSpentTime").value?.toString()
-                    if (!totalSpentTime.isNullOrBlank() && totalSpentTime != "NA") {
-                        totalSpentTimeList.add(totalSpentTime)
-                    }
-                }
+        private fun formatDate(date: Date): String {
+            val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+            return formatter.format(date)
+        }
 
-                val totalSpentTime = singleTotalSpentTime(totalSpentTimeList)
-                val totalSpentTimeInt = calculateTotalSpentTimeInSeconds(totalSpentTime)
-                updatedActivities.add(ActivityItem(activityData, creationTime, status, totalSpentTimeInt))
+        private fun formatTime(seconds: Long): String {
+            return if (seconds <= 0) {
+                "00:00:00"
+            } else {
+                val hours = seconds / 3600
+                val minutes = (seconds % 3600) / 60
+                val secs = seconds % 60
+                String.format("%02d:%02d:%02d", hours, minutes, secs)
             }
         }
-        // After processing all activities, update the original list and sort alphabetically
-        activities.addAll(updatedActivities)
-        activities.sortBy { it.activityName }
-        notifyDataSetChanged()
-    }
-
-    private fun singleTotalSpentTime(totalSpentTime: List<String>): String {
-        return calculateSumTotalSpentTime(totalSpentTime)
-    }
-
-    private fun calculateTotalSpentTimeInSeconds(totalSpentTime: String): Int {
-        val timeParts = totalSpentTime.split(":")
-        val hours = timeParts[0].toIntOrNull() ?: 0
-        val minutes = timeParts.getOrNull(1)?.toIntOrNull() ?: 0
-        val seconds = timeParts.getOrNull(2)?.toIntOrNull() ?: 0
-        return hours * 3600 + minutes * 60 + seconds
-    }
-
-    private fun calculateSumTotalSpentTime(totalSpentTimeList: List<String>): String {
-        val totalSeconds = totalSpentTimeList.mapNotNull { it.toIntOrNull() }.sum()
-        val hours = totalSeconds / 3600
-        val minutes = (totalSeconds % 3600) / 60
-        val seconds = totalSeconds % 60
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
-    private fun formatTime(totalSpentTime: Int): String {
-        return if (totalSpentTime <= 0) {
-            "NA"
-        } else {
-            val hours = totalSpentTime / 3600
-            val minutes = (totalSpentTime % 3600) / 60
-            val seconds = totalSpentTime % 60
-            String.format("%02d:%02d:%02d", hours, minutes, seconds)
-        }
-    }
-
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val activityNameTextView: TextView = itemView.findViewById(R.id.activityNameTextView)
-        val creationTimeTextView: TextView = itemView.findViewById(R.id.creationTimeTextView)
-        val statusTextView: TextView = itemView.findViewById(R.id.statusTextView)
-        val totalSpentTimeTextView: TextView = itemView.findViewById(R.id.totalSpentTimeTextView)
     }
 }
-

@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Background oval -->
+    <!-- Background oval (soft variant of primary for subtle contrast) -->
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/colorLightYellow" />
+            <solid android:color="@color/primaryLight" />
             <size
                 android:width="40dp"
                 android:height="40dp" />
         </shape>
     </item>
 
-    <!-- Border -->
+    <!-- Border (main brand primary color) -->
     <item android:left="2dp" android:right="2dp" android:top="2dp" android:bottom="2dp">
         <shape android:shape="oval">
             <stroke
                 android:width="3dp"
-                android:color="@color/teal_700" />
+                android:color="@color/primary" />
         </shape>
     </item>
 
-    <!-- Vector Icon with Padding -->
+    <!-- Vector Icon with Padding (contrasting color for readability) -->
     <item android:top="5dp" android:left="5dp" android:right="5dp" android:bottom="5dp">
-        <vector android:height="24dp"
-            android:viewportHeight="24"
-            android:viewportWidth="24"
+        <vector
+            xmlns:android="http://schemas.android.com/apk/res/android"
             android:width="24dp"
-            xmlns:android="http://schemas.android.com/apk/res/android">
+            android:height="24dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
             <path
-                android:fillColor="@color/green"
+                android:fillColor="@color/onPrimary"
                 android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM17,13h-4v4h-2v-4L7,13v-2h4L11,7h2v4h4v2z" />
         </vector>
     </item>
 
 </layer-list>
-

@@ -1,41 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:padding="16dp"
     tools:context=".fragments.PieChartFragment">
 
-    <!-- Title Text -->
-    <TextView
-        android:id="@+id/chart_title"
+    <!-- Animated Gradient Background -->
+    <View
+        android:id="@+id/background_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_background" />
+
+    <!-- Background Decorations -->
+    <ImageView
+        android:id="@+id/bg_blob_1"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="-100dp"
+        android:layout_marginEnd="-100dp"
+        android:alpha="0.08"
+        android:src="@drawable/bg_blob_1" />
+
+    <ImageView
+        android:id="@+id/bg_blob_2"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginBottom="-80dp"
+        android:layout_marginStart="-80dp"
+        android:alpha="0.08"
+        android:layout_gravity="bottom|start"
+        android:src="@drawable/bg_blob_2" />
+
+    <!-- App Bar with Fixed Position -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/activity_distribution"
-        android:textColor="@color/primary"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="20dp"
-        android:paddingTop="10dp" />
+        android:background="@drawable/appbar_background_bottom_radius"
+        android:elevation="12dp"
+        android:fitsSystemWindows="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <!-- CardView for the Chart -->
-    <androidx.cardview.widget.CardView
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp"
+            app:layout_scrollFlags="enterAlways|snap">
+
+            <!-- App Title -->
+            <TextView
+                android:id="@+id/activityNameView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Activity Distribution"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/actionButtonsLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:id="@+id/actionButtonsLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- Refresh Button -->
+                <ImageButton
+                    android:id="@+id/refreshButton"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/rounded_button_background"
+                    android:src="@drawable/ic_reset"
+                    android:contentDescription="Refresh chart"
+                    android:scaleType="centerInside" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content Area with SwipeRefreshLayout -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@id/chart_title"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="10dp" >
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Pie Chart -->
-        <com.anychart.AnyChartView
-            android:id="@+id/any_chart_view"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    </androidx.cardview.widget.CardView>
+            <!-- Full Screen Pie Chart Container -->
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChartView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/background_glass"
+                android:elevation="16dp"
+                android:padding="24dp" />
 
-</RelativeLayout>
+            <!-- Empty State View -->
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:padding="32dp">
+
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/error_no_data"
+                    android:alpha="0.5" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="No activity data"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Start tracking activities to see distribution"
+                    android:textColor="@color/textHint"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Loading Progress -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
