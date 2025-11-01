@@ -9,9 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Patterns
-import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
@@ -29,7 +27,6 @@ import com.sakhi.mindfulminutes.databinding.NavHeaderBinding
 import com.sakhi.mindfulminutes.fragments.*
 import com.sakhi.mindfulminutes.models.UserProfile
 import com.squareup.picasso.Picasso
-import kotlin.jvm.java
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -47,37 +44,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val IMAGE_PICK_CODE = 1000
     private val TAG = "MainActivity"
 
-    // SharedPreferences keys
-    private companion object {
-        const val PREFS_NAME = "UserProfilePrefs"
-        const val KEY_PROFILE_IMAGE_URI = "profile_image_uri"
-        const val KEY_USER_NAME = "user_name"
-        const val KEY_USER_EMAIL = "user_email"
+    companion object {
+        private const val PREFS_NAME = "UserProfilePrefs"
+        private const val KEY_PROFILE_IMAGE_URI = "profile_image_uri"
+        private const val KEY_USER_NAME = "user_name"
+        private const val KEY_USER_EMAIL = "user_email"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize ViewBinding
+        // ViewBinding setup
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize Firebase and SharedPreferences
+        // Firebase + SharedPreferences setup
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance()
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
         setupToolbar()
+        setupBottomSheet()          // initialize BEFORE loading user data
         setupNavigationDrawer()
-        setupBottomSheet()
         setupClickListeners()
 
         // Load initial fragment
-        if (savedInstanceState == null) {
-            if (auth.currentUser != null) {
-                loadFragment(ActiveActivitiesFragment(), addToBackStack = false)
-                binding.navView.setCheckedItem(R.id.nav_active)
-            }
+        if (savedInstanceState == null && auth.currentUser != null) {
+            loadFragment(ActiveActivitiesFragment(), addToBackStack = false)
+            binding.navView.setCheckedItem(R.id.nav_active)
         }
     }
 
@@ -99,7 +93,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         binding.navView.setNavigationItemSelectedListener(this)
 
-        // Get header binding
+        // Header binding
         val headerView = binding.navView.getHeaderView(0)
         navHeaderBinding = NavHeaderBinding.bind(headerView)
 
@@ -135,27 +129,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setupClickListeners() {
-        navHeaderBinding.editProfileFab.setOnClickListener {
+        navHeaderBinding.editProfileButton.setOnClickListener {
             showEditProfileBottomSheet()
         }
     }
 
     private fun loadUserData() {
-        val currentUser = auth.currentUser
-        currentUser?.let { user ->
-            // Load basic user info from Firebase Auth
-            val savedName = sharedPreferences.getString(KEY_USER_NAME, user.displayName ?: "User")
-            val savedEmail = sharedPreferences.getString(KEY_USER_EMAIL, user.email ?: "No email")
+        val currentUser = auth.currentUser ?: return
 
-            navHeaderBinding.userNameText.text = savedName
-            navHeaderBinding.userEmailText.text = savedEmail
+        val savedName = sharedPreferences.getString(KEY_USER_NAME, currentUser.displayName ?: "User")
+        val savedEmail = sharedPreferences.getString(KEY_USER_EMAIL, currentUser.email ?: "No email")
 
-            // Load profile picture from SharedPreferences
-            loadProfileImageFromStorage()
+        navHeaderBinding.userNameText.text = savedName
+        navHeaderBinding.userEmailText.text = savedEmail
 
-            // Load additional user data from Realtime Database
-            loadUserFromDatabase(user.uid)
-        }
+        loadProfileImageFromStorage()
+        loadUserFromDatabase(currentUser.uid)
     }
 
     private fun loadProfileImageFromStorage() {
@@ -168,28 +157,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .error(R.drawable.ic_profile)
                 .into(navHeaderBinding.avatarImage)
 
-            // Also load in bottom sheet if open
-            Picasso.get()
-                .load(imageUri)
-                .into(profileBottomSheetBinding.imgProfilePicture)
+            if (::profileBottomSheetBinding.isInitialized) {
+                Picasso.get().load(imageUri).into(profileBottomSheetBinding.imgProfilePicture)
+            }
         } ?: run {
-            // Load default image if no saved image
             navHeaderBinding.avatarImage.setImageResource(R.drawable.ic_profile)
-            profileBottomSheetBinding.imgProfilePicture.setImageResource(R.drawable.ic_profile)
+            if (::profileBottomSheetBinding.isInitialized) {
+                profileBottomSheetBinding.imgProfilePicture.setImageResource(R.drawable.ic_profile)
+            }
         }
     }
 
     private fun saveProfileImageToStorage(imageUri: Uri) {
-        val editor = sharedPreferences.edit()
-        editor.putString(KEY_PROFILE_IMAGE_URI, imageUri.toString())
-        editor.apply()
+        sharedPreferences.edit().putString(KEY_PROFILE_IMAGE_URI, imageUri.toString()).apply()
     }
 
     private fun saveUserProfileToStorage(userName: String, email: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString(KEY_USER_NAME, userName)
-        editor.putString(KEY_USER_EMAIL, email)
-        editor.apply()
+        sharedPreferences.edit()
+            .putString(KEY_USER_NAME, userName)
+            .putString(KEY_USER_EMAIL, email)
+            .apply()
     }
 
     private fun loadUserFromDatabase(userId: String) {
@@ -197,21 +184,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userRef.get().addOnSuccessListener { snapshot ->
             val user = snapshot.getValue(UserProfile::class.java)
             user?.let {
-                // Update UI with database data
                 navHeaderBinding.userNameText.text = it.userName
                 navHeaderBinding.userEmailText.text = it.userEmail
 
-                // Save to SharedPreferences
                 saveUserProfileToStorage(it.userName, it.userEmail)
 
-                // Update status chip
-                if (it.isVerified) {
-                    navHeaderBinding.statusChip.text = "Verified"
-                    navHeaderBinding.statusChip.setChipBackgroundColorResource(R.color.statusSuccess)
-                } else {
-                    navHeaderBinding.statusChip.text = "Not Verified"
-                    navHeaderBinding.statusChip.setChipBackgroundColorResource(R.color.statusWarning)
-                }
+                navHeaderBinding.statusChip.text = "Active"
+                navHeaderBinding.statusChip.setChipBackgroundColorResource(R.color.statusInfo)
             }
         }.addOnFailureListener { e ->
             Log.e(TAG, "Failed to load user data: ${e.message}")
@@ -219,17 +198,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun showEditProfileBottomSheet() {
-        val currentUser = auth.currentUser
-        currentUser?.let { user ->
-            val savedName = sharedPreferences.getString(KEY_USER_NAME, user.displayName ?: "")
-            val savedEmail = sharedPreferences.getString(KEY_USER_EMAIL, user.email ?: "")
+        val currentUser = auth.currentUser ?: return
 
-            profileBottomSheetBinding.etUserName.setText(savedName)
-            profileBottomSheetBinding.etUserEmail.setText(savedEmail)
+        val savedName = sharedPreferences.getString(KEY_USER_NAME, currentUser.displayName ?: "")
+        val savedEmail = sharedPreferences.getString(KEY_USER_EMAIL, currentUser.email ?: "")
 
-            // Load current profile picture from SharedPreferences
-            loadProfileImageFromStorage()
-        }
+        profileBottomSheetBinding.etUserName.setText(savedName)
+        profileBottomSheetBinding.etUserEmail.setText(savedEmail)
+
+        loadProfileImageFromStorage()
         bottomSheetDialog.show()
     }
 
@@ -253,18 +230,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return
         }
 
-        showProgress(true)
-        val currentUser = auth.currentUser
-        currentUser?.let { user ->
-            // Update in Realtime Database
-            updateUserInDatabase(user.uid, userName, email)
+        showLoading(true)
+        val currentUser = auth.currentUser ?: return
 
-            // Update in Firebase Auth
-            updateAuthProfile(user, userName, email)
-
-            // Save to SharedPreferences
-            saveUserProfileToStorage(userName, email)
-        }
+        updateUserInDatabase(currentUser.uid, userName, email)
+        updateAuthProfile(currentUser, userName, email)
+        saveUserProfileToStorage(userName, email)
     }
 
     private fun updateUserInDatabase(userId: String, userName: String, email: String) {
@@ -295,17 +266,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .addOnSuccessListener {
                 user.updateEmail(email)
                     .addOnSuccessListener {
-                        showProgress(false)
+                        showLoading(false)
                         bottomSheetDialog.dismiss()
                         showSuccess("Profile updated successfully")
                     }
                     .addOnFailureListener { e ->
-                        showProgress(false)
+                        showLoading(false)
                         showError("Email update failed: ${e.message}")
                     }
             }
             .addOnFailureListener { e ->
-                showProgress(false)
+                showLoading(false)
                 showError("Profile update failed: ${e.message}")
             }
     }
@@ -321,11 +292,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (requestCode == IMAGE_PICK_CODE && resultCode == RESULT_OK && data != null) {
             val imageUri = data.data
             imageUri?.let { uri ->
-                // Update UI immediately
                 Picasso.get().load(uri).into(profileBottomSheetBinding.imgProfilePicture)
                 Picasso.get().load(uri).into(navHeaderBinding.avatarImage)
-
-                // Save image URI to SharedPreferences (local storage)
                 saveProfileImageToStorage(uri)
                 showSuccess("Profile picture updated locally")
             }
@@ -348,42 +316,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun loadFragment(fragment: Fragment, addToBackStack: Boolean = true) {
         currentFragment = fragment
         val transaction = supportFragmentManager.beginTransaction()
-            .setCustomAnimations(
-                R.animator.slide_in_right,
-                R.animator.slide_out_left,
-                R.animator.slide_in_left,
-                R.animator.slide_out_right
-            )
             .replace(R.id.fragment_container, fragment)
 
-        if (addToBackStack) {
-            transaction.addToBackStack(null)
-        }
+        if (addToBackStack) transaction.addToBackStack(null)
         transaction.commit()
     }
-
 
     private fun showLogoutConfirmation() {
         MaterialAlertDialogBuilder(this)
             .setTitle("Logout")
             .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Logout") { dialog, which ->
-                logoutUser()
-            }
+            .setPositiveButton("Logout") { _, _ -> logoutUser() }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
     private fun logoutUser() {
-        // Clear SharedPreferences on logout
-        val editor = sharedPreferences.edit()
-        editor.clear()
-        editor.apply()
-
+        sharedPreferences.edit().clear().apply()
         auth.signOut()
-        // Navigate to login activity
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
 
@@ -391,7 +342,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-
         return when {
             activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
             activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
@@ -400,9 +350,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun showProgress(show: Boolean) {
-        profileBottomSheetBinding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+    // ✅ New simplified loading indicator
+    private fun showLoading(show: Boolean) {
         profileBottomSheetBinding.btnSaveProfile.isEnabled = !show
+        profileBottomSheetBinding.btnSaveProfile.text =
+            if (show) "Updating..." else "Update Changes"
     }
 
     private fun showSuccess(message: String) {
@@ -410,8 +362,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             binding.root,
             message,
             com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
-        ).setBackgroundTint(getColor(R.color.statusSuccess))
-            .show()
+        ).setBackgroundTint(getColor(R.color.statusSuccess)).show()
     }
 
     private fun showError(message: String) {
@@ -419,8 +370,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             binding.root,
             message,
             com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-        ).setBackgroundTint(getColor(R.color.error))
-            .show()
+        ).setBackgroundTint(getColor(R.color.error)).show()
     }
 
     override fun onBackPressed() {
@@ -429,11 +379,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             super.onBackPressed()
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.nav_menu, menu)
-        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

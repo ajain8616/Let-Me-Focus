@@ -17,12 +17,9 @@ data class UserProfile(
     val userName: String = "",
     val userEmail: String = "",
     val createdAt: Long = 0L,
-    val isVerified: Boolean = false,
     val lastLoginAt: Long = 0L,
-    val accountStatus: String = "active",
-    val profileCompleted: Boolean = false,
-    val profileImageUrl: String = "" // Add this field if you want to store profile images
+    val profileImageUrl: String = ""
 ) {
-    // Default constructor for Firebase
-    constructor() : this("", "", "", 0L, false, 0L, "active", false, "")
+    // Default constructor for Firebase (no-arg constructor)
+    constructor() : this("", "", "", 0L, 0L, "")
 }

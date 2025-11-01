@@ -11,6 +11,8 @@ import androidx.core.animation.doOnEnd
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.sakhi.mindfulminutes.R
+import com.sakhi.mindfulminutes.activities.LoginActivity
+import com.sakhi.mindfulminutes.activities.MainActivity
 import com.sakhi.mindfulminutes.activities.SignupActivity
 import com.sakhi.mindfulminutes.databinding.ActivitySplashBinding
 
@@ -135,11 +137,11 @@ class SplashActivity : AppCompatActivity() {
             .start()
 
         Handler(Looper.getMainLooper()).postDelayed({
-            navigateToSignupActivity()
+            navigateNext()
         }, splashDelay)
     }
 
-    private fun navigateToSignupActivity() {
+    private fun navigateNext() {
         val flipOutAnimator = android.animation.AnimatorInflater.loadAnimator(
             this,
             R.animator.card_flip_out
@@ -160,13 +162,23 @@ class SplashActivity : AppCompatActivity() {
             }.start()
             binding.versionInfo.animate().alpha(0f).setDuration(400).withEndAction {
                 binding.versionInfo.visibility = View.INVISIBLE
-                startSignupActivity()
+                decideNextActivity()
             }.start()
         }
     }
 
-    private fun startSignupActivity() {
-        startActivity(Intent(this, SignupActivity::class.java))
+    private fun decideNextActivity() {
+        val prefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val isLoggedIn = prefs.getBoolean("is_logged_in", false)
+        val isRegistered = prefs.getBoolean("is_registered", false)
+
+        val nextIntent = when {
+            isLoggedIn -> Intent(this, MainActivity::class.java)
+            isRegistered -> Intent(this, LoginActivity::class.java)
+            else -> Intent(this, SignupActivity::class.java)
+        }
+
+        startActivity(nextIntent)
         overridePendingTransition(R.animator.slide_in_right, R.animator.slide_out_left)
         finish()
     }

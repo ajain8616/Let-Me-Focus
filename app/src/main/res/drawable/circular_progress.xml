@@ -4,26 +4,26 @@
     android:fromDegrees="0"
     android:toDegrees="360"
     android:pivotX="50%"
-    android:pivotY="50%">
+    android:pivotY="50%"
+    android:interpolator="@android:anim/linear_interpolator">
 
-    <!-- Ring Shape with modern gradient and thickness -->
+    <!-- Modern ring shape with gradient -->
     <shape
-        android:innerRadiusRatio="3"
         android:shape="ring"
-        android:thicknessRatio="6"
-        android:useLevel="false">
+        android:thickness="6dp"
+        android:useLevel="false"
+        android:innerRadiusRatio="3">
 
         <size
-            android:width="16dp"
-            android:height="16dp" />
+            android:width="40dp"
+            android:height="40dp"/>
 
         <gradient
-            android:angle="0"
+            android:type="sweep"
+            android:useLevel="false"
             android:startColor="@color/primary_color"
             android:centerColor="@color/primary_light_color"
             android:endColor="@color/primary_dark_color"
-            android:type="sweep"
-            android:useLevel="false" />
+            android:angle="0"/>
     </shape>
-
 </animated-rotate>

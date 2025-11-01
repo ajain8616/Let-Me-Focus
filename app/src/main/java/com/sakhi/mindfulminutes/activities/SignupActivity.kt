@@ -4,14 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.FirebaseDatabase
-import com.sakhi.mindfulminutes.R
 import com.sakhi.mindfulminutes.databinding.ActivitySignupBinding
 import com.sakhi.mindfulminutes.fragments.ErrorBottomSheetFragment
 import com.sakhi.mindfulminutes.fragments.SuccessBottomSheetFragment
@@ -22,6 +21,10 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
+
+    companion object {
+        private const val TAG = "SignupActivity"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,16 +49,13 @@ class SignupActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        // Sign Up button
         binding.signupButton.setOnClickListener {
             validateAndSignUp()
         }
 
-        // Navigate to LoginActivity when "Login here" is clicked
         binding.loginTextview.setOnClickListener {
             navigateToLogin()
         }
-
     }
 
     private fun setupTextWatchers() {
@@ -154,18 +154,20 @@ class SignupActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    Log.d(TAG, "User created successfully with email: $email")
                     val user = auth.currentUser
                     user?.let {
-                        // Send verification email immediately after user creation
                         sendVerificationEmail(user, name, email)
                     }
                 } else {
                     showLoading(false)
+                    Log.e(TAG, "Sign up failed: ${task.exception?.message}")
                     showErrorBottomSheet("Sign up failed: ${task.exception?.message}")
                 }
             }
             .addOnFailureListener { exception ->
                 showLoading(false)
+                Log.e(TAG, "Signup error: ${exception.message}")
                 showErrorBottomSheet("Signup error: ${exception.message}")
             }
     }
@@ -174,10 +176,11 @@ class SignupActivity : AppCompatActivity() {
         user.sendEmailVerification()
             .addOnCompleteListener { verificationTask ->
                 if (verificationTask.isSuccessful) {
-                    // Update user profile and save to database after verification email is sent
+                    Log.d(TAG, "Verification email sent to: $email")
                     updateUserProfileAndSaveToDatabase(user, name, email)
                 } else {
                     showLoading(false)
+                    Log.e(TAG, "Error sending verification email: ${verificationTask.exception?.message}")
                     showErrorBottomSheet("Error sending verification email: ${verificationTask.exception?.message}")
                 }
             }
@@ -191,9 +194,11 @@ class SignupActivity : AppCompatActivity() {
         user.updateProfile(profileUpdates)
             .addOnCompleteListener { profileTask ->
                 if (profileTask.isSuccessful) {
+                    Log.d(TAG, "User profile updated successfully")
                     saveUserToDatabase(user.uid, name, email)
                 } else {
                     showLoading(false)
+                    Log.e(TAG, "Profile update failed: ${profileTask.exception?.message}")
                     showErrorBottomSheet("Profile update failed: ${profileTask.exception?.message}")
                 }
             }
@@ -205,9 +210,8 @@ class SignupActivity : AppCompatActivity() {
             userName = name,
             userEmail = email,
             createdAt = System.currentTimeMillis(),
-            isVerified = false,
             lastLoginAt = System.currentTimeMillis(),
-            accountStatus = "pending_verification"
+            profileImageUrl = ""
         )
 
         val usersRef = database.getReference("TradingPlatformUsers")
@@ -215,35 +219,47 @@ class SignupActivity : AppCompatActivity() {
             .addOnCompleteListener { databaseTask ->
                 showLoading(false)
                 if (databaseTask.isSuccessful) {
+                    Log.d(TAG, "User data saved to database")
+
+                    // ✅ Set SharedPreferences after successful registration
+                    val prefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
+                    prefs.edit().putBoolean("is_registered", true).apply()
+
                     showSuccessBottomSheet(
                         "Verification link sent to your email. Please verify your email before logging in.",
                         autoDismiss = false
                     )
-
-                    // Navigate to login after 3 seconds
                     binding.root.postDelayed({
                         navigateToLogin()
                     }, 3000)
                 } else {
+                    Log.e(TAG, "Failed to save user data: ${databaseTask.exception?.message}")
                     showErrorBottomSheet("Failed to save user data: ${databaseTask.exception?.message}")
                 }
             }
     }
-
 
     private fun showLoading(show: Boolean) {
         binding.signupButton.isEnabled = !show
         binding.signupButton.text = if (show) "Creating Account..." else "Create Account"
     }
 
+    private fun showBottomSheetSafely(fragment: androidx.fragment.app.DialogFragment, tag: String) {
+        if (supportFragmentManager.isStateSaved) {
+            supportFragmentManager.beginTransaction().add(fragment, tag).commitAllowingStateLoss()
+        } else {
+            fragment.show(supportFragmentManager, tag)
+        }
+    }
+
     private fun showSuccessBottomSheet(message: String, autoDismiss: Boolean = true) {
         val successBottomSheet = SuccessBottomSheetFragment(message)
-        successBottomSheet.show(supportFragmentManager, "SuccessBottomSheet")
+        showBottomSheetSafely(successBottomSheet, "SuccessBottomSheet")
 
         if (autoDismiss) {
             binding.root.postDelayed({
                 if (successBottomSheet.isVisible) {
-                    successBottomSheet.dismiss()
+                    successBottomSheet.dismissAllowingStateLoss()
                 }
             }, 3000)
         }
@@ -251,12 +267,11 @@ class SignupActivity : AppCompatActivity() {
 
     private fun showErrorBottomSheet(message: String) {
         val errorBottomSheet = ErrorBottomSheetFragment(message)
-        errorBottomSheet.show(supportFragmentManager, "ErrorBottomSheet")
+        showBottomSheetSafely(errorBottomSheet, "ErrorBottomSheet")
 
-        // Auto dismiss error sheets after 4 seconds
         binding.root.postDelayed({
             if (errorBottomSheet.isVisible) {
-                errorBottomSheet.dismiss()
+                errorBottomSheet.dismissAllowingStateLoss()
             }
         }, 4000)
     }
@@ -268,15 +283,14 @@ class SignupActivity : AppCompatActivity() {
         finish()
     }
 
-    // Optional: Check if email is verified when activity resumes
     override fun onResume() {
         super.onResume()
         auth.currentUser?.let { user ->
             user.reload().addOnCompleteListener { reloadTask ->
                 if (reloadTask.isSuccessful && user.isEmailVerified) {
-                    showSuccessBottomSheet("Email verified successfully! You can now login.")
-
-                    // Navigate to login after success message
+                    binding.root.post {
+                        showSuccessBottomSheet("Email verified successfully! You can now login.")
+                    }
                     binding.root.postDelayed({
                         navigateToLogin()
                     }, 2000)

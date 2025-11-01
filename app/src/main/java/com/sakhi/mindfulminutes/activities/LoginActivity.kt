@@ -17,7 +17,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 import com.sakhi.mindfulminutes.R
 import com.sakhi.mindfulminutes.databinding.ActivityLoginBinding
-import com.sakhi.mindfulminutes.fragments.ActiveActivitiesFragment
 import com.sakhi.mindfulminutes.models.UserProfile
 
 class LoginActivity : AppCompatActivity() {
@@ -40,12 +39,12 @@ class LoginActivity : AppCompatActivity() {
 
         Log.d(TAG, "LoginActivity created")
 
-        // Initialize Firebase instances
+        // Initialize Firebase
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance()
         Log.d(TAG, "Firebase instances initialized")
 
-        // Initialize Google Sign In
+        // Initialize Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
@@ -56,7 +55,6 @@ class LoginActivity : AppCompatActivity() {
         setupClickListeners()
         setupTextWatchers()
 
-        // Check if user is already logged in
         checkExistingUser()
     }
 
@@ -66,7 +64,8 @@ class LoginActivity : AppCompatActivity() {
             Log.d(TAG, "User already logged in: ${currentUser.uid}")
             if (currentUser.isEmailVerified) {
                 Log.d(TAG, "User email verified, navigating to home")
-                navigateToHomeFragment()
+                saveLoginState()
+                navigateToMainActivity()
             } else {
                 Log.w(TAG, "User email not verified, signing out")
                 auth.signOut()
@@ -189,8 +188,9 @@ class LoginActivity : AppCompatActivity() {
                     if (currentUser != null && currentUser.isEmailVerified) {
                         Log.d(TAG, "User email verified, updating login data")
                         updateUserLoginData(currentUser.uid)
+                        saveLoginState() // <-- Save login state here
                         showSuccess("Login successful!")
-                        navigateToHomeFragment()
+                        navigateToMainActivity()
                     } else {
                         showLoading(false)
                         Log.w(TAG, "User email not verified, signing out")
@@ -216,8 +216,7 @@ class LoginActivity : AppCompatActivity() {
         val userRef = database.getReference("TradingPlatformUsers").child(uid)
 
         val updates = hashMapOf<String, Any>(
-            "lastLoginAt" to System.currentTimeMillis(),
-            "accountStatus" to "active"
+            "lastLoginAt" to System.currentTimeMillis()
         )
 
         userRef.updateChildren(updates).addOnCompleteListener { task ->
@@ -332,10 +331,7 @@ class LoginActivity : AppCompatActivity() {
             userName = googleAccount.displayName ?: "Google User",
             userEmail = googleAccount.email ?: "",
             createdAt = System.currentTimeMillis(),
-            isVerified = true,
             lastLoginAt = System.currentTimeMillis(),
-            accountStatus = "active",
-            profileCompleted = false,
             profileImageUrl = googleAccount.photoUrl?.toString() ?: ""
         )
 
@@ -343,9 +339,10 @@ class LoginActivity : AppCompatActivity() {
         usersRef.child(firebaseUser.uid).setValue(user).addOnCompleteListener { task ->
             showLoading(false)
             if (task.isSuccessful) {
+                saveLoginState() // <-- Save login state here
                 Log.d(TAG, "Google user created successfully in database")
                 showSuccess("Google sign-in successful!")
-                navigateToHomeFragment()
+                navigateToMainActivity()
             } else {
                 Log.e(TAG, "Failed to save Google user data: ${task.exception?.message}", task.exception)
                 showError("Failed to save user data: ${task.exception?.message}")
@@ -353,26 +350,21 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-
     private fun updateGoogleUserLoginData(firebaseUser: com.google.firebase.auth.FirebaseUser, existingUser: UserProfile) {
         Log.d(TAG, "Updating Google user login data: ${firebaseUser.uid}")
 
         val userRef = database.getReference("TradingPlatformUsers").child(firebaseUser.uid)
 
         val updates = hashMapOf<String, Any>(
-            "lastLoginAt" to System.currentTimeMillis(),
-            "accountStatus" to "active",
-            "isVerified" to true // Ensure Google users are always marked as verified
+            "lastLoginAt" to System.currentTimeMillis()
         )
 
-        // Update profile image if available and not already set
-//        firebaseUser.photoUrl?.toString()?.let { photoUrl ->
-//            if (existingUser.profileImageUrl.isNullOrEmpty()) {
-//                updates["profileImageUrl"] = photoUrl
-//            }
-//        }
+        firebaseUser.photoUrl?.toString()?.let { photoUrl ->
+            if (existingUser.profileImageUrl.isNullOrEmpty()) {
+                updates["profileImageUrl"] = photoUrl
+            }
+        }
 
-        // Update display name if changed
         firebaseUser.displayName?.let { displayName ->
             if (existingUser.userName != displayName) {
                 updates["userName"] = displayName
@@ -382,9 +374,10 @@ class LoginActivity : AppCompatActivity() {
         userRef.updateChildren(updates).addOnCompleteListener { task ->
             showLoading(false)
             if (task.isSuccessful) {
+                saveLoginState() // <-- Save login state here
                 Log.d(TAG, "Google user login data updated successfully")
                 showSuccess("Google sign-in successful!")
-                navigateToHomeFragment()
+                navigateToMainActivity()
             } else {
                 Log.e(TAG, "Failed to update Google user data: ${task.exception?.message}", task.exception)
                 showError("Failed to update user data: ${task.exception?.message}")
@@ -392,51 +385,36 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun showLoading(show: Boolean) {
-        binding.loginButton.isEnabled = !show
-        binding.loginButton.text = if (show) "Signing In..." else "Login"
-        binding.googleButton.isEnabled = !show
-        Log.d(TAG, "Loading state: $show")
+    private fun saveLoginState() {
+        Log.d(TAG, "Saving login state to SharedPreferences")
+        val prefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        prefs.edit().putBoolean("is_logged_in", true).apply()
     }
 
-    private fun showSuccess(message: String) {
-        Log.d(TAG, "Success: $message")
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
-            .setBackgroundTint(getColor(R.color.statusSuccess))
-            .show()
-    }
-
-    private fun showError(message: String) {
-        Log.e(TAG, "Error: $message")
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
-            .setBackgroundTint(getColor(R.color.error))
-            .show()
-    }
-
-    private fun navigateToSignUpActivity() {
-        Log.d(TAG, "Navigating to SignUpActivity")
-        val intent = Intent(this, SignupActivity::class.java)
+    private fun navigateToMainActivity() {
+        Log.d(TAG, "Navigating to MainActivity")
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
     }
 
-    private fun navigateToHomeFragment() {
-        Log.d(TAG, "Navigating to HomeFragment")
-        val homeFragment = ActiveActivitiesFragment()
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(
-                R.animator.slide_in_left,
-                R.animator.slide_out_right,
-                R.animator.slide_in_right,
-                R.animator.slide_out_left
-            )
-            .replace(R.id.fragment_container, homeFragment)
-            .addToBackStack(null)
-            .commit()
+    private fun navigateToSignUpActivity() {
+        Log.d(TAG, "Navigating to SignUpActivity")
+        startActivity(Intent(this, SignupActivity::class.java))
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "LoginActivity destroyed")
+    private fun showLoading(show: Boolean) {
+        binding.loginButton.isEnabled = !show
+        binding.loginButton.text = if (show) "Logging in..." else "Login"
+    }
+
+
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun showSuccess(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 }
