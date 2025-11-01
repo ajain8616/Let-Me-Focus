@@ -61,13 +61,27 @@
                 android:scaleType="centerInside"
                 android:padding="6dp" />
 
+            <!-- Refresh Button -->
+            <ImageButton
+                android:id="@+id/refreshButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_reset"
+                android:background="@drawable/rounded_button_background_primary"
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                android:contentDescription="Refresh statistics" />
+
             <!-- Activity Name -->
             <TextView
                 android:id="@+id/intentActivityView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/backButton"
+                android:layout_toStartOf="@id/refreshButton"
                 android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:gravity="center"
                 android:text="Activity Statistics"
                 android:textSize="20sp"
@@ -78,350 +92,463 @@
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Statistics Container -->
-    <androidx.cardview.widget.CardView
+    <!-- Main Content Layout -->
+    <LinearLayout
+        android:id="@+id/contentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/headerCard"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="2dp">
+        android:orientation="vertical"
+        android:visibility="visible">
 
-        <ScrollView
+        <!-- Statistics Container -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp"
-            android:fillViewport="true">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp">
 
-            <LinearLayout
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:fillViewport="true">
 
-                <!-- Stats Grid - Row 1 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                    android:orientation="vertical">
 
-                    <!-- Start Time -->
+                    <!-- Additional Statistics Row -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@drawable/stat_item_background"
-                        android:padding="16dp"
-                        android:layout_marginEnd="6dp">
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- Last Session -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Start Time"
-                            android:textSize="12sp"
-                            android:textColor="@color/textSecondary"
-                            android:letterSpacing="0.02" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginEnd="6dp">
 
-                        <TextView
-                            android:id="@+id/sTimeTextView"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Last Session"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/lastSessionTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="00:00:00"
+                                android:textSize="14sp"
+                                android:textColor="@color/success_dark"
+                                android:textStyle="bold"
+                                android:fontFamily="monospace" />
+
+                        </LinearLayout>
+
+                        <!-- Today's Time -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="NA"
-                            android:textSize="14sp"
-                            android:textColor="@color/textPrimary"
-                            android:textStyle="bold"
-                            android:maxLines="1"
-                            android:ellipsize="end" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginStart="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Today"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/todayTimeTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="00:00:00"
+                                android:textSize="14sp"
+                                android:textColor="@color/modern_primary"
+                                android:textStyle="bold"
+                                android:fontFamily="monospace" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
-                    <!-- End Time -->
+                    <!-- Total Sessions Row -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
                         android:background="@drawable/stat_item_background"
                         android:padding="16dp"
-                        android:layout_marginStart="6dp">
+                        android:layout_marginBottom="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="End Time"
+                            android:text="Total Sessions"
                             android:textSize="12sp"
                             android:textColor="@color/textSecondary"
                             android:letterSpacing="0.02" />
 
                         <TextView
-                            android:id="@+id/endTimeTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="NA"
-                            android:textSize="14sp"
-                            android:textColor="@color/textPrimary"
-                            android:textStyle="bold"
-                            android:maxLines="1"
-                            android:ellipsize="end" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Stats Grid - Row 2 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
-
-                    <!-- Total Time -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@drawable/stat_item_background"
-                        android:padding="16dp"
-                        android:layout_marginEnd="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Total Time"
-                            android:textSize="12sp"
-                            android:textColor="@color/textSecondary"
-                            android:letterSpacing="0.02" />
-
-                        <TextView
-                            android:id="@+id/totalTimeTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00:00:00"
-                            android:textSize="14sp"
-                            android:textColor="@color/textPrimary"
-                            android:textStyle="bold"
-                            android:fontFamily="monospace" />
-
-                    </LinearLayout>
-
-                    <!-- Sessions Count -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@drawable/stat_item_background"
-                        android:padding="16dp"
-                        android:layout_marginStart="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sessions"
-                            android:textSize="12sp"
-                            android:textColor="@color/textSecondary"
-                            android:letterSpacing="0.02" />
-
-                        <TextView
-                            android:id="@+id/countTimeTextView"
+                            android:id="@+id/totalSessionsTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="14sp"
+                            android:textSize="16sp"
                             android:textColor="@color/textPrimary"
                             android:textStyle="bold" />
 
                     </LinearLayout>
 
-                </LinearLayout>
-
-                <!-- Stats Grid - Row 3 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
-
-                    <!-- Mean Time -->
+                    <!-- Stats Grid - Row 1 -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Start Time -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginEnd="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Start Time"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/sTimeTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="NA"
+                                android:textSize="14sp"
+                                android:textColor="@color/textPrimary"
+                                android:textStyle="bold"
+                                android:maxLines="1"
+                                android:ellipsize="end" />
+
+                        </LinearLayout>
+
+                        <!-- End Time -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginStart="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="End Time"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/endTimeTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="NA"
+                                android:textSize="14sp"
+                                android:textColor="@color/textPrimary"
+                                android:textStyle="bold"
+                                android:maxLines="1"
+                                android:ellipsize="end" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Stats Grid - Row 2 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Total Time -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginEnd="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Total Time"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/totalTimeTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="00:00:00"
+                                android:textSize="14sp"
+                                android:textColor="@color/textPrimary"
+                                android:textStyle="bold"
+                                android:fontFamily="monospace" />
+
+                        </LinearLayout>
+
+                        <!-- Sessions Count -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginStart="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sessions"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/countTimeTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textSize="14sp"
+                                android:textColor="@color/textPrimary"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Stats Grid - Row 3 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Mean Time -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginEnd="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Average"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/meanTimeTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="00:00:00"
+                                android:textSize="14sp"
+                                android:textColor="@color/textPrimary"
+                                android:textStyle="bold"
+                                android:fontFamily="monospace" />
+
+                        </LinearLayout>
+
+                        <!-- Median Time -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginStart="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Median"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/medianTimeTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="00:00:00"
+                                android:textSize="14sp"
+                                android:textColor="@color/textPrimary"
+                                android:textStyle="bold"
+                                android:fontFamily="monospace" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Stats Grid - Row 4 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- Maximum Time -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginEnd="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Longest"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/maximumTimeTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="00:00:00"
+                                android:textSize="14sp"
+                                android:textColor="@color/textPrimary"
+                                android:textStyle="bold"
+                                android:fontFamily="monospace" />
+
+                        </LinearLayout>
+
+                        <!-- Minimum Time -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stat_item_background"
+                            android:padding="16dp"
+                            android:layout_marginStart="6dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Shortest"
+                                android:textSize="12sp"
+                                android:textColor="@color/textSecondary"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/minimumTimeTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="00:00:00"
+                                android:textSize="14sp"
+                                android:textColor="@color/textPrimary"
+                                android:textStyle="bold"
+                                android:fontFamily="monospace" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Pause Time -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:gravity="center"
                         android:background="@drawable/stat_item_background"
                         android:padding="16dp"
-                        android:layout_marginEnd="6dp">
+                        android:layout_marginTop="8dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Average"
+                            android:text="Last Pause"
                             android:textSize="12sp"
                             android:textColor="@color/textSecondary"
                             android:letterSpacing="0.02" />
 
                         <TextView
-                            android:id="@+id/meanTimeTextView"
+                            android:id="@+id/pauseTimeTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="00:00:00"
+                            android:text="NA"
                             android:textSize="14sp"
                             android:textColor="@color/textPrimary"
                             android:textStyle="bold"
-                            android:fontFamily="monospace" />
-
-                    </LinearLayout>
-
-                    <!-- Median Time -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@drawable/stat_item_background"
-                        android:padding="16dp"
-                        android:layout_marginStart="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Median"
-                            android:textSize="12sp"
-                            android:textColor="@color/textSecondary"
-                            android:letterSpacing="0.02" />
-
-                        <TextView
-                            android:id="@+id/medianTimeTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00:00:00"
-                            android:textSize="14sp"
-                            android:textColor="@color/textPrimary"
-                            android:textStyle="bold"
-                            android:fontFamily="monospace" />
+                            android:maxLines="1"
+                            android:ellipsize="end" />
 
                     </LinearLayout>
 
                 </LinearLayout>
 
-                <!-- Stats Grid - Row 4 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+            </ScrollView>
 
-                    <!-- Maximum Time -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@drawable/stat_item_background"
-                        android:padding="16dp"
-                        android:layout_marginEnd="6dp">
+        </androidx.cardview.widget.CardView>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Longest"
-                            android:textSize="12sp"
-                            android:textColor="@color/textSecondary"
-                            android:letterSpacing="0.02" />
+    </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/maximumTimeTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00:00:00"
-                            android:textSize="14sp"
-                            android:textColor="@color/textPrimary"
-                            android:textStyle="bold"
-                            android:fontFamily="monospace" />
-
-                    </LinearLayout>
-
-                    <!-- Minimum Time -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@drawable/stat_item_background"
-                        android:padding="16dp"
-                        android:layout_marginStart="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Shortest"
-                            android:textSize="12sp"
-                            android:textColor="@color/textSecondary"
-                            android:letterSpacing="0.02" />
-
-                        <TextView
-                            android:id="@+id/minimumTimeTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00:00:00"
-                            android:textSize="14sp"
-                            android:textColor="@color/textPrimary"
-                            android:textStyle="bold"
-                            android:fontFamily="monospace" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Pause Time -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="@drawable/stat_item_background"
-                    android:padding="16dp"
-                    android:layout_marginTop="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Last Pause"
-                        android:textSize="12sp"
-                        android:textColor="@color/textSecondary"
-                        android:letterSpacing="0.02" />
-
-                    <TextView
-                        android:id="@+id/pauseTimeTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NA"
-                        android:textSize="14sp"
-                        android:textColor="@color/textPrimary"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </ScrollView>
-
-    </androidx.cardview.widget.CardView>
+    <!-- Empty State -->
 
     <!-- Loading Progress -->
     <ProgressBar

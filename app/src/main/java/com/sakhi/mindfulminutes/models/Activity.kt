@@ -1,21 +1,12 @@
 package com.sakhi.mindfulminutes.model
 
-import java.util.Date
-
 data class Activity(
     val id: String = "",
     val name: String = "",
-    val status: String = "active",
-    val creationTime: Date = Date(),
-    val totalTime: Long = 0, // in seconds
-    val sessionCount: Int = 0
-)
-
-data class ActivityInstance(
-    val id: String = "",
-    val activityId: String = "",
-    val startTime: Date = Date(),
-    val endTime: Date? = null,
-    val duration: Long = 0, // in seconds
-    val status: String = "completed"
+    val description: String = "",
+    val color: Int = 0,
+    val icon: Int = 0,
+    val status: String = "active", // "active" or "inactive"
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis()
 )

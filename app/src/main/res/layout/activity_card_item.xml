@@ -96,7 +96,7 @@
                     android:layout_marginStart="8dp" />
             </LinearLayout>
 
-            <!-- Quick Actions -->
+            <!-- Quick Actions - 3 Buttons Layout -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -104,24 +104,41 @@
                 android:gravity="center"
                 android:layout_marginTop="16dp">
 
+                <!-- Play/Pause Button -->
                 <ImageButton
                     android:id="@+id/playPauseButton"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
+                    android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_play"
                     android:background="@drawable/rounded_button_outline_green"
                     android:tint="@color/success_dark"
                     android:scaleType="centerInside"
                     android:padding="8dp" />
 
+                <!-- Stop Button -->
+                <ImageButton
+                    android:id="@+id/stopButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/ic_stop"
+                    android:background="@drawable/rounded_button_outline_red"
+                    android:tint="@color/error"
+                    android:scaleType="centerInside"
+                    android:padding="8dp"
+                    android:visibility="gone" />
+
+                <!-- Flip Button -->
                 <ImageButton
                     android:id="@+id/flipButton"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:src="@drawable/ic_flip"
                     android:background="@drawable/rounded_button_outline_primary"
                     android:tint="@color/modern_primary"
@@ -141,7 +158,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="16dp">
+                android:paddingBottom="16px">
 
                 <ImageButton
                     android:id="@+id/backButton"
@@ -194,7 +211,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Session"
+                            android:text="Total Time"
                             android:textSize="12sp"
                             android:textColor="@color/textSecondary"
                             android:letterSpacing="0.02" />
@@ -223,7 +240,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Total"
+                            android:text="Sessions"
                             android:textSize="12sp"
                             android:textColor="@color/textSecondary"
                             android:letterSpacing="0.02" />
@@ -232,11 +249,10 @@
                             android:id="@+id/backTextView2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="00:00:00"
+                            android:text="0"
                             android:textSize="16sp"
                             android:textColor="@color/textPrimary"
-                            android:textStyle="bold"
-                            android:fontFamily="monospace" />
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -259,7 +275,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sessions"
+                            android:text="Average Time"
                             android:textSize="12sp"
                             android:textColor="@color/textSecondary"
                             android:letterSpacing="0.02" />
@@ -268,10 +284,11 @@
                             android:id="@+id/backTextView3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0"
+                            android:text="00:00:00"
                             android:textSize="16sp"
                             android:textColor="@color/textPrimary"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:fontFamily="monospace" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -287,7 +304,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Average"
+                            android:text="Last Session"
                             android:textSize="12sp"
                             android:textColor="@color/textSecondary"
                             android:letterSpacing="0.02" />
@@ -324,7 +341,18 @@
                     android:scaleType="centerInside"
                     android:padding="8dp" />
 
-                <!-- Share button removed -->
+                <!-- Share Button -->
+                <ImageButton
+                    android:id="@+id/shareButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_share"
+                    android:background="@drawable/rounded_button_background_transparent"
+                    android:tint="@color/modern_primary"
+                    android:scaleType="centerInside"
+                    android:padding="8dp" />
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

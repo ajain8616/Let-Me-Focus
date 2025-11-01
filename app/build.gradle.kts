@@ -46,9 +46,10 @@ android {
 
 dependencies {
 
-//    implementation ("com.github.AnyChart:AnyChart-Android:1.1.5")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-
+    implementation("com.itextpdf:itext7-core:7.2.5")
+//    implementation("com.github.blackfizz:eazegraph:1.2.2@aar")
+//    implementation("com.nineoldandroids:library:2.4.0")
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("com.google.android.gms:play-services-auth:21.1.1")
     implementation("androidx.core:core-ktx:1.13.1")

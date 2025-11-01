@@ -44,6 +44,7 @@ class ActiveActivitiesFragment : Fragment() {
             isServiceBound = true
             setupAdapter()
             loadActivities()
+            setupServiceListener()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -75,6 +76,13 @@ class ActiveActivitiesFragment : Fragment() {
     private fun setupAdapter() {
         adapter = ActiveActivityAdapter(mutableListOf(), stopwatchService, ::loadActivities)
         binding.activityRecyclerView.adapter = adapter
+    }
+
+    private fun setupServiceListener() {
+        stopwatchService?.addListener { time, formattedTime ->
+            // Update the adapter when timer changes
+            adapter.updateList(allActivities)
+        }
     }
 
     private fun setupClickListeners() {
@@ -280,9 +288,16 @@ class ActiveActivitiesFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Refresh activities when fragment resumes
+        loadActivities()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         if (isServiceBound) {
+            stopwatchService?.removeListener { _, _ -> }
             requireContext().unbindService(serviceConnection)
             isServiceBound = false
         }

@@ -38,6 +38,7 @@ class ActivitiesDetailsFragment : Fragment() {
         setupRecyclerView()
         setupRealTimeUpdates()
         loadActivities()
+        showEmptyState(false)
     }
 
     private fun setupRecyclerView() {

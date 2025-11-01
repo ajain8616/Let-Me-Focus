@@ -15,8 +15,9 @@ package com.sakhi.mindfulminutes.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.sakhi.mindfulminutes.model.Activity
-import com.sakhi.mindfulminutes.model.ActivityInstance
+import com.sakhi.mindfulminutes.models.ActivityInstance
 import kotlinx.coroutines.tasks.await
 import java.util.*
 
@@ -74,41 +75,127 @@ class ActivityRepository {
             }
     }
 
-    // Activity Instances Collection
-    suspend fun addActivityInstance(instance: ActivityInstance): String {
+    // Activity Instances Collection - Following your Firebase structure
+    suspend fun addActivityInstance(
+        activityId: String,
+        totalSpentTime: Long,
+        startTime: String,
+        stopTime: String
+    ): String {
         val userId = getUserId()
-        val docRef = db.collection("users").document(userId)
-            .collection("activity_instances").document()
-        val newInstance = instance.copy(id = docRef.id)
-        docRef.set(newInstance).await()
-        return docRef.id
+
+        // Get the next instance ID based on existing instances count
+        val instancesSnapshot = db.collection("users").document(userId)
+            .collection("activities").document(activityId)
+            .collection("instances")
+            .get().await()
+
+        val instanceId = instancesSnapshot.size().toString()
+
+        val instanceData = mapOf(
+            "totalSpentTime" to totalSpentTime,
+            "startTime" to startTime,
+            "stopTime" to stopTime,
+            "createdAt" to System.currentTimeMillis()
+        )
+
+        // Store the instance with numerical ID
+        db.collection("users").document(userId)
+            .collection("activities").document(activityId)
+            .collection("instances").document(instanceId)
+            .set(instanceData).await()
+
+        return instanceId
     }
 
-    suspend fun updateActivityInstance(instanceId: String, updates: Map<String, Any>) {
+    suspend fun addActivityInstanceWithObject(instance: ActivityInstance): String {
+        val userId = getUserId()
+
+        // Get the next instance ID based on existing instances count
+        val instancesSnapshot = db.collection("users").document(userId)
+            .collection("activities").document(instance.activityId)
+            .collection("instances")
+            .get().await()
+
+        val instanceId = instancesSnapshot.size().toString()
+
+        val instanceData = mapOf(
+            "totalSpentTime" to instance.duration,
+            "startTime" to instance.startTime,
+            "stopTime" to instance.stopTime,
+            "createdAt" to System.currentTimeMillis()
+        )
+
+        // Store the instance with numerical ID
+        db.collection("users").document(userId)
+            .collection("activities").document(instance.activityId)
+            .collection("instances").document(instanceId)
+            .set(instanceData).await()
+
+        return instanceId
+    }
+
+    suspend fun updateActivityInstance(activityId: String, instanceId: String, updates: Map<String, Any>) {
         val userId = getUserId()
         db.collection("users").document(userId)
-            .collection("activity_instances").document(instanceId)
+            .collection("activities").document(activityId)
+            .collection("instances").document(instanceId)
             .update(updates).await()
     }
 
     suspend fun getActivityInstances(activityId: String): List<ActivityInstance> {
         val userId = getUserId()
         val snapshot = db.collection("users").document(userId)
-            .collection("activity_instances")
-            .whereEqualTo("activityId", activityId)
+            .collection("activities").document(activityId)
+            .collection("instances")
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .get().await()
-        return snapshot.toObjects(ActivityInstance::class.java)
+
+        return snapshot.documents.mapNotNull { document ->
+            try {
+                val totalSpentTime = document.getLong("totalSpentTime") ?: 0L
+                val startTime = document.getString("startTime") ?: ""
+                val stopTime = document.getString("stopTime") ?: ""
+
+                ActivityInstance(
+                    id = document.id,
+                    activityId = activityId,
+                    duration = totalSpentTime,
+                    startTime = startTime,
+                    stopTime = stopTime
+                )
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 
     suspend fun getLastActivityInstance(activityId: String): ActivityInstance? {
         val userId = getUserId()
         val snapshot = db.collection("users").document(userId)
-            .collection("activity_instances")
-            .whereEqualTo("activityId", activityId)
-            .orderBy("startTime", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .collection("activities").document(activityId)
+            .collection("instances")
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .limit(1)
             .get().await()
-        return snapshot.documents.firstOrNull()?.toObject(ActivityInstance::class.java)
+
+        return snapshot.documents.firstOrNull()?.let { document ->
+            try {
+                val totalSpentTime = document.getLong("totalSpentTime") ?: 0L
+                val startTime = document.getString("startTime") ?: ""
+                val stopTime = document.getString("stopTime") ?: ""
+
+                ActivityInstance(
+                    id = document.id,
+                    activityId = activityId,
+                    duration = totalSpentTime,
+                    startTime = startTime,
+                    stopTime = stopTime
+                )
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 
     suspend fun getTotalActivityTime(activityId: String): Long {
@@ -117,11 +204,13 @@ class ActivityRepository {
     }
 
     suspend fun getActivitySessionCount(activityId: String): Int {
-        val instances = getActivityInstances(activityId)
-        return instances.size
+        val userId = getUserId()
+        val snapshot = db.collection("users").document(userId)
+            .collection("activities").document(activityId)
+            .collection("instances")
+            .get().await()
+        return snapshot.size()
     }
-
-    // Add these methods to your existing ActivityRepository class
 
     suspend fun getAllActivities(): List<Activity> {
         val userId = getUserId()
@@ -167,5 +256,112 @@ class ActivityRepository {
             }
     }
 
+    // Additional methods for better instance management
+    suspend fun deleteActivityInstance(activityId: String, instanceId: String) {
+        val userId = getUserId()
+        db.collection("users").document(userId)
+            .collection("activities").document(activityId)
+            .collection("instances").document(instanceId)
+            .delete().await()
+    }
 
+    suspend fun getActivityInstance(activityId: String, instanceId: String): ActivityInstance? {
+        val userId = getUserId()
+        val document = db.collection("users").document(userId)
+            .collection("activities").document(activityId)
+            .collection("instances").document(instanceId)
+            .get().await()
+
+        return if (document.exists()) {
+            try {
+                val totalSpentTime = document.getLong("totalSpentTime") ?: 0L
+                val startTime = document.getString("startTime") ?: ""
+                val stopTime = document.getString("stopTime") ?: ""
+
+                ActivityInstance(
+                    id = document.id,
+                    activityId = activityId,
+                    duration = totalSpentTime,
+                    startTime = startTime,
+                    stopTime = stopTime
+                )
+            } catch (e: Exception) {
+                null
+            }
+        } else {
+            null
+        }
+    }
+
+    // Method to get instances within a date range
+    suspend fun getActivityInstancesInRange(activityId: String, startDate: Long, endDate: Long): List<ActivityInstance> {
+        val userId = getUserId()
+        val snapshot = db.collection("users").document(userId)
+            .collection("activities").document(activityId)
+            .collection("instances")
+            .whereGreaterThanOrEqualTo("createdAt", startDate)
+            .whereLessThanOrEqualTo("createdAt", endDate)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .get().await()
+
+        return snapshot.documents.mapNotNull { document ->
+            try {
+                val totalSpentTime = document.getLong("totalSpentTime") ?: 0L
+                val startTime = document.getString("startTime") ?: ""
+                val stopTime = document.getString("stopTime") ?: ""
+
+                ActivityInstance(
+                    id = document.id,
+                    activityId = activityId,
+                    duration = totalSpentTime,
+                    startTime = startTime,
+                    stopTime = stopTime
+                )
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
+    // Method to reset all instances for an activity
+    suspend fun resetActivityInstances(activityId: String) {
+        val userId = getUserId()
+        val instancesSnapshot = db.collection("users").document(userId)
+            .collection("activities").document(activityId)
+            .collection("instances")
+            .get().await()
+
+        val batch = db.batch()
+        instancesSnapshot.documents.forEach { document ->
+            batch.delete(document.reference)
+        }
+        batch.commit().await()
+    }
+
+    // Method to get total time spent on all activities
+    suspend fun getTotalTimeAllActivities(): Long {
+        val userId = getUserId()
+        val activities = getAllActivities()
+        var totalTime = 0L
+
+        activities.forEach { activity ->
+            totalTime += getTotalActivityTime(activity.id)
+        }
+
+        return totalTime
+    }
+
+    // Method to get today's instances for an activity
+    suspend fun getTodayActivityInstances(activityId: String): List<ActivityInstance> {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        val startOfDay = calendar.timeInMillis
+        val endOfDay = startOfDay + (24 * 60 * 60 * 1000) - 1
+
+        return getActivityInstancesInRange(activityId, startOfDay, endOfDay)
+    }
 }

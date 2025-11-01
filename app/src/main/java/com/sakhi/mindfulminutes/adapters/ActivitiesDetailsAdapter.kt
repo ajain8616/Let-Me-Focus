@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.sakhi.mindfulminutes.R
 import com.sakhi.mindfulminutes.model.Activity
+import com.sakhi.mindfulminutes.models.ActivityInstance
 import com.sakhi.mindfulminutes.repository.ActivityRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,12 @@ class ActivitiesDetailsAdapter(
         holder.itemView.setOnClickListener {
             onItemClick(activity)
         }
+
+        // Set up long click listener for additional actions
+        holder.setOnLongClickListener(activity) { clickedActivity ->
+            // Handle long click - you can show a context menu or dialog
+            true
+        }
     }
 
     override fun getItemCount(): Int = activityList.size
@@ -54,37 +61,83 @@ class ActivitiesDetailsAdapter(
         private val totalSpentTimeTextView: TextView = itemView.findViewById(R.id.totalSpentTimeTextView)
         private val sessionsTextView: TextView = itemView.findViewById(R.id.sessionsTextView)
         private val statusIndicator: View = itemView.findViewById(R.id.statusIndicator)
+        private val lastSessionTextView: TextView = itemView.findViewById(R.id.lastSessionTextView)
+        private val averageTimeTextView: TextView = itemView.findViewById(R.id.averageTimeTextView)
+        private val todayTimeTextView: TextView = itemView.findViewById(R.id.todayTimeTextView)
 
         fun bind(activity: Activity) {
+            // Set basic activity information
             activityNameTextView.text = activity.name
-            creationTimeTextView.text = formatDate(activity.creationTime)
+            creationTimeTextView.text = formatDate(Date(activity.createdAt))
             statusTextView.text = activity.status.replaceFirstChar { it.uppercase() }
-            totalSpentTimeTextView.text = formatTime(activity.totalTime)
-            sessionsTextView.text = activity.sessionCount.toString()
 
             // Set status color and indicator
             setStatusStyle(activity.status, statusTextView, statusIndicator)
 
-            // Load additional data if needed
-            loadAdditionalData(activity.id)
+            // Load real-time data from repository
+            loadRealTimeData(activity.id)
         }
 
-        private fun loadAdditionalData(activityId: String) {
+        private fun loadRealTimeData(activityId: String) {
             coroutineScope.launch {
                 try {
-                    // You can load additional real-time data here if needed
-                    // For example, current status, recent sessions, etc.
+                    // 1. Get total activity time using repository
+                    val totalTime = repository.getTotalActivityTime(activityId)
+                    totalSpentTimeTextView.text = formatTime(totalTime)
+
+                    // 2. Get session count using repository
+                    val sessionCount = repository.getActivitySessionCount(activityId)
+                    sessionsTextView.text = sessionCount.toString()
+
+                    // 3. Get last activity instance
+                    val lastInstance = repository.getLastActivityInstance(activityId)
+                    lastSessionTextView.text = if (lastInstance != null) {
+                        formatTime(lastInstance.duration)
+                    } else {
+                        "00:00:00"
+                    }
+
+                    // 4. Calculate and display average time
+                    val averageTime = if (sessionCount > 0) totalTime / sessionCount else 0
+                    averageTimeTextView.text = formatTime(averageTime)
+
+                    // 5. Get today's activity instances
+                    val todayInstances = repository.getTodayActivityInstances(activityId)
+                    val todayTotalTime = todayInstances.sumOf { it.duration }
+                    todayTimeTextView.text = formatTime(todayTotalTime)
+
+                    // 6. Get activity with detailed stats for any additional updates
+                    val activityWithStats = repository.getActivityWithStats(activityId)
+                    activityWithStats?.let {
+                        // Update any additional fields if needed
+                        updateActivityDetails(it)
+                    }
+
                 } catch (e: Exception) {
-                    // Handle error silently
+                    // Handle error by setting placeholder data
+                    setPlaceholderData()
                 }
             }
         }
 
+        private fun updateActivityDetails(activity: Activity) {
+            // Update any activity-specific details if needed
+            // This can be used for additional fields from getActivityWithStats
+        }
+
+        private fun setPlaceholderData() {
+            totalSpentTimeTextView.text = "00:00:00"
+            sessionsTextView.text = "0"
+            lastSessionTextView.text = "00:00:00"
+            averageTimeTextView.text = "00:00:00"
+            todayTimeTextView.text = "00:00:00"
+        }
+
         private fun setStatusStyle(status: String, statusView: TextView, indicator: View) {
             val (textColor, backgroundRes) = when (status.lowercase()) {
-                "active", "start" -> Pair(R.color.success_dark, R.drawable.status_indicator_active)
+                "active" -> Pair(R.color.success_dark, R.drawable.status_indicator_active)
                 "inactive" -> Pair(R.color.error, R.drawable.status_indicator_inactive)
-                "pause", "stop" -> Pair(R.color.warning_dark, R.drawable.status_indicator_paused)
+                "paused" -> Pair(R.color.warning_dark, R.drawable.status_indicator_paused)
                 else -> Pair(R.color.textSecondary, R.drawable.status_indicator_inactive)
             }
 
@@ -105,6 +158,135 @@ class ActivitiesDetailsAdapter(
                 val minutes = (seconds % 3600) / 60
                 val secs = seconds % 60
                 String.format("%02d:%02d:%02d", hours, minutes, secs)
+            }
+        }
+
+        // Method to handle item long click for additional actions
+        fun setOnLongClickListener(activity: Activity, onLongClick: (Activity) -> Boolean) {
+            itemView.setOnLongClickListener {
+                onLongClick(activity)
+            }
+        }
+    }
+
+    // Public methods to interact with the adapter from outside
+    fun getActivityAtPosition(position: Int): Activity? {
+        return if (position in 0 until activityList.size) {
+            activityList[position]
+        } else {
+            null
+        }
+    }
+
+    fun removeActivity(activityId: String) {
+        val position = activityList.indexOfFirst { it.id == activityId }
+        if (position != -1) {
+            activityList.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    fun updateActivity(activityId: String, updatedActivity: Activity) {
+        val position = activityList.indexOfFirst { it.id == activityId }
+        if (position != -1) {
+            activityList[position] = updatedActivity
+            notifyItemChanged(position)
+        }
+    }
+
+    fun refreshActivityData(activityId: String) {
+        coroutineScope.launch {
+            try {
+                val activityWithStats = repository.getActivityWithStats(activityId)
+                activityWithStats?.let { activity ->
+                    updateActivity(activityId, activity)
+                }
+            } catch (e: Exception) {
+                // Handle error
+            }
+        }
+    }
+
+    fun refreshAllData() {
+        coroutineScope.launch {
+            try {
+                val allActivities = repository.getAllActivities()
+                updateList(allActivities)
+            } catch (e: Exception) {
+                // Handle error
+            }
+        }
+    }
+
+    // Method to get activities by status
+    fun filterByStatus(status: String): List<Activity> {
+        return activityList.filter { it.status.equals(status, ignoreCase = true) }
+    }
+
+    // Method to get total time across all activities
+    fun getTotalTimeAllActivities(callback: (Long) -> Unit) {
+        coroutineScope.launch {
+            try {
+                val totalTime = repository.getTotalTimeAllActivities()
+                callback(totalTime)
+            } catch (e: Exception) {
+                callback(0L)
+            }
+        }
+    }
+
+    // Method to reset activity instances
+    fun resetActivityInstances(activityId: String, onComplete: (Boolean) -> Unit) {
+        coroutineScope.launch {
+            try {
+                repository.resetActivityInstances(activityId)
+                refreshActivityData(activityId)
+                onComplete(true)
+            } catch (e: Exception) {
+                onComplete(false)
+            }
+        }
+    }
+
+    // Method to get activity instances in date range
+    fun getActivityInstancesInRange(
+        activityId: String,
+        startDate: Long,
+        endDate: Long,
+        callback: (List<ActivityInstance>) -> Unit
+    ) {
+        coroutineScope.launch {
+            try {
+                val instances = repository.getActivityInstancesInRange(activityId, startDate, endDate)
+                callback(instances)
+            } catch (e: Exception) {
+                callback(emptyList())
+            }
+        }
+    }
+
+    // Method to delete activity instance
+    fun deleteActivityInstance(activityId: String, instanceId: String, onComplete: (Boolean) -> Unit) {
+        coroutineScope.launch {
+            try {
+                repository.deleteActivityInstance(activityId, instanceId)
+                refreshActivityData(activityId)
+                onComplete(true)
+            } catch (e: Exception) {
+                onComplete(false)
+            }
+        }
+    }
+
+    // Method to update activity status
+    fun updateActivityStatus(activityId: String, newStatus: String, onComplete: (Boolean) -> Unit) {
+        coroutineScope.launch {
+            try {
+                repository.updateActivity(activityId, mapOf("status" to newStatus))
+                refreshActivityData(activityId)
+                onComplete(true)
+            } catch (e: Exception) {
+                onComplete(false)
             }
         }
     }
