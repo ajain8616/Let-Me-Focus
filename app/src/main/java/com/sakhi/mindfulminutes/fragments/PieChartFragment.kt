@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
+import androidx.core.graphics.toColorInt
 
 class PieChartFragment : Fragment() {
 
@@ -43,26 +44,26 @@ class PieChartFragment : Fragment() {
 
     // Color palette for the chart
     private val colors = intArrayOf(
-        Color.parseColor("#FF6B6B"),
-        Color.parseColor("#4ECDC4"),
-        Color.parseColor("#45B7D1"),
-        Color.parseColor("#96CEB4"),
-        Color.parseColor("#FFEAA7"),
-        Color.parseColor("#DDA0DD"),
-        Color.parseColor("#98D8C8"),
-        Color.parseColor("#F7DC6F"),
-        Color.parseColor("#BB8FCE"),
-        Color.parseColor("#85C1E9"),
-        Color.parseColor("#F8B195"),
-        Color.parseColor("#F67280"),
-        Color.parseColor("#C06C84"),
-        Color.parseColor("#6C5B7B"),
-        Color.parseColor("#355C7D"),
-        Color.parseColor("#99B898"),
-        Color.parseColor("#FECEAB"),
-        Color.parseColor("#FF847C"),
-        Color.parseColor("#E84A5F"),
-        Color.parseColor("#2A363B")
+        "#FF6B6B".toColorInt(),
+        "#4ECDC4".toColorInt(),
+        "#45B7D1".toColorInt(),
+        "#96CEB4".toColorInt(),
+        "#FFEAA7".toColorInt(),
+        "#DDA0DD".toColorInt(),
+        "#98D8C8".toColorInt(),
+        "#F7DC6F".toColorInt(),
+        "#BB8FCE".toColorInt(),
+        "#85C1E9".toColorInt(),
+        "#F8B195".toColorInt(),
+        "#F67280".toColorInt(),
+        "#C06C84".toColorInt(),
+        "#6C5B7B".toColorInt(),
+        "#355C7D".toColorInt(),
+        "#99B898".toColorInt(),
+        "#FECEAB".toColorInt(),
+        "#FF847C".toColorInt(),
+        "#E84A5F".toColorInt(),
+        "#2A363B".toColorInt()
     )
 
     override fun onCreateView(
