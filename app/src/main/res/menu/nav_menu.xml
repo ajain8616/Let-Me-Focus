@@ -28,11 +28,6 @@
             android:textColor="@color/white"
             android:title="@string/activities_analysis_data" />
 
-        <item
-            android:id="@+id/nav_filtered"
-            android:icon="@drawable/ic_filtered"
-            android:textColor="@color/white"
-            android:title="@string/activities_filtered_data" />
     </group>
 
 

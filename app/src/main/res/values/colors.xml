@@ -146,7 +146,6 @@
 
     <!-- Navigation Colors -->
     <color name="nav_icon_color">#3F51B5</color>
-    <color name="nav_text_color">#212121</color>
 
     <!-- Professional Trading App Specific Colors -->
     <color name="trading_positive">#4CAF50</color>

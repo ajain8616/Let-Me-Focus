@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.IBinder
 import android.text.Editable
@@ -14,15 +15,19 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.sakhi.mindfulminutes.adapters.ActiveActivityAdapter
 import com.sakhi.mindfulminutes.databinding.FragmentActiveActivitiesBinding
 import com.sakhi.mindfulminutes.model.Activity
+import com.sakhi.mindfulminutes.models.ActivityInstance
 import com.sakhi.mindfulminutes.repository.ActivityRepository
 import com.sakhi.mindfulminutes.services.StopwatchService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ActiveActivitiesFragment : Fragment() {
 
@@ -71,6 +76,25 @@ class ActiveActivitiesFragment : Fragment() {
 
     private fun setupRecyclerView() {
         binding.activityRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.activityRecyclerView.itemAnimator = null
+        binding.activityRecyclerView.overScrollMode = View.OVER_SCROLL_NEVER
+
+        setupRecyclerViewSpacing()
+    }
+
+    private fun setupRecyclerViewSpacing() {
+        binding.activityRecyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(
+                outRect: Rect,
+                view: View,
+                parent: RecyclerView,
+                state: RecyclerView.State
+            ) {
+                super.getItemOffsets(outRect, view, parent, state)
+                outRect.top = 0
+                outRect.bottom = 0
+            }
+        })
     }
 
     private fun setupAdapter() {
@@ -211,8 +235,9 @@ class ActiveActivitiesFragment : Fragment() {
 
         coroutineScope.launch {
             try {
-                val activity = Activity(name = activityName)
-                repository.addActivity(activity)
+                val activity = Activity(name = activityName, status = "active")
+                val activityId = repository.addActivity(activity)
+                createInitialActivityInstance(activityId)
 
                 hideAddLayout()
                 loadActivities()
@@ -221,6 +246,26 @@ class ActiveActivitiesFragment : Fragment() {
             } catch (e: Exception) {
                 showError("Failed to add activity: ${e.message}")
             }
+        }
+    }
+
+    private suspend fun createInitialActivityInstance(activityId: String) {
+        try {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val currentTime = dateFormat.format(Date())
+
+            val initialInstance = ActivityInstance(
+                id = "0",
+                activityId = activityId,
+                duration = 0L, // Zero duration for initial instance
+                startTime = currentTime,
+                stopTime = currentTime
+            )
+
+            repository.addActivityInstanceWithObject(initialInstance)
+        } catch (e: Exception) {
+            // Log the error but don't block activity creation
+            e.printStackTrace()
         }
     }
 
@@ -290,7 +335,6 @@ class ActiveActivitiesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh activities when fragment resumes
         loadActivities()
     }
 

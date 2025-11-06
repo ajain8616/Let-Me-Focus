@@ -51,7 +51,6 @@
         app:itemBackground="@drawable/nav_item_background"
         app:itemIconPadding="16dp"
         app:itemIconTint="@color/nav_icon_color"
-        app:itemTextColor="@color/nav_text_color"
         app:menu="@menu/nav_menu"
         app:elevation="16dp" />
 

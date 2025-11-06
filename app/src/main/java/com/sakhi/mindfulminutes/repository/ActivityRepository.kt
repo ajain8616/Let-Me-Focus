@@ -27,6 +27,14 @@ class ActivityRepository {
 
     private fun getUserId(): String = auth.currentUser?.uid ?: throw Exception("User not authenticated")
 
+    // Add this method to update activity status
+    suspend fun updateActivityStatus(activityId: String, status: String) {
+        val userId = getUserId()
+        db.collection("users").document(userId)
+            .collection("activities").document(activityId)
+            .update("status", status).await()
+    }
+
     // Activities Collection
     suspend fun addActivity(activity: Activity): String {
         val userId = getUserId()

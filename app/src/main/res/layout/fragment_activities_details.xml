@@ -86,7 +86,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="12dp">
 
                 <!-- Stats Summary Card -->
                 <!-- Empty State View -->
@@ -128,9 +128,12 @@
                     android:id="@+id/activityDetailsView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="400dp"
+                    android:minHeight="200dp"
                     android:clipToPadding="false"
-                    android:padding="4dp" />
+                    android:padding="0dp"
+                    android:clipChildren="true"
+                    android:paddingVertical="0dp"
+                    tools:listitem="@layout/item_activities_details" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

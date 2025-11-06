@@ -5,27 +5,19 @@ import android.animation.AnimatorSet
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.FileProvider
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.sakhi.mindfulminutes.R
 import com.sakhi.mindfulminutes.databinding.ActivityCardItemBinding
 import com.sakhi.mindfulminutes.model.Activity
-import com.sakhi.mindfulminutes.models.ActivityInstance
 import com.sakhi.mindfulminutes.services.StopwatchService
 import com.sakhi.mindfulminutes.repository.ActivityRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ActiveActivityAdapter(
     private var activityList: MutableList<Activity>,
@@ -83,10 +75,13 @@ class ActiveActivityAdapter(
                 updateStopwatchUI(currentTime)
                 isTimerRunning = stopwatchService?.isTimerRunning() ?: false
                 updateButtonStates()
+                updateStatusIndicator("active")
             } else {
                 binding.stopwatchTextView.text = "00:00:00"
                 isTimerRunning = false
                 updateButtonStates()
+                // Set status based on activity status
+                updateStatusIndicator(activity.status)
             }
 
             loadActivityStats(activity.id)
@@ -136,12 +131,6 @@ class ActiveActivityAdapter(
                     showResetConfirmation(activity)
                 }
             }
-
-            binding.shareButton.setOnClickListener {
-                currentActivity?.let { activity ->
-                    showShareOptions(activity)
-                }
-            }
         }
 
         private fun setupStopwatchListener() {
@@ -152,10 +141,12 @@ class ActiveActivityAdapter(
                         isTimerRunning = stopwatchService.isTimerRunning()
                         isCurrentActivity = true
                         updateButtonStates()
+                        updateStatusIndicator("active")
                     } else {
                         isCurrentActivity = false
                         isTimerRunning = false
                         updateButtonStates()
+                        updateStatusIndicator(activity.status)
                     }
                 }
             }
@@ -172,6 +163,10 @@ class ActiveActivityAdapter(
             isCurrentActivity = true
             isTimerRunning = true
             updateButtonStates()
+            updateStatusIndicator("active")
+
+            // Update activity status in database
+            updateActivityStatus(activity.id, "active")
         }
 
         private fun pauseTimer() {
@@ -182,6 +177,12 @@ class ActiveActivityAdapter(
 
             isTimerRunning = false
             updateButtonStates()
+            updateStatusIndicator("paused")
+
+            // Update activity status in database
+            currentActivity?.let { activity ->
+                updateActivityStatus(activity.id, "paused")
+            }
         }
 
         private fun resumeTimer() {
@@ -192,6 +193,12 @@ class ActiveActivityAdapter(
 
             isTimerRunning = true
             updateButtonStates()
+            updateStatusIndicator("active")
+
+            // Update activity status in database
+            currentActivity?.let { activity ->
+                updateActivityStatus(activity.id, "active")
+            }
         }
 
         private fun stopTimer() {
@@ -204,6 +211,12 @@ class ActiveActivityAdapter(
             isCurrentActivity = false
             updateButtonStates()
             binding.stopwatchTextView.text = "00:00:00"
+            updateStatusIndicator("inactive")
+
+            // Update activity status in database
+            currentActivity?.let { activity ->
+                updateActivityStatus(activity.id, "inactive")
+            }
         }
 
         private fun updateStopwatchUI(time: Long) {
@@ -215,26 +228,52 @@ class ActiveActivityAdapter(
 
         private fun updateButtonStates() {
             if (isCurrentActivity) {
-                // This activity is currently active
                 if (isTimerRunning) {
                     // Timer is running - show pause button
                     binding.playPauseButton.setImageResource(R.drawable.ic_pause)
                     binding.playPauseButton.setBackgroundResource(R.drawable.rounded_button_outline_red)
-                    binding.playPauseButton.imageTintList = context.getColorStateList(R.color.error)
+                    binding.playPauseButton.imageTintList = ContextCompat.getColorStateList(context, R.color.error)
                     binding.stopButton.visibility = View.VISIBLE
                 } else {
                     // Timer is paused - show play button
                     binding.playPauseButton.setImageResource(R.drawable.ic_play)
                     binding.playPauseButton.setBackgroundResource(R.drawable.rounded_button_outline_green)
-                    binding.playPauseButton.imageTintList = context.getColorStateList(R.color.success_dark)
+                    binding.playPauseButton.imageTintList = ContextCompat.getColorStateList(context, R.color.success_dark)
                     binding.stopButton.visibility = View.VISIBLE
                 }
             } else {
                 // This activity is not active - show play button to start
                 binding.playPauseButton.setImageResource(R.drawable.ic_play)
                 binding.playPauseButton.setBackgroundResource(R.drawable.rounded_button_outline_green)
-                binding.playPauseButton.imageTintList = context.getColorStateList(R.color.success_dark)
+                binding.playPauseButton.imageTintList = ContextCompat.getColorStateList(context, R.color.success_dark)
                 binding.stopButton.visibility = View.GONE
+            }
+        }
+
+        private fun updateStatusIndicator(status: String) {
+            when (status) {
+                "active" -> {
+                    binding.statusIndicator.setBackgroundResource(R.drawable.status_indicator_active)
+                }
+                "paused" -> {
+                    binding.statusIndicator.setBackgroundResource(R.drawable.status_indicator_paused)
+                }
+                "inactive" -> {
+                    binding.statusIndicator.setBackgroundResource(R.drawable.status_indicator_inactive)
+                }
+                else -> {
+                    binding.statusIndicator.setBackgroundResource(R.drawable.status_indicator_inactive)
+                }
+            }
+        }
+
+        private fun updateActivityStatus(activityId: String, status: String) {
+            coroutineScope.launch {
+                try {
+                    repository.updateActivityStatus(activityId, status)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
 
@@ -297,14 +336,19 @@ class ActiveActivityAdapter(
         private fun showDeleteConfirmation(activity: Activity) {
             AlertDialog.Builder(context)
                 .setTitle("Delete Activity")
-                .setMessage("Are you sure you want to delete ${activity.name}?")
+                .setMessage("Are you sure you want to delete ${activity.name}? This will remove all associated data.")
                 .setPositiveButton("Delete") { _, _ ->
                     coroutineScope.launch {
                         try {
+                            // Stop timer if this activity is currently active
+                            if (isCurrentActivity) {
+                                stopTimer()
+                            }
                             repository.deleteActivity(activity.id)
                             onActivityUpdate()
+                            showSnackbar("Activity '${activity.name}' deleted successfully")
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            showSnackbar("Failed to delete activity: ${e.message}")
                         }
                     }
                 }
@@ -314,17 +358,17 @@ class ActiveActivityAdapter(
 
         private fun showResetConfirmation(activity: Activity) {
             AlertDialog.Builder(context)
-                .setTitle("Reset Stats")
-                .setMessage("Are you sure you want to reset statistics for ${activity.name}?")
+                .setTitle("Reset Statistics")
+                .setMessage("Are you sure you want to reset all statistics for ${activity.name}? This cannot be undone.")
                 .setPositiveButton("Reset") { _, _ ->
                     coroutineScope.launch {
                         try {
-                            // Use the new reset functionality from repository
                             repository.resetActivityInstances(activity.id)
-                            loadActivityStats(activity.id) // Refresh stats
+                            loadActivityStats(activity.id)
                             onActivityUpdate()
+                            showSnackbar("Statistics reset for '${activity.name}'")
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            showSnackbar("Failed to reset statistics: ${e.message}")
                         }
                     }
                 }
@@ -332,241 +376,8 @@ class ActiveActivityAdapter(
                 .show()
         }
 
-        private fun showShareOptions(activity: Activity) {
-            val options = arrayOf("Share as Image", "Share as PDF", "Share as Text")
-
-            AlertDialog.Builder(context)
-                .setTitle("Share Activity Stats")
-                .setItems(options) { _, which ->
-                    when (which) {
-                        0 -> shareActivityAsImage(activity)
-                        1 -> shareActivityAsPdf(activity)
-                        2 -> shareActivityStats(activity)
-                    }
-                }
-                .setNegativeButton("Cancel", null)
-                .show()
-        }
-
-        private fun shareActivityAsImage(activity: Activity) {
-            coroutineScope.launch {
-                try {
-                    // Get activity stats using repository methods
-                    val totalTime = repository.getTotalActivityTime(activity.id)
-                    val sessionCount = repository.getActivitySessionCount(activity.id)
-                    val averageTime = if (sessionCount > 0) totalTime / sessionCount else 0
-                    val lastInstance = repository.getLastActivityInstance(activity.id)
-
-                    // Create share message
-                    val shareMessage = """
-                        🎯 Activity: ${activity.name}
-                        
-                        📊 Statistics:
-                        ⏱️ Total Time: ${formatTime(totalTime)}
-                        📈 Sessions Completed: $sessionCount
-                        📊 Average Time/Session: ${formatTime(averageTime)}
-                        ⏰ Last Session: ${lastInstance?.let { formatTime(it.duration) } ?: "00:00:00"}
-                        
-                        🚀 Tracked via Let Me Focus App
-                        #Productivity #TimeTracking #MindfulMinutes
-                    """.trimIndent()
-
-                    // Create bitmap from card view
-                    val bitmap = createBitmapFromView(binding.mainCardView)
-
-                    // Save bitmap to file
-                    val imageFile = saveBitmapToFile(bitmap, "${activity.name}_stats.png")
-
-                    // Share both image and text
-                    shareActivityContent(shareMessage, imageFile, activity.name)
-
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    // Fallback to text sharing if image sharing fails
-                    shareActivityStats(activity)
-                }
-            }
-        }
-
-        private fun shareActivityAsPdf(activity: Activity) {
-            coroutineScope.launch {
-                try {
-                    // Get activity stats using repository methods
-                    val totalTime = repository.getTotalActivityTime(activity.id)
-                    val sessionCount = repository.getActivitySessionCount(activity.id)
-                    val averageTime = if (sessionCount > 0) totalTime / sessionCount else 0
-                    val lastInstance = repository.getLastActivityInstance(activity.id)
-
-                    // Create PDF file
-                    val pdfFile = createActivityPdf(activity, totalTime, sessionCount, averageTime, lastInstance)
-
-                    // Share PDF
-                    sharePdfFile(pdfFile, activity.name)
-
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    // Fallback to text sharing if PDF sharing fails
-                    shareActivityStats(activity)
-                }
-            }
-        }
-
-        private fun createActivityPdf(
-            activity: Activity,
-            totalTime: Long,
-            sessionCount: Int,
-            averageTime: Long,
-            lastInstance: ActivityInstance?
-        ): File {
-            val pdfFile = File(context.externalCacheDir ?: context.cacheDir, "${activity.name}_stats.pdf")
-
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-            val currentDate = dateFormat.format(Date())
-
-            val pdfContent = """
-                ACTIVITY STATISTICS REPORT
-                ==========================
-                
-                Activity Name: ${activity.name}
-                Generated On: $currentDate
-                
-                STATISTICS:
-                -----------
-                • Total Time: ${formatTime(totalTime)}
-                • Sessions Completed: $sessionCount
-                • Average Time/Session: ${formatTime(averageTime)}
-                • Last Session Duration: ${lastInstance?.let { formatTime(it.duration) } ?: "00:00:00"}
-                • Last Session Start: ${lastInstance?.startTime ?: "N/A"}
-                • Last Session End: ${lastInstance?.stopTime ?: "N/A"}
-                
-                SUMMARY:
-                --------
-                This report shows your productivity statistics for "${activity.name}".
-                Keep tracking your time to improve your focus and productivity!
-                
-                Generated by Let Me Focus App
-                #Productivity #TimeTracking
-            """.trimIndent()
-
-            FileOutputStream(pdfFile).use { out ->
-                out.write(pdfContent.toByteArray())
-            }
-
-            return pdfFile
-        }
-
-        private fun sharePdfFile(pdfFile: File, activityName: String) {
-            try {
-                val uri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.provider",
-                    pdfFile
-                )
-
-                val intent = Intent(Intent.ACTION_SEND).apply {
-                    type = "application/pdf"
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                    putExtra(Intent.EXTRA_SUBJECT, "Activity Stats Report: $activityName")
-                    putExtra(Intent.EXTRA_TEXT, "Here are my activity statistics for $activityName")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
-
-                context.startActivity(Intent.createChooser(intent, "Share Activity Stats as PDF"))
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                // Fallback to text sharing
-                shareActivityStatsText("Failed to share PDF. Here are my stats for $activityName", activityName)
-            }
-        }
-
-        private fun createBitmapFromView(view: View): Bitmap {
-            view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-            val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            view.layout(0, 0, view.measuredWidth, view.measuredHeight)
-            view.draw(canvas)
-            return bitmap
-        }
-
-        private fun saveBitmapToFile(bitmap: Bitmap, fileName: String): File {
-            val filesDir = context.externalCacheDir ?: context.cacheDir
-            val imageFile = File(filesDir, fileName)
-
-            FileOutputStream(imageFile).use { out ->
-                bitmap.compress(Bitmap.CompressFormat.PNG, 90, out)
-            }
-            return imageFile
-        }
-
-        private fun shareActivityContent(shareMessage: String, imageFile: File, activityName: String) {
-            try {
-                val uri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.provider",
-                    imageFile
-                )
-
-                val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-                    type = "image/*"
-                    putExtra(Intent.EXTRA_SUBJECT, "My Activity Stats: $activityName")
-                    putExtra(Intent.EXTRA_TEXT, shareMessage)
-
-                    // Add image
-                    val uris = ArrayList<android.net.Uri>()
-                    uris.add(uri)
-                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
-
-                    // Grant read permission to the receiving app
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
-
-                context.startActivity(Intent.createChooser(intent, "Share Activity Stats"))
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                // Fallback to text sharing
-                shareActivityStatsText(shareMessage, activityName)
-            }
-        }
-
-        private fun shareActivityStats(activity: Activity) {
-            coroutineScope.launch {
-                try {
-                    val totalTime = repository.getTotalActivityTime(activity.id)
-                    val sessionCount = repository.getActivitySessionCount(activity.id)
-                    val averageTime = if (sessionCount > 0) totalTime / sessionCount else 0
-                    val lastInstance = repository.getLastActivityInstance(activity.id)
-
-                    val shareMessage = """
-                        📊 Activity Statistics: ${activity.name}
-                        
-                        ⏱️ Total Time: ${formatTime(totalTime)}
-                        📈 Sessions Completed: $sessionCount
-                        📊 Average Time/Session: ${formatTime(averageTime)}
-                        ⏰ Last Session: ${lastInstance?.let {
-                        "Duration: ${formatTime(it.duration)}\nStart: ${it.startTime}\nEnd: ${it.stopTime}"
-                    } ?: "00:00:00"}
-                        
-                        Tracked via Let Me Focus App
-                        #Productivity #TimeTracking
-                    """.trimIndent()
-
-                    shareActivityStatsText(shareMessage, activity.name)
-
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        private fun shareActivityStatsText(shareMessage: String, activityName: String) {
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, shareMessage)
-                putExtra(Intent.EXTRA_SUBJECT, "My Activity Stats: $activityName")
-            }
-            context.startActivity(Intent.createChooser(intent, "Share Activity Stats"))
+        private fun showSnackbar(message: String) {
+            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 }

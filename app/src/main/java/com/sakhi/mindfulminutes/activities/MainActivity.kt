@@ -305,7 +305,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_active -> loadFragment(ActiveActivitiesFragment())
             R.id.nav_details -> loadFragment(ActivitiesDetailsFragment())
             R.id.nav_analysis -> loadFragment(PieChartFragment())
-            R.id.nav_filtered -> loadFragment(ActivitiesFilteredDataFragment())
             R.id.nav_logout -> showLogoutConfirmation()
         }
 

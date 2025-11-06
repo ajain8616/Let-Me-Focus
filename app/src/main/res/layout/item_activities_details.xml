@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="4dp"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
     app:cardUseCompatPadding="true">
 
     <!-- Gradient background -->
@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/card_gradient_background"
-        android:padding="20dp">
+        android:padding="16dp">
 
         <!-- Activity Header -->
         <RelativeLayout
@@ -27,19 +27,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/statusIndicator"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:text="Activity Name"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/textPrimary"
-                android:letterSpacing="0.02"
-                android:lineHeight="24sp" />
+                android:letterSpacing="0.01"
+                android:lineHeight="20sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <!-- Status Indicator -->
             <View
                 android:id="@+id/statusIndicator"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/status_indicator_active" />
@@ -52,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/activityHeader"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:orientation="vertical">
 
             <!-- Row 1 -->
@@ -60,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="8dp">
 
                 <!-- Creation Time -->
                 <LinearLayout
@@ -70,14 +72,14 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="12dp"
-                    android:layout_marginEnd="6dp">
+                    android:padding="8dp"
+                    android:layout_marginEnd="4dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Created"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@color/textSecondary"
                         android:letterSpacing="0.02" />
 
@@ -86,7 +88,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="00/00/0000"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textColor="@color/textPrimary"
                         android:textStyle="bold"
                         android:maxLines="1"
@@ -102,14 +104,14 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="12dp"
-                    android:layout_marginStart="6dp">
+                    android:padding="8dp"
+                    android:layout_marginStart="4dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Status"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@color/textSecondary"
                         android:letterSpacing="0.02" />
 
@@ -118,7 +120,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Active"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textColor="@color/success_dark"
                         android:textStyle="bold" />
 
@@ -131,7 +133,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="8dp">
 
                 <!-- Total Time -->
                 <LinearLayout
@@ -141,14 +143,14 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="12dp"
-                    android:layout_marginEnd="6dp">
+                    android:padding="8dp"
+                    android:layout_marginEnd="4dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Total Time"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@color/textSecondary"
                         android:letterSpacing="0.02" />
 
@@ -157,7 +159,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="00:00:00"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textColor="@color/textPrimary"
                         android:textStyle="bold"
                         android:fontFamily="monospace" />
@@ -172,14 +174,14 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="12dp"
-                    android:layout_marginStart="6dp">
+                    android:padding="8dp"
+                    android:layout_marginStart="4dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Sessions"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@color/textSecondary"
                         android:letterSpacing="0.02" />
 
@@ -188,7 +190,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textColor="@color/textPrimary"
                         android:textStyle="bold" />
 
@@ -200,7 +202,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
 
                 <!-- Last Session -->
                 <LinearLayout
@@ -210,14 +213,14 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="12dp"
-                    android:layout_marginEnd="6dp">
+                    android:padding="8dp"
+                    android:layout_marginEnd="4dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Last Session"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@color/textSecondary"
                         android:letterSpacing="0.02" />
 
@@ -226,7 +229,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="00:00:00"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textColor="@color/textPrimary"
                         android:textStyle="bold"
                         android:fontFamily="monospace" />
@@ -241,14 +244,14 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="12dp"
-                    android:layout_marginStart="6dp">
+                    android:padding="8dp"
+                    android:layout_marginStart="4dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Average Time"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@color/textSecondary"
                         android:letterSpacing="0.02" />
 
@@ -257,7 +260,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="00:00:00"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textColor="@color/textPrimary"
                         android:textStyle="bold"
                         android:fontFamily="monospace" />
@@ -270,8 +273,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="12dp">
+                android:orientation="horizontal">
 
                 <!-- Today's Time -->
                 <LinearLayout
@@ -280,13 +282,13 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="12dp">
+                    android:padding="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Today's Total Time"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="@color/textSecondary"
                         android:letterSpacing="0.02" />
 
@@ -295,7 +297,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="00:00:00"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textColor="@color/modern_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace" />
@@ -306,16 +308,6 @@
 
         </LinearLayout>
 
-        <!-- Click Indicator -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/statsGrid"
-            android:layout_marginTop="12dp"
-            android:text="Tap to view detailed statistics →"
-            android:textSize="12sp"
-            android:textColor="@color/modern_primary"
-            android:gravity="end" />
 
     </RelativeLayout>
 
