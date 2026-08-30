@@ -1,4 +1,4 @@
-package com.sakhi.mindfulminutes
+package com.sakhi.mindfulminutes.models
 
 data class ActivityItem(
     val activityName: String,
@@ -6,4 +6,3 @@ data class ActivityItem(
     val status: String,
     val totalSpentTime: Int
 )
-

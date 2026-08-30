@@ -1,33 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/surface_light"
     android:theme="@style/Base.Theme.ActivityTracker"
     tools:context=".ActivitiesDetailsFragment">
 
-    <!-- Header View -->
     <TextView
         android:id="@+id/activityNameView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/padding_large"
-        android:paddingTop="@dimen/padding_large"
-        android:paddingBottom="@dimen/padding_standard"
-        android:text="@string/title_activities_details"
-        android:textSize="@dimen/text_size_large"
-        android:textColor="@color/black"
-        android:fontFamily="sans-serif-black" />
+        android:text="Activities List View"
+        android:gravity="center"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true" />
 
-    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/activityDetailsView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/padding_xlarge"
-        android:scrollbars="none" />
+        android:layout_below="@id/activityNameView"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp" />
 
-</LinearLayout>
+</RelativeLayout>

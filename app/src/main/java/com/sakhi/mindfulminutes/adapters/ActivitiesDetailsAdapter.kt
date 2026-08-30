@@ -1,4 +1,4 @@
-package com.sakhi.mindfulminutes
+package com.sakhi.mindfulminutes.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -10,6 +10,10 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.firestore.FirebaseFirestore
+import com.sakhi.mindfulminutes.models.ActivityItem
+import com.sakhi.mindfulminutes.fragments.StatisticsActivitiesFragment
+import com.sakhi.mindfulminutes.R
 
 class ActivitiesDetailsAdapter(
     private val context: Context,
@@ -41,7 +45,7 @@ class ActivitiesDetailsAdapter(
 
         holder.itemView.setOnClickListener {
             val activityName = activities[position].activityName
-            val fragment = FilteredActivitiesFragment.newInstance(activityName)
+            val fragment = StatisticsActivitiesFragment.newInstance(activityName)
             (context as AppCompatActivity).supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
@@ -59,6 +63,7 @@ class ActivitiesDetailsAdapter(
             "Inactive" -> R.color.red
             "Stop" -> R.color.yellow
             "Start" -> R.color.green
+            "Pause" -> R.color.colorBlue
             else -> android.R.color.black
         }
         statusTextView.setTextColor(context.resources.getColor(color))

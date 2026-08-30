@@ -1,4 +1,4 @@
-package com.sakhi.mindfulminutes
+package com.sakhi.mindfulminutes.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -17,11 +17,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import com.sakhi.mindfulminutes.R
 
 class LoginFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var usernameEditText: EditText
+    private lateinit var passwordEditText: EditText
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,14 +34,15 @@ class LoginFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_login, container, false)
-        val usernameEditText = view.findViewById<EditText>(R.id.username_edittext)
-        val passwordEditText = view.findViewById<EditText>(R.id.password_edittext)
+        usernameEditText = view.findViewById(R.id.useremail_edittext)
+        passwordEditText = view.findViewById(R.id.password_edittext)
         val loginButton = view.findViewById<Button>(R.id.login_button)
         val forgetPasswordTextView = view.findViewById<TextView>(R.id.forget_password_textview)
         val signUpButton = view.findViewById<TextView>(R.id.signup_button)
         val googleButton = view.findViewById<com.google.android.gms.common.SignInButton>(R.id.google_button)
 
         auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
@@ -44,28 +50,9 @@ class LoginFragment : Fragment() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
 
-
         // Set click listeners
         loginButton.setOnClickListener {
-            val username = usernameEditText.text.toString()
-            val password = passwordEditText.text.toString()
-
-            if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(requireContext(), "Username or Password cannot be blank", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Perform login process
-            auth.signInWithEmailAndPassword(username, password)
-                .addOnCompleteListener(requireActivity()) { task ->
-                    if (task.isSuccessful) {
-                        // Login successful, navigate to HomeFragment
-                        navigateToHomeFragment()
-                    } else {
-                        // Login failed, display error message
-                        Toast.makeText(requireContext(), "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            checkLoginCondition()
         }
 
         forgetPasswordTextView.setOnClickListener {
@@ -73,7 +60,8 @@ class LoginFragment : Fragment() {
             if (email.isNotEmpty()) {
                 sendPasswordResetEmail(email)
             } else {
-                Toast.makeText(requireContext(), "Please enter your email", Toast.LENGTH_SHORT).show()
+                showBottomSheet(
+                    "Please enter your email address to reset your password",true)
             }
         }
 
@@ -88,13 +76,79 @@ class LoginFragment : Fragment() {
         return view
     }
 
+    private fun checkLoginCondition() {
+        val currentUser = auth.currentUser
+        if (currentUser != null && !currentUser.isEmailVerified) {
+            showBottomSheet("Please verify your email address before logging in for security purposes.",true)
+        } else {
+            loginUser()
+        }
+    }
+
+    private fun loginUser() {
+        val username = usernameEditText.text.toString()
+        val password = passwordEditText.text.toString()
+
+        if (username.isEmpty() || password.isEmpty()) {
+            showBottomSheet("Please enter your email and password, these fields are required to fill and login.", true)
+            return
+        }
+
+        // Perform login process
+        auth.signInWithEmailAndPassword(username, password)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    // Check if the user's email is verified
+                    val currentUser = auth.currentUser
+                    if (currentUser != null && currentUser.isEmailVerified) {
+                        // Save user data to Firestore
+                        saveUserDataToFirestore(currentUser.displayName ?: "Unknown", currentUser.email ?: "Unknown")
+
+                        // Login successful and email is verified, navigate to HomeFragment
+                        navigateToHomeFragment()
+
+                        // Show success bottom sheet
+                        showBottomSheet("Login successful!", false)
+                    } else {
+                        // Email is not verified, display error message
+                       ErrorBottomSheetFragment( "Please verify your email address before logging in for security purposes.")
+                        // Sign out the user as email is not verified
+                        auth.signOut()
+                    }
+                } else {
+                    // Login failed, display error message
+                    Toast.makeText(requireContext(), "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    // Show error bottom sheet
+                    showBottomSheet("Login failed. Please try again.", true)
+                }
+            }
+    }
+
+    private fun saveUserDataToFirestore(userName: String, userEmail: String) {
+        val userMap = hashMapOf(
+            "userName" to userName,
+            "userEmail" to userEmail,
+            "isVerified" to false
+        )
+
+        firestore.collection("users")
+            .document(auth.currentUser!!.uid)
+            .set(userMap)
+            .addOnSuccessListener {
+                showBottomSheet("User data saved to Firestore",false)
+            }
+            .addOnFailureListener { e ->
+                showBottomSheet("Failed to save user data: ${e.message}", true)
+            }
+    }
+
     private fun sendPasswordResetEmail(email: String) {
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(requireContext(), "Password reset email sent successfully", Toast.LENGTH_SHORT).show()
+                    showBottomSheet("Password reset email sent successfully",false)
                 } else {
-                    Toast.makeText(requireContext(), "Failed to send reset email: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    showBottomSheet("Failed to send reset email: ${task.exception?.message}", true)
                 }
             }
     }
@@ -130,6 +184,7 @@ class LoginFragment : Fragment() {
                 firebaseAuthWithGoogle(account!!)
             } else {
                 Toast.makeText(requireContext(), "Google sign in failed", Toast.LENGTH_SHORT).show()
+                showBottomSheet("Google sign in failed. Please try again.", true)
             }
         }
     }
@@ -141,15 +196,28 @@ class LoginFragment : Fragment() {
                 if (task.isSuccessful) {
                     // Sign in success, navigate to HomeFragment
                     navigateToHomeFragment()
+
+                    // Show success bottom sheet
+                    showBottomSheet("Google sign-in successful!", false)
                 } else {
                     // Sign in failed, display error message
                     Toast.makeText(requireContext(), "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    showBottomSheet("Authentication failed. Please try again.", true)
                 }
             }
+    }
+
+    private fun showBottomSheet(message: String, isError: Boolean) {
+        val bottomSheetFragment = if (isError) {
+            ErrorBottomSheetFragment(message)
+        } else {
+            SuccessBottomSheetFragment(message)
+        }
+
+        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
     }
 
     companion object {
         private const val RC_SIGN_IN = 9001
     }
 }
-

@@ -1,155 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="@color/white"
     android:theme="@style/Base.Theme.ActivityTracker"
     tools:context=".SignUpFragment">
+
+    <ImageView
+        android:id="@+id/signup_page_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_signup_page" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/margin_xlarge"
-        android:paddingTop="@dimen/margin_header"
-        android:paddingBottom="@dimen/margin_xlarge"
-        android:gravity="center_horizontal">
+        android:padding="24dp"
+        android:layout_gravity="center">
 
-        <!-- Header -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="@dimen/margin_xxlarge">
+            android:text="Sign Up"
+            android:textColor="@color/white"
+            android:textSize="35sp"
+            android:textStyle="bold"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/signup_title"
-                android:textColor="@color/colorPrimary"
-                android:textSize="@dimen/text_size_hero"
-                android:fontFamily="sans-serif-black"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_tiny"
-                android:text="@string/signup_subtitle"
-                android:textColor="@color/lavender"
-                android:textSize="@dimen/text_size_body_large"
-                android:fontFamily="sans-serif-medium" />
-        </LinearLayout>
-
-        <!-- Full Name Input -->
         <EditText
             android:id="@+id/userName"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/input_field_height"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="@dimen/padding_large"
-            android:hint="@string/hint_name"
-            android:textColorHint="@color/light_gray"
-            android:textColor="@color/black"
-            android:textSize="@dimen/text_size_body_large"
-            android:inputType="textPersonName|textCapWords"
-            android:imeOptions="actionNext"
-            android:autofillHints="name"
-            android:importantForAutofill="yes"
-            android:maxLines="1" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Name "
+            android:textColorHint="@color/white" />
 
-        <!-- Email Input -->
         <EditText
             android:id="@+id/userEmail"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/input_field_height"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="@dimen/padding_large"
-            android:hint="@string/hint_email"
-            android:textColorHint="@color/light_gray"
-            android:textColor="@color/black"
-            android:textSize="@dimen/text_size_body_large"
-            android:inputType="textEmailAddress"
-            android:imeOptions="actionNext"
-            android:autofillHints="emailAddress"
-            android:importantForAutofill="yes"
-            android:maxLines="1" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Email id "
+            android:textColorHint="@color/white" />
 
-        <!-- Password Input -->
         <EditText
             android:id="@+id/userPassword"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/input_field_height"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="@dimen/padding_large"
-            android:hint="@string/hint_password"
-            android:textColorHint="@color/light_gray"
-            android:textColor="@color/black"
-            android:textSize="@dimen/text_size_body_large"
-            android:inputType="textPassword"
-            android:imeOptions="actionNext"
-            android:autofillHints="newPassword"
-            android:importantForAutofill="yes"
-            android:maxLines="1" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Password"
+            android:textColorHint="@android:color/white"
+            android:inputType="textPassword"/>
 
-        <!-- Confirm Password Input -->
+        <!-- EditText for confirming password -->
         <EditText
             android:id="@+id/confirmUserPassword"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/input_field_height"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:background="@drawable/bg_input_field"
-            android:paddingHorizontal="@dimen/padding_large"
-            android:hint="@string/hint_confirm_password"
-            android:textColorHint="@color/light_gray"
-            android:textColor="@color/black"
-            android:textSize="@dimen/text_size_body_large"
-            android:inputType="textPassword"
-            android:imeOptions="actionDone"
-            android:autofillHints="newPassword"
-            android:importantForAutofill="yes"
-            android:maxLines="1" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Confirm Password"
+            android:textColorHint="@android:color/white"
+            android:inputType="textPassword" />
 
-        <!-- Sign Up Button -->
+        <!-- Button for sign up -->
         <Button
             android:id="@+id/signup_button"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginTop="@dimen/margin_xlarge"
-            android:background="@drawable/bg_primary_button"
-            android:text="@string/action_sign_up"
-            android:textAllCaps="false"
+            android:layout_height="wrap_content"
+            android:text="Sign Up"
             android:textColor="@color/white"
-            android:textSize="@dimen/text_size_subheading"
-            android:textStyle="bold"
-            android:stateListAnimator="@null"
-            android:elevation="@dimen/card_elevation" />
+            android:layout_marginTop="24dp"/>
 
-        <!-- Flexible Spacer -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:minHeight="@dimen/margin_xlarge" />
-
-        <!-- Login Prompt -->
         <TextView
             android:id="@+id/login_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_large"
-            android:padding="@dimen/padding_standard"
-            android:text="@string/prompt_have_account"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_size_body_large"
-            android:fontFamily="sans-serif-medium"
-            android:clickable="true"
-            android:focusable="true" />
+            android:text="Already have an account? Login here."
+            android:textStyle="bold"
+            android:textSize="19sp"
+            android:textColor="@color/white"
+            android:layout_marginTop="16dp"/>
 
     </LinearLayout>
 
-</ScrollView>
+</FrameLayout>

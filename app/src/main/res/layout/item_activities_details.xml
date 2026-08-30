@@ -3,138 +3,129 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/margin_large"
-    android:layout_marginVertical="@dimen/margin_standard"
+    android:layout_margin="16dp"
     android:theme="@style/Base.Theme.ActivityTracker"
-    app:cardCornerRadius="@dimen/card_corner_radius"
-    app:cardElevation="@dimen/card_elevation"
-    app:cardBackgroundColor="@color/white"
-    app:cardUseCompatPadding="true">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/padding_large">
+        android:padding="14dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Activity Name Header -->
-            <TextView
+        <TextView
                 android:id="@+id/activityNameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-black"
-                android:textSize="@dimen/text_size_heading"
-                android:textColor="@color/black"
-                android:gravity="center"
-                android:paddingBottom="@dimen/padding_standard"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                android:textColor="@android:color/black"
+                android:gravity="center_horizontal"
+                android:paddingBottom="8dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="@string/hint_activity_name" />
+                android:text="Activity Name" />
 
-            <!-- Clean Subtle Divider -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/divider_height"
+                android:layout_height="1dp"
                 android:background="@color/dividerColor"
-                android:layout_marginTop="@dimen/margin_tiny"
-                android:layout_marginBottom="@dimen/margin_large" />
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"/>
 
-            <!-- Creation Time Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="@dimen/margin_medium">
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_creation_time"
-                    android:textSize="@dimen/text_size_body"
-                    android:textColor="@color/light_gray"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_marginEnd="@dimen/margin_standard" />
+                    android:text="Creation Time:"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:layout_gravity="start"
+                    android:gravity="center_vertical"
+                    android:layout_marginEnd="8dp"
+                   />
 
                 <TextView
                     android:id="@+id/creationTimeTextView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="@dimen/text_size_body"
-                    android:textColor="@color/black"
-                    android:fontFamily="sans-serif-bold"
-                    android:gravity="end"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:gravity="start"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@string/default_empty_value" />
+                    android:text=" "
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
-            <!-- Status Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="@dimen/margin_medium">
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_status"
-                    android:textSize="@dimen/text_size_body"
-                    android:textColor="@color/light_gray"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_marginEnd="@dimen/margin_standard" />
+                    android:text="Status:"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:layout_gravity="start"
+                    android:gravity="center_vertical"
+                    android:layout_marginEnd="8dp" />
 
                 <TextView
                     android:id="@+id/statusTextView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="@dimen/text_size_body"
-                    android:textColor="@color/green"
-                    android:fontFamily="sans-serif-bold"
-                    android:gravity="end"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:gravity="start"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@string/default_empty_value" />
+                    android:text=" "
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
-            <!-- Total Spent Time Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/label_total_spent_time"
-                    android:textSize="@dimen/text_size_body"
-                    android:textColor="@color/light_gray"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_marginEnd="@dimen/margin_standard" />
+                    android:text="Total Spent Time:"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:layout_gravity="start"
+                    android:gravity="center_vertical"
+                    android:layout_marginEnd="8dp"/>
 
                 <TextView
                     android:id="@+id/totalSpentTimeTextView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="@dimen/text_size_body"
-                    android:textColor="@color/colorRoyalBlue"
-                    android:fontFamily="sans-serif-black"
-                    android:gravity="end"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:gravity="start"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@string/default_empty_value" />
+                    android:text=" "
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 

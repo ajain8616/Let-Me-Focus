@@ -1,78 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App Core -->
     <string name="app_name">Activity Tracker</string>
     <string name="open_nav">Open Navigation Drawer</string>
     <string name="close_nav">Close Navigation Drawer</string>
     <string name="default_web_client_id" translatable="false">1081756889190-85cmo0al2a90ugeqs592t0i3bc9jt3re.apps.googleusercontent.com</string>
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="cd_app_icon">App Logo</string>
-    <!-- Sign Up Screen -->
-    <string name="signup_title">Create Account</string>
-    <string name="signup_subtitle">Start tracking your activities &amp; boost productivity</string>
-    <string name="hint_name">Full Name</string>
-    <string name="hint_email">Email Address</string>
-    <string name="hint_password">Password</string>
-    <string name="hint_confirm_password">Confirm Password</string>
-    <string name="action_sign_up">Sign Up</string>
-    <string name="prompt_have_account">Already have an account? Log In</string>
-
-    <!-- Activity Card Item -->
-    <string name="label_activity_name">Activity Name</string>
-    <string name="label_creation_time">Created:</string>
-    <string name="label_status">Status:</string>
-    <string name="label_total_spent_time">Total Spent:</string>
-    <string name="default_empty_value">--</string>
-
-    <!-- Screen Headers -->
-    <string name="title_active_activities">Active Activities</string>
-    <string name="title_activities_details">Activity Details</string>
-    <string name="title_activity_analysis">Activity Analytics</string>
-    <string name="subtitle_analytics">Visual summary of your recorded time</string>
-
-    <!-- Search & Add Actions -->
-    <string name="hint_search_activity">Search activity...</string>
-    <string name="hint_activity_name">Enter new activity name...</string>
-    <string name="cd_clear_search">Clear search input</string>
-    <string name="cd_add_activity">Save activity</string>
-    <string name="cd_fab_menu">Toggle actions menu</string>
-    <string name="cd_fab_add">Add new activity</string>
-    <string name="cd_fab_search">Search activities</string>
-    <string name="timer_default_value">00:00:00</string>
-
-    <!-- Navigation Drawer -->
-    <string name="nav_header_title">Activity Tracker</string>
-    <string name="nav_header_subtitle">Track your daily focus</string>
-    <string name="nav_active_activities">Active Activities</string>
-    <string name="nav_activities_details">Activities Details</string>
-    <string name="nav_analysis_data">Activities Analysis Data</string>
-    <string name="nav_filtered_data">Activities Filtered Data</string>
-    <string name="nav_login">Login</string>
-    <string name="nav_signup">SignUp</string>
-    <string name="nav_logout">Logout</string>
-
-
-    <!-- Content Descriptions for Accessibility -->
-    <string name="cd_close_activity">Close Activity</string>
-    <string name="cd_flip_back">Back to Timer</string>
-
-    <!-- Login Screen -->
-    <string name="login_title">Welcome Back</string>
-    <string name="login_subtitle">Sign in to continue to your account</string>
-    <string name="action_forgot_password">Forgot Password?</string>
-    <string name="action_login">Log In</string>
-    <string name="divider_or">OR</string>
-    <string name="prompt_no_account">Don\'t have an Account? Sign Up</string>
-    <!-- Sign Up Screen -->
-
-    <!-- Activity Statistics Labels -->
-    <string name="label_start_time">Start Time</string>
-    <string name="label_end_time">End Time</string>
-    <string name="label_mean_time">Mean Time</string>
-    <string name="label_median_time">Median Time</string>
-    <string name="label_count_sessions">Count of Sessions</string>
-    <string name="label_maximum_time">Maximum Time</string>
-    <string name="label_minimum_time">Minimum Time</string>
-
 
 </resources>

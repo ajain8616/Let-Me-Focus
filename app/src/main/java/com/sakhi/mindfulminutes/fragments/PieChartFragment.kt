@@ -1,4 +1,4 @@
-package com.sakhi.mindfulminutes
+package com.sakhi.mindfulminutes.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
+import com.sakhi.mindfulminutes.R
 import java.util.concurrent.TimeUnit
 
 class PieChartFragment : Fragment() {

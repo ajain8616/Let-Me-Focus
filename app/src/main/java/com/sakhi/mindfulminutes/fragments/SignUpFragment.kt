@@ -1,4 +1,4 @@
-package com.sakhi.mindfulminutes
+package com.sakhi.mindfulminutes.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +10,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.sakhi.mindfulminutes.R
 
 class SignUpFragment : Fragment() {
 
@@ -20,15 +23,14 @@ class SignUpFragment : Fragment() {
     private lateinit var signUpButton: Button
     private lateinit var loginTextView: TextView
     private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_sign_up, container, false)
 
-        // Initialize views
         userNameEditText = view.findViewById(R.id.userName)
         userEmailEditText = view.findViewById(R.id.userEmail)
         userPasswordEditText = view.findViewById(R.id.userPassword)
@@ -37,16 +39,13 @@ class SignUpFragment : Fragment() {
         loginTextView = view.findViewById(R.id.login_textview)
 
         firebaseAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
-        // Set click listener for sign up button
         signUpButton.setOnClickListener {
-            // Handle sign up button click event
             signUp()
         }
 
-        // Set click listener for login text view
         loginTextView.setOnClickListener {
-            // Handle login text view click event
             navigateToLoginFragment()
         }
 
@@ -59,39 +58,60 @@ class SignUpFragment : Fragment() {
         val password = userPasswordEditText.text.toString().trim()
         val confirmPassword = confirmUserPasswordEditText.text.toString().trim()
 
-        // Check if any field is empty
         if (userName.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            showBottomSheet("Please fill in all fields for sign up and verification", isError = true)
             return
         }
 
-        // Check if passwords match
         if (password != confirmPassword) {
-            Toast.makeText(requireContext(), "Passwords do not match", Toast.LENGTH_SHORT).show()
+            showBottomSheet("Passwords do not match. Please try again.", isError = true)
             return
         }
 
-        // Create user with email and password
         firebaseAuth.createUserWithEmailAndPassword(userEmail, password)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-                    // Send verification email
                     firebaseAuth.currentUser?.sendEmailVerification()
                         ?.addOnCompleteListener { verificationTask ->
                             if (verificationTask.isSuccessful) {
-                                // Verification email sent successfully
-                                Toast.makeText(requireContext(), "Verification email sent to $userEmail", Toast.LENGTH_SHORT).show()
-                                // Navigate to login fragment
+                                saveUserDataToFirestore(userName, userEmail)
+                                showBottomSheet("A verification email has been successfully sent to $userEmail. Please check your inbox and follow the instructions to verify your email address.", isError = false)
                                 navigateToLoginFragment()
                             } else {
-                                // Failed to send verification email
-                                Toast.makeText(requireContext(), "Failed to send verification email", Toast.LENGTH_SHORT).show()
+                                showBottomSheet("Failed to send the verification link. Please try again.", isError = true)
                             }
                         }
                 } else {
-                    // Sign up failed
-                    Toast.makeText(requireContext(), "Sign up failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    showBottomSheet("Sign up failed: ${task.exception?.message}", isError = true)
                 }
+            }
+    }
+
+    private fun showBottomSheet(message: String, isError: Boolean) {
+        val bottomSheetFragment = if (isError) {
+            ErrorBottomSheetFragment(message)
+        } else {
+            SuccessBottomSheetFragment(message)
+        }
+
+        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+    }
+
+    private fun saveUserDataToFirestore(userName: String, userEmail: String) {
+        val userMap = hashMapOf(
+            "userName" to userName,
+            "userEmail" to userEmail,
+            "isVerified" to false
+        )
+
+        firestore.collection("users")
+            .document(firebaseAuth.currentUser!!.uid)
+            .set(userMap)
+            .addOnSuccessListener {
+                showBottomSheet("User data saved to Firestore",false)
+            }
+            .addOnFailureListener { e ->
+                showBottomSheet("Failed to save user data: ${e.message}", true)
             }
     }
 

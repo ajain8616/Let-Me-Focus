@@ -1,4 +1,4 @@
-package com.sakhi.mindfulminutes
+package com.sakhi.mindfulminutes.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.sakhi.mindfulminutes.R
+import com.sakhi.mindfulminutes.adapters.ActivitiesDetailsAdapter
+import com.sakhi.mindfulminutes.models.ActivityItem
 
 
 class ActivitiesDetailsFragment : Fragment() {
