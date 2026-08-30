@@ -42,18 +42,7 @@ Thank you all for your contributions and support in making "Let me focus" a real
 - **Backend: Kotlin**
 * **Database: Firebase**
 + **Libraries: Various third-party and Android libraries**
-## Screenshots 
-**Here are some Screenshots of the App**
 
-![Screenshot 2024-05-03 135134](https://github.com/ajain8616/Activity_Tracker/assets/106903991/01d7f65c-86d2-4ca3-989a-3559af4bda8a)
-![Screenshot 2024-05-03 135203](https://github.com/ajain8616/Activity_Tracker/assets/106903991/5fc0895a-f5d2-4717-8928-e671b2f97879)
-![Screenshot 2024-05-03 135214](https://github.com/ajain8616/Activity_Tracker/assets/106903991/9028d5fb-5d8a-48a2-adbb-421758db4401)
-![Screenshot 2024-05-03 135234](https://github.com/ajain8616/Activity_Tracker/assets/106903991/39b53fea-f18b-4416-86b5-66e233164666)
-![Screenshot 2024-05-03 135242](![Screenshot 2024-05-03 135335](https://github.com/ajain8616/Activity_Tracker/assets/106903991/7c38377a-4ac6-42ba-9719-a3afd80b59dd)
-![Screenshot 2024-05-03 135226](https://github.com/ajain8616/Activity_Tracker/assets/106903991/24086aec-19ae-4ffc-8107-fef1568b303d)
-![Screenshot 2024-05-03 135120](https://github.com/ajain8616/Activity_Tracker/assets/106903991/03f799f1-bcba-4639-aaa4-8023ef1037b8)
-
-![Screenshot 2024-05-03 135250](https://github.com/ajain8616/Activity_Tracker/assets/106903991/a29434ab-3efa-4066-9133-6e82d788fc5b)
 ## Getting Started
 
 To get a local copy up and running, follow these steps:
