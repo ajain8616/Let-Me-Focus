@@ -4,317 +4,332 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="25dp"
-    android:layout_margin="16dp"
-    android:layout_marginTop="16dp"
-    android:layout_marginBottom="16dp"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    android:theme="@style/Base.Theme.ActivityTracker">
+    android:background="@color/surface_light"
+    android:theme="@style/Base.Theme.ActivityTracker"
+    tools:context=".FilteredActivitiesFragment">
 
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_large"
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:cardElevation="@dimen/card_elevation"
+        app:cardBackgroundColor="@color/white"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- TextViews -->
-        <TextView
-            android:id="@+id/intentActivityView"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="start"
-            android:gravity="center_horizontal"
-            android:text="Activity Name"
-            android:textColor="@android:color/black"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:scrollbars="none"
+            android:fillViewport="true">
 
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:background="@color/dividerColor" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:text="Start Time:"
-                android:textAllCaps="true"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="@dimen/padding_large">
 
-            <TextView
-                android:id="@+id/sTimeTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="start"
-                android:maxLines="1"
-                android:text=" "
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                <!-- Activity Name Header -->
+                <TextView
+                    android:id="@+id/intentActivityView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/hint_activity_name"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_large"
+                    android:fontFamily="sans-serif-black"
+                    android:ellipsize="end"
+                    android:maxLines="1" />
 
-        </LinearLayout>
+                <!-- Subtle Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:layout_marginTop="@dimen/margin_standard"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    android:background="@color/dividerColor" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                <!-- 1. Start Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="@dimen/padding_medium"
+                    android:layout_marginBottom="@dimen/margin_standard">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_margin="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:text="Mean Time:"
-                android:textAllCaps="true"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_start_time"
+                        android:textColor="@color/light_gray"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-bold"
+                        android:textAllCaps="true"
+                        android:layout_marginEnd="@dimen/margin_standard" />
 
-            <TextView
-                android:id="@+id/meanTimeTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="start"
-                android:maxLines="1"
-                android:text=" "
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/sTimeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/default_empty_value"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="end"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+                </LinearLayout>
 
-        </LinearLayout>
+                <!-- 2. End Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="@dimen/padding_medium"
+                    android:layout_marginBottom="@dimen/margin_standard">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_end_time"
+                        android:textColor="@color/light_gray"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-bold"
+                        android:textAllCaps="true"
+                        android:layout_marginEnd="@dimen/margin_standard" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_margin="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:text="Median Time:"
-                android:textAllCaps="true"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/endTimeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/default_empty_value"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="end"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/medianTimeTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="start"
-                android:maxLines="1"
-                android:text=" "
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                <!-- 3. Mean Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="@dimen/padding_medium"
+                    android:layout_marginBottom="@dimen/margin_standard">
 
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_mean_time"
+                        android:textColor="@color/light_gray"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-bold"
+                        android:textAllCaps="true"
+                        android:layout_marginEnd="@dimen/margin_standard" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/meanTimeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/default_empty_value"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="end"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+                </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_margin="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:text="Count Time:"
-                android:textAllCaps="true"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                <!-- 4. Median Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="@dimen/padding_medium"
+                    android:layout_marginBottom="@dimen/margin_standard">
 
-            <TextView
-                android:id="@+id/countTimeTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="start"
-                android:maxLines="1"
-                android:text=" "
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_median_time"
+                        android:textColor="@color/light_gray"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-bold"
+                        android:textAllCaps="true"
+                        android:layout_marginEnd="@dimen/margin_standard" />
 
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/medianTimeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/default_empty_value"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="end"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+                </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                <!-- 5. Count of Sessions -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="@dimen/padding_medium"
+                    android:layout_marginBottom="@dimen/margin_standard">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_margin="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:text="Total Spent Time:"
-                android:textAllCaps="true"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_count_sessions"
+                        android:textColor="@color/light_gray"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-bold"
+                        android:textAllCaps="true"
+                        android:layout_marginEnd="@dimen/margin_standard" />
 
-                />
+                    <TextView
+                        android:id="@+id/countTimeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/default_empty_value"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="end"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/totalTimeTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="start"
-                android:maxLines="1"
-                android:text=" "
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                <!-- 6. Minimum Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="@dimen/padding_medium"
+                    android:layout_marginBottom="@dimen/margin_standard">
 
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_minimum_time"
+                        android:textColor="@color/light_gray"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-bold"
+                        android:textAllCaps="true"
+                        android:layout_marginEnd="@dimen/margin_standard" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/minimumTimeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/default_empty_value"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="end"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+                </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_margin="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:text="Maximum Time:"
-                android:textAllCaps="true"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                <!-- 7. Maximum Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="@dimen/padding_medium"
+                    android:layout_marginBottom="@dimen/margin_standard">
 
-            <TextView
-                android:id="@+id/maximumTimeTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="start"
-                android:maxLines="1"
-                android:text=" "
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_maximum_time"
+                        android:textColor="@color/light_gray"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-bold"
+                        android:textAllCaps="true"
+                        android:layout_marginEnd="@dimen/margin_standard" />
 
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/maximumTimeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/default_empty_value"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="end"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+                </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                <!-- 8. Total Spent Time (Highlighted) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="@dimen/padding_medium">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_margin="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="16dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:text="End Time:"
-                android:textAllCaps="true"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_total_spent_time"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="sans-serif-bold"
+                        android:textAllCaps="true"
+                        android:layout_marginEnd="@dimen/margin_standard" />
 
-            <TextView
-                android:id="@+id/endTimeTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="start"
-                android:maxLines="1"
-                android:text=" "
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </LinearLayout>
+                    <TextView
+                        android:id="@+id/totalTimeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/default_empty_value"
+                        android:textColor="@color/colorRoyalBlue"
+                        android:textSize="@dimen/text_size_subheading"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="end"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

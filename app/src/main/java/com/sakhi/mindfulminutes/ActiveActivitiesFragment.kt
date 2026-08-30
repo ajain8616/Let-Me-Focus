@@ -3,13 +3,18 @@ package com.sakhi.mindfulminutes
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import java.text.SimpleDateFormat
-import java.util.*
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,8 +25,16 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class ActiveActivitiesFragment : Fragment() {
+
+    companion object {
+        private const val TAG = "ActiveActivitiesDebug"
+    }
 
     // UI components
     private lateinit var itemNameEditText: EditText
@@ -34,13 +47,12 @@ class ActiveActivitiesFragment : Fragment() {
     private lateinit var activityRecyclerView: RecyclerView
     private lateinit var addItemLayout: RelativeLayout
     private lateinit var searchItemLayout: RelativeLayout
-    private lateinit var activityNameView:TextView
-    private lateinit var activityNameLayout:LinearLayout
-
+    private lateinit var activityNameView: TextView
+    private lateinit var activityNameLayout: LinearLayout
 
     // Firebase
     private lateinit var auth: FirebaseAuth
-    private lateinit var databaseReference: DatabaseReference
+    private var databaseReference: DatabaseReference? = null
 
     // Data
     private lateinit var activityAdapter: ActiveActivityAdapter
@@ -55,24 +67,20 @@ class ActiveActivitiesFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_active_activities, container, false)
 
-        // Initialize UI components
+        // 1. Initialize UI components
         initializeViews(view)
 
-        // Initialize Firebase
+        // 2. Initialize Firebase
         initializeFirebase()
 
-        // Set listeners
+        // 3. Set listeners
         setListeners()
 
-        // Fetch data from database
+        // 4. Fetch data in realtime
         fetchDataFromDatabase()
-
-        // Setup EditText
-        setupEditText()
 
         return view
     }
-
 
     private fun initializeViews(view: View) {
         itemNameEditText = view.findViewById(R.id.itemName)
@@ -86,7 +94,7 @@ class ActiveActivitiesFragment : Fragment() {
         addItemLayout = view.findViewById(R.id.addItemLayout)
         searchItemLayout = view.findViewById(R.id.searchItemLayout)
         activityNameView = view.findViewById(R.id.activityNameView)
-        activityNameLayout= view.findViewById(R.id.activityNameLayout)
+        activityNameLayout = view.findViewById(R.id.activityNameLayout)
 
         // RecyclerView setup
         activityRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -96,64 +104,234 @@ class ActiveActivitiesFragment : Fragment() {
 
     private fun initializeFirebase() {
         auth = FirebaseAuth.getInstance()
-        databaseReference = FirebaseDatabase.getInstance().reference.child("Activities")
-            .child(auth.currentUser?.uid ?: "")
-    }
+        val currentUserId = auth.currentUser?.uid
 
-    private fun arrangeActivityList() {
-        activityList.sortBy { it.second.toLowerCase(Locale.getDefault()) }
-    }
+        println("[$TAG] Current User UID: $currentUserId")
+        Log.d(TAG, "Current User UID: $currentUserId")
 
-    private fun clearTextShowList() {
-        if (itemSearchEditText.text.isEmpty()) {
-            fetchDataFromDatabase()
+        if (!currentUserId.isNullOrEmpty()) {
+            databaseReference = FirebaseDatabase.getInstance().reference
+                .child("Activities")
+                .child(currentUserId)
+        } else {
+            Log.e(TAG, "Firebase Auth: User is NOT logged in!")
+            Toast.makeText(context, "User not authenticated. Please log in.", Toast.LENGTH_LONG).show()
         }
     }
 
     private fun setListeners() {
+        // FAB toggle listeners
         fabActionButton.setOnClickListener { toggleButtonsVisibility() }
         addActionButton.setOnClickListener { toggleAddItemLayoutVisibility() }
         searchActionButton.setOnClickListener { toggleSearchItemLayoutVisibility() }
+
+        // Clear search button
         clearButton.setOnClickListener {
+            println("[$TAG] Clear search button clicked")
             itemSearchEditText.text.clear()
-            fetchDataFromDatabase()
+            searchActivity("")
         }
 
-
+        // Send / Add Activity Button
         sendButton.setOnClickListener {
-            val activityName = itemNameEditText.text.toString().trim()
-            if (activityName.isNotEmpty()) {
-                duplicateActivities(activityName) { canAddActivity ->
-                    if (canAddActivity) {
-                        saveActivityToDatabase()
-                    } else {
-                        Toast.makeText(context, "Cannot add activity with the same name!", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } else {
-                Toast.makeText(context, "Please enter activity name!", Toast.LENGTH_SHORT).show()
-            }
+            handleSendAction()
         }
 
+        // Soft Keyboard 'Done' / 'Enter' listener on EditText
+        itemNameEditText.setOnEditorActionListener { _, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE ||
+                (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)
+            ) {
+                handleSendAction()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
 
-
-        // TextWatcher for itemSearchEditText
+        // Single TextWatcher for Search
         itemSearchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Call searchActivity() with the entered text
-                searchActivity(s.toString())
-
-                // Check if the new text is empty and call clearTextShowList() if true
-                if (s.isNullOrEmpty()) {
-                    clearTextShowList()
-                }
+                val query = s?.toString() ?: ""
+                println("[$TAG] Search Query: '$query'")
+                searchActivity(query)
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
 
+    private fun handleSendAction() {
+        val activityName = itemNameEditText.text.toString().trim()
+
+        println("[$TAG] SendButton Clicked! Input Name: '$activityName'")
+        Log.d(TAG, "SendButton Clicked! Input Name: '$activityName'")
+
+        if (activityName.isEmpty()) {
+            println("[$TAG] Validation Failed: Activity name is empty")
+            Log.w(TAG, "Validation Failed: Activity name is empty")
+            Toast.makeText(context, "Please enter activity name!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Check for duplicates and save
+        validateAndSaveActivity(activityName)
+    }
+
+    private fun validateAndSaveActivity(activityName: String) {
+        val dbRef = databaseReference
+        if (dbRef == null) {
+            println("[$TAG] DatabaseReference is NULL (User not logged in)")
+            Log.e(TAG, "DatabaseReference is NULL (User not logged in)")
+            Toast.makeText(context, "Cannot save: User session not found", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        println("[$TAG] Checking duplicates for '$activityName' in Firebase...")
+        Log.d(TAG, "Checking duplicates for '$activityName' in Firebase...")
+
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var isDuplicate = false
+                var totalActiveCount = 0
+
+                for (child in snapshot.children) {
+                    val existingName = child.child("activity").value?.toString() ?: ""
+                    val status = child.child("status").value?.toString() ?: ""
+
+                    if (status != "Inactive") {
+                        totalActiveCount++
+                    }
+
+                    // Check duplicate case-insensitively
+                    if (existingName.equals(activityName, ignoreCase = true) && status != "Inactive") {
+                        isDuplicate = true
+                        break
+                    }
+                }
+
+                println("[$TAG] Validation check: ActiveCount=$totalActiveCount, isDuplicate=$isDuplicate")
+                Log.d(TAG, "Validation check: ActiveCount=$totalActiveCount, isDuplicate=$isDuplicate")
+
+                if (isDuplicate) {
+                    println("[$TAG] Duplicate activity found!")
+                    Log.w(TAG, "Duplicate activity found!")
+                    Toast.makeText(context, "Cannot add activity with the same name!", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
+                if (totalActiveCount >= 12) {
+                    println("[$TAG] Max limit reached (12 activities)")
+                    Log.w(TAG, "Max limit reached (12 activities)")
+                    Toast.makeText(context, "Cannot add more than 12 active activities!", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
+                // Proceed with saving
+                saveToFirebase(activityName)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                println("[$TAG] Duplicate check cancelled/failed: ${error.message}")
+                Log.e(TAG, "Duplicate check cancelled/failed: ${error.message}")
+                Toast.makeText(context, "Database error: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun saveToFirebase(activityName: String) {
+        val dbRef = databaseReference ?: return
+        val newKey = dbRef.push().key
+
+        if (newKey == null) {
+            println("[$TAG] Error: Failed to generate Firebase Push Key")
+            Log.e(TAG, "Error: Failed to generate Firebase Push Key")
+            Toast.makeText(context, "Error generating key for activity", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val creationTime = getCurrentIndianTime()
+        val status = "Active"
+
+        val activityData = hashMapOf(
+            "activity" to activityName,
+            "creationTime" to creationTime,
+            "status" to status
+        )
+
+        println("[$TAG] Pushing data to path Activities/${auth.currentUser?.uid}/$newKey -> $activityData")
+        Log.d(TAG, "Pushing data to path Activities/${auth.currentUser?.uid}/$newKey -> $activityData")
+
+        dbRef.child(newKey).setValue(activityData)
+            .addOnSuccessListener {
+                println("[$TAG] SUCCESS: Activity '$activityName' saved to Firebase!")
+                Log.d(TAG, "SUCCESS: Activity '$activityName' saved to Firebase!")
+                Toast.makeText(context, "Activity saved successfully!", Toast.LENGTH_SHORT).show()
+                itemNameEditText.text.clear()
+                addItemLayout.visibility = View.GONE
+            }
+            .addOnFailureListener { exception ->
+                println("[$TAG] FAILURE: Failed to save activity: ${exception.localizedMessage}")
+                Log.e(TAG, "FAILURE: Failed to save activity: ${exception.localizedMessage}", exception)
+                Toast.makeText(context, "Failed to save activity: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun getCurrentIndianTime(): String {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy hh:mm:ss a", Locale.ENGLISH)
+        dateFormat.timeZone = TimeZone.getTimeZone("Asia/Kolkata")
+        return dateFormat.format(Date())
+    }
+
+    private fun fetchDataFromDatabase() {
+        val dbRef = databaseReference ?: return
+
+        println("[$TAG] Attaching realtime ValueEventListener to ${dbRef.key}...")
+        Log.d(TAG, "Attaching realtime ValueEventListener to ${dbRef.key}...")
+
+        dbRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                activityList.clear()
+                inactiveActivityList.clear()
+
+                for (postSnapshot in snapshot.children) {
+                    val activityId = postSnapshot.key ?: ""
+                    val activityName = postSnapshot.child("activity").value?.toString() ?: ""
+                    val status = postSnapshot.child("status").value?.toString() ?: ""
+
+                    if (status == "Inactive") {
+                        inactiveActivityList.add(activityId to activityName)
+                    } else {
+                        activityList.add(activityId to activityName)
+                    }
+                }
+
+                // Sort alphabetically
+                activityList.sortBy { it.second.lowercase(Locale.getDefault()) }
+
+                println("[$TAG] Realtime update: Fetched ${activityList.size} active activities")
+                Log.d(TAG, "Realtime update: Fetched ${activityList.size} active activities")
+
+                activityAdapter.notifyDataSetChanged()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                println("[$TAG] Realtime fetch cancelled: ${error.message}")
+                Log.e(TAG, "Realtime fetch cancelled: ${error.message}")
+                Toast.makeText(context, "Failed to fetch activities: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun searchActivity(query: String) {
+        val listToFilter = if (showInactiveActivities) inactiveActivityList else activityList
+        val filteredList = if (query.isEmpty()) {
+            listToFilter
+        } else {
+            listToFilter.filter { it.second.contains(query, ignoreCase = true) }
+        }
+        activityAdapter.updateList(filteredList.toMutableList())
     }
 
     private fun toggleButtonsVisibility() {
@@ -161,7 +339,6 @@ class ActiveActivitiesFragment : Fragment() {
         searchActionButton.visibility = visibility
         addActionButton.visibility = visibility
     }
-
 
     private fun toggleAddItemLayoutVisibility() {
         val addItemVisibility = if (addItemLayout.visibility == View.GONE) View.VISIBLE else View.GONE
@@ -174,224 +351,4 @@ class ActiveActivitiesFragment : Fragment() {
         searchItemLayout.visibility = searchItemVisibility
         addItemLayout.visibility = View.GONE
     }
-
-    private fun saveActivityToDatabase() {
-        val activityName = itemNameEditText.text.toString().trim()
-        val creationTime = getCurrentIndianTime()
-        val status = "Active"
-
-        if (activityName.isNotEmpty()) {
-            // Check if the number of activities is less than 12 or if any activity is inactive
-            if (activityList.size < 12 || activityList.any { it.second == "Inactive" }) {
-                val activityRef = databaseReference
-
-                // Retrieve current activities from the database
-                activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val newActivityData = hashMapOf(
-                            "activity" to activityName,
-                            "creationTime" to creationTime,
-                            "status" to status
-                        )
-
-                        // Find the correct position to insert the new activity
-                        var insertIndex = 0
-                        for (childSnapshot in snapshot.children) {
-                            val childActivityName = childSnapshot.child("activity").value.toString()
-                            if (activityName.compareTo(childActivityName) < 0) {
-                                break
-                            }
-                            insertIndex++
-                        }
-
-                        // Push the new activity to the correct position
-                        activityRef.child(activityRef.push().key ?: "").setValue(newActivityData)
-                            .addOnSuccessListener {
-                                Toast.makeText(context, "Activity saved successfully!", Toast.LENGTH_SHORT).show()
-                                itemNameEditText.text.clear()
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(context, "Failed to save activity!", Toast.LENGTH_SHORT).show()
-                            }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(context, "Failed to retrieve activities: ${error.message}", Toast.LENGTH_SHORT).show()
-                    }
-                })
-            } else {
-                Toast.makeText(context, "Cannot add more than 12 activities!", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            Toast.makeText(context, "Please enter activity name!", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-
-    private fun getCurrentIndianTime(): String {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy hh:mm:ss a", Locale.ENGLISH)
-        dateFormat.timeZone = TimeZone.getTimeZone("Asia/Kolkata") // Set Indian time zone
-        return dateFormat.format(Date())
-    }
-
-    private fun fetchDataFromDatabase() {
-        databaseReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                activityList.clear() // Clear the previous list before adding new data
-                for (postSnapshot in snapshot.children) {
-                    val activityId = postSnapshot.key ?: ""
-                    val activityName = postSnapshot.child("activity").value.toString()
-                    val status = postSnapshot.child("status").value.toString()
-
-                    // Include activities with all statuses except "Inactive" if not showing inactive activities
-                    if (!showInactiveActivities && status != "Inactive") {
-                        activityList.add(activityId to activityName)
-                    }
-                }
-
-                // Arrange the activity list alphabetically
-                arrangeActivityList()
-
-                activityAdapter.notifyDataSetChanged()
-
-                if (activityList.isEmpty()) {
-                    Toast.makeText(context, "No Activities found!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "You can add more activities!", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle database error
-                Toast.makeText(context, "Failed to fetch activities: ${error.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun setupEditText() {
- // Editor action listener for itemNameEditText
-        itemNameEditText.setOnEditorActionListener { _, actionId, event ->
-            if (actionId == KeyEvent.KEYCODE_ENTER || event.action == KeyEvent.ACTION_DOWN) {
-                val activityName = itemNameEditText.text.toString().trim()
-                if (activityName.isNotEmpty()) {
-                    duplicateActivities(activityName) { canAddActivity ->
-                        if (canAddActivity) {
-                            saveActivityToDatabase()
-                            fetchDataFromDatabase()
-                        } else {
-                            Toast.makeText(context, "Cannot add activity with the same name!", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } else {
-                    Toast.makeText(context, "Please enter activity name!", Toast.LENGTH_SHORT).show()
-                }
-                return@setOnEditorActionListener true
-            }
-            return@setOnEditorActionListener false
-        }
-
-
-        // TextWatcher for itemSearchEditText
-        itemSearchEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Call searchActivity() with the entered text
-                searchActivity(s.toString())
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-    }
-
-
-    private fun searchActivity(query: String) {
-        val filteredList = if (showInactiveActivities) {
-            inactiveActivityList.filter { it.second.contains(query, true) }
-        } else {
-            activityList.filter { it.second.contains(query, true) }
-        }
-        activityAdapter.updateList(filteredList.toMutableList())
-    }
-
-
-    private fun duplicateActivities(activityName: String, callback: (Boolean) -> Unit) {
-        // Check if the activityName contains only letters and spaces, and not starting or ending with space
-        val isAlphaWithSpaces = activityName.matches(Regex("^[a-zA-Z]+(?: [a-zA-Z]+)*$"))
-                && !activityName.startsWith(" ")
-                && !activityName.endsWith(" ")
-
-        // Check if the activityName does not contain any numerical values or special characters
-        val isNoNumericOrSpecial = activityName.matches(Regex("^[a-zA-Z ]+\$"))
-
-        // Check if the activityName has at least one character
-        val isNotEmpty = activityName.isNotEmpty()
-
-        // Check if the activityName is not already in the database with a different case
-        var isNotDuplicateCase = true // Assuming initially it's not a duplicate case
-        val lowercaseActivityName = activityName.toLowerCase(Locale.getDefault())
-        val uppercaseActivityName = activityName.toUpperCase(Locale.getDefault())
-        val activityRef = databaseReference.orderByChild("activity")
-            .startAt(lowercaseActivityName)
-            .endAt(lowercaseActivityName + "\uf8ff")
-
-        activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (postSnapshot in snapshot.children) {
-                    val existingName = postSnapshot.child("activity").value.toString()
-                    if (existingName == lowercaseActivityName) {
-                        // If an activity with the same name already exists (case-sensitive), it's a duplicate case
-                        isNotDuplicateCase = false
-                        break
-                    }
-                    if (existingName == uppercaseActivityName) {
-                        // If an activity with the same name in uppercase already exists, it's a duplicate case
-                        isNotDuplicateCase = false
-                        break
-                    }
-                }
-                // After checking for duplicate case, proceed with other checks
-                if (isNotEmpty && isAlphaWithSpaces && isNoNumericOrSpecial && isNotDuplicateCase) {
-                    // If all conditions are met, proceed with checking for duplicates in Firebase
-                    val activityRef = databaseReference.orderByChild("activity")
-
-                    activityRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            var canAddActivity = true
-                            for (postSnapshot in snapshot.children) {
-                                val existingName = postSnapshot.child("activity").value.toString()
-                                val status = postSnapshot.child("status").value.toString()
-                                if (existingName.equals(lowercaseActivityName, ignoreCase = true) && status == "Inactive") {
-                                    // If an inactive activity with the same name (case-insensitive) already exists, allow adding the new activity
-                                    canAddActivity = true
-                                    break
-                                }
-                                if (existingName.equals(lowercaseActivityName, ignoreCase = true)) {
-                                    // If an active activity with the same name (case-insensitive) already exists, user cannot add it again
-                                    canAddActivity = false
-                                    break
-                                }
-                            }
-                            callback(canAddActivity)
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            // Handle database error
-                            callback(false)
-                        }
-                    })
-                } else {
-                    // If any of the conditions fail, indicate that the activity name is invalid
-                    callback(false)
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle database error
-                callback(false)
-            }
-        })
-    }
-
-
 }

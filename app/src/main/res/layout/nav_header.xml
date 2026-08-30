@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
-    android:padding="16dp"
-    android:theme="@style/Base.Theme.ActivityTracker"
+    android:layout_height="@dimen/nav_header_height"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_large"
+    android:gravity="bottom"
     android:background="@drawable/headerbkg"
-    android:layout_margin="9dp">
+    android:theme="@style/Base.Theme.ActivityTracker">
 
+    <!-- App / User Logo -->
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="90dp"
+        android:layout_width="@dimen/nav_header_icon_size"
+        android:layout_height="@dimen/nav_header_icon_height"
         android:src="@drawable/icon"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="16dp"/>
+        android:contentDescription="@string/cd_app_icon"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_large" />
 
+    <!-- App Title -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Activity Tracker"
+        android:text="@string/nav_header_title"
         android:textColor="@color/white"
-        android:textSize="19sp"
+        android:textSize="@dimen/text_size_title"
+        android:fontFamily="sans-serif-black"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="@dimen/margin_tiny" />
+
+    <!-- App Subtitle -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nav_header_subtitle"
+        android:textColor="@color/colorLightYellow"
+        android:textSize="@dimen/text_size_caption"
+        android:fontFamily="sans-serif-medium" />
+
 </LinearLayout>

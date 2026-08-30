@@ -4,69 +4,79 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    android:theme="@style/Base.Theme.ActivityTracker"
-    android:layout_margin="8dp">
+    android:layout_marginHorizontal="@dimen/margin_large"
+    android:layout_marginVertical="@dimen/margin_standard"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation"
+    app:cardBackgroundColor="@color/white"
+    app:cardUseCompatPadding="true"
+    android:theme="@style/Base.Theme.ActivityTracker">
 
     <RelativeLayout
         android:id="@+id/main_CardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="@dimen/padding_large">
 
-        <!-- Front Side of Card -->
+        <!-- ================= FRONT SIDE OF CARD ================= -->
         <LinearLayout
             android:id="@+id/card_front"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Header -->
+            <!-- Front Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/margin_medium">
 
                 <!-- Activity Name -->
                 <TextView
                     android:id="@+id/activityNameTextView"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:textSize="25sp"
-                    android:textStyle="bold"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:gravity="center"
-                    android:hint="Activity Name" />
+                    android:layout_weight="1"
+                    android:textSize="@dimen/text_size_heading"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/black"
+                    android:gravity="start|center_vertical"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:hint="@string/hint_activity_name"
+                    android:textColorHint="@color/light_gray" />
 
                 <!-- Close Button -->
                 <ImageButton
                     android:id="@+id/closeButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/icon_button_size"
+                    android:layout_height="@dimen/icon_button_size"
+                    android:layout_marginStart="@dimen/margin_standard"
                     android:src="@drawable/ic_clear"
-                    android:background="?android:attr/selectableItemBackground"
-                    app:tint="@color/black" />
+                    android:contentDescription="@string/cd_close_activity"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    app:tint="@color/light_gray" />
 
             </LinearLayout>
 
-            <!-- Stopwatch -->
+            <!-- Stopwatch Timer Hero Display -->
             <TextView
                 android:id="@+id/stopwatchTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="28sp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
+                android:background="@drawable/bg_timer_container"
+                android:textSize="@dimen/text_size_timer"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/colorRoyalBlue"
                 android:gravity="center"
-                android:text="00:00:00" />
+                android:paddingVertical="@dimen/padding_large"
+                android:text="@string/timer_default_value" />
 
         </LinearLayout>
 
-        <!-- Back Side of Card -->
+        <!-- ================= BACK SIDE OF CARD ================= -->
         <LinearLayout
             android:id="@+id/card_back"
             android:layout_width="match_parent"
@@ -74,63 +84,81 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!-- Header -->
+            <!-- Back Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/margin_medium">
 
-                <!-- Back Button -->
+                <!-- Back / Flip Button -->
                 <ImageButton
                     android:id="@+id/backButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/icon_button_size"
+                    android:layout_height="@dimen/icon_button_size"
+                    android:layout_marginEnd="@dimen/margin_standard"
                     android:src="@drawable/ic_back"
-                    android:background="?android:attr/selectableItemBackground"
-                    app:tint="@color/black" />
+                    android:contentDescription="@string/cd_flip_back"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    app:tint="@color/colorRoyalBlue" />
 
-                <!-- Activity Name -->
+                <!-- Activity Name on Back -->
                 <TextView
                     android:id="@+id/activityNameTextView1"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:textSize="25sp"
-                    android:textStyle="bold"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:gravity="center"
-                    android:hint="Activity Name" />
+                    android:layout_weight="1"
+                    android:textSize="@dimen/text_size_heading"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/black"
+                    android:gravity="start|center_vertical"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:hint="@string/hint_activity_name"
+                    android:textColorHint="@color/light_gray" />
 
             </LinearLayout>
 
-            <!-- Additional details -->
+            <!-- Additional Detail Rows -->
             <TextView
                 android:id="@+id/backTextView1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=" "
-                android:textSize="18sp"
-                android:padding="8dp" />
+                android:background="@drawable/bg_detail_row"
+                android:textSize="@dimen/text_size_body"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"
+                android:padding="@dimen/padding_medium"
+                android:layout_marginBottom="@dimen/margin_standard"
+                android:text="@string/default_empty_value" />
 
             <TextView
                 android:id="@+id/backTextView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=" "
-                android:textSize="18sp"
-                android:padding="8dp" />
+                android:background="@drawable/bg_detail_row"
+                android:textSize="@dimen/text_size_body"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"
+                android:padding="@dimen/padding_medium"
+                android:layout_marginBottom="@dimen/margin_standard"
+                android:text="@string/default_empty_value" />
 
             <TextView
                 android:id="@+id/backTextView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=" "
+                android:background="@drawable/bg_detail_row"
+                android:textSize="@dimen/text_size_body"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black"
+                android:padding="@dimen/padding_medium"
                 android:visibility="gone"
-                android:textSize="18sp"
-                android:padding="8dp" />
+                android:text="@string/default_empty_value" />
 
         </LinearLayout>
+
     </RelativeLayout>
+
 </androidx.cardview.widget.CardView>

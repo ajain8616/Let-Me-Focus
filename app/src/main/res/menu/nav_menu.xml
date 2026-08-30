@@ -3,58 +3,52 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:theme="@style/Base.Theme.ActivityTracker"
-    tools:showIn = "navigation_view">
+    tools:showIn="navigation_view">
 
-    <group
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
 
         <item
             android:id="@+id/nav_active"
             android:icon="@drawable/ic_active"
-            android:title="Active Activities"/>
-
+            android:title="@string/nav_active_activities" />
 
         <item
             android:id="@+id/nav_details"
             android:icon="@drawable/ic_data_details"
-            android:title="Activities Details "/>
+            android:title="@string/nav_activities_details" />
 
         <item
             android:id="@+id/nav_analysis"
             android:icon="@drawable/ic_analytics"
-            android:title="Activities Analysis Data"/>
+            android:title="@string/nav_analysis_data" />
 
         <item
             android:id="@+id/nav_filtered"
             android:icon="@drawable/ic_analytics"
-            android:title="Activities Filtered Data"
-            android:visible="false"/>
-
+            android:title="@string/nav_filtered_data"
+            android:visible="false" />
 
         <item
             android:id="@+id/nav_login"
             android:icon="@drawable/ic_login"
-            android:title="Login"
-            android:visible="false"/>
+            android:title="@string/nav_login"
+            android:visible="false" />
 
         <item
             android:id="@+id/nav_signUp"
             android:icon="@drawable/ic_signup"
-            android:title="SignUp"
-            android:visible="false"/>
+            android:title="@string/nav_signup"
+            android:visible="false" />
 
     </group>
-    <item
-        android:title="">
 
+    <item android:title="">
         <menu>
-
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_logout"
-                android:title="Logout"/>
+                android:title="@string/nav_logout" />
         </menu>
-
     </item>
 
 </menu>

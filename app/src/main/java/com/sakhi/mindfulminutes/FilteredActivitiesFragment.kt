@@ -22,6 +22,7 @@ class FilteredActivitiesFragment : Fragment() {
     private lateinit var countTimeTextView: TextView
     private lateinit var totalSpentTimeTextView: TextView
     private lateinit var maximumTimeTextView: TextView
+    private lateinit var minimumTimeTextView:TextView
     private lateinit var endTimeTextView: TextView
     private lateinit var auth: FirebaseAuth
     private var activityName: String? = null
@@ -61,6 +62,7 @@ class FilteredActivitiesFragment : Fragment() {
         countTimeTextView = view.findViewById(R.id.countTimeTextView)
         totalSpentTimeTextView = view.findViewById(R.id.totalTimeTextView)
         maximumTimeTextView = view.findViewById(R.id.maximumTimeTextView)
+        minimumTimeTextView = view.findViewById(R.id.minimumTimeTextView)
         endTimeTextView = view.findViewById(R.id.endTimeTextView)
 
         // Retrieve the activity name passed as an argument
