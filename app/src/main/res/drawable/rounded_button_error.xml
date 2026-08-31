@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/error" />
-    <corners android:radius="16dp" />
-</shape>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_light">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/error" />
+            <stroke
+                android:width="@dimen/stroke_hairline"
+                android:color="@color/error_dark" />
+        </shape>
+    </item>
+</ripple>

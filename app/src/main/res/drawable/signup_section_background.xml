@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/signup_section_bg" />
-    <corners android:radius="12dp" />
+    <stroke
+        android:width="@dimen/stroke_thin"
+        android:color="@color/border_gray" />
+    <corners android:radius="@dimen/radius_medium" />
 </shape>

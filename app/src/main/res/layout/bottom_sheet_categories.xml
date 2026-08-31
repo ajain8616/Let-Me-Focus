@@ -4,21 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_background"
-    android:padding="24dp">
+    android:padding="@dimen/padding_screen">
 
-    <!-- Close Button -->
+    <!-- Close Button with Circular Red Background -->
     <ImageButton
         android:id="@+id/crossIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/icon_size_large"
+        android:layout_height="@dimen/icon_size_large"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:src="@drawable/ic_clear"
-        android:background="@drawable/rounded_button_background_transparent"
-        android:tint="@color/textSecondary"
+        android:background="@drawable/rounded_button_error"
+        app:tint="@color/white"
         android:contentDescription="@string/close"
         android:scaleType="centerInside"
-        android:padding="8dp" />
+        android:padding="@dimen/padding_tiny" />
 
     <!-- Title -->
     <TextView
@@ -26,14 +26,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/crossIcon"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_large"
         android:gravity="center"
-        android:text="Filter Activities"
+        android:text="@string/choose_your_category"
         android:textColor="@color/textPrimary"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.02" />
+        android:textSize="@dimen/text_size_heading"
+        android:fontFamily="@font/bold"
+        android:letterSpacing="0.01" />
 
     <!-- Filter Options -->
     <RadioGroup
@@ -44,22 +44,21 @@
         android:orientation="vertical">
 
         <!-- Complete List -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardCompleteList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="1dp"
+            android:layout_marginBottom="@dimen/margin_small"
+            app:cardCornerRadius="@dimen/radius_medium"
+            app:cardElevation="@dimen/elevation_subtle"
+            app:strokeWidth="@dimen/stroke_thin"
+            app:strokeColor="@color/border_gray"
             app:cardBackgroundColor="@color/surface">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="56dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:background="?android:attr/selectableItemBackground">
+                android:layout_height="52dp"
+                android:paddingHorizontal="@dimen/padding_large">
 
                 <RadioButton
                     android:id="@+id/radioButtonCompleteList"
@@ -73,32 +72,32 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@id/radioButtonCompleteList"
-                    android:layout_marginStart="16dp"
-                    android:text="Complete List"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:text="@string/complete_list"
+                    android:fontFamily="@font/robotomedium"
                     android:textColor="@color/textPrimary"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/text_size_subheading" />
 
             </RelativeLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Active -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardActive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="1dp"
+            android:layout_marginBottom="@dimen/margin_small"
+            app:cardCornerRadius="@dimen/radius_medium"
+            app:cardElevation="@dimen/elevation_subtle"
+            app:strokeWidth="@dimen/stroke_thin"
+            app:strokeColor="@color/border_gray"
             app:cardBackgroundColor="@color/surface">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="56dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:background="?android:attr/selectableItemBackground">
+                android:layout_height="52dp"
+                android:paddingHorizontal="@dimen/padding_large">
 
                 <RadioButton
                     android:id="@+id/radioButtonActive"
@@ -112,32 +111,32 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@id/radioButtonActive"
-                    android:layout_marginStart="16dp"
-                    android:text="Active"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:text="@string/active"
+                    android:fontFamily="@font/robotomedium"
                     android:textColor="@color/textPrimary"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/text_size_subheading" />
 
             </RelativeLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Inactive -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardInactive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="1dp"
+            android:layout_marginBottom="@dimen/margin_small"
+            app:cardCornerRadius="@dimen/radius_medium"
+            app:cardElevation="@dimen/elevation_subtle"
+            app:strokeWidth="@dimen/stroke_thin"
+            app:strokeColor="@color/border_gray"
             app:cardBackgroundColor="@color/surface">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="56dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:background="?android:attr/selectableItemBackground">
+                android:layout_height="52dp"
+                android:paddingHorizontal="@dimen/padding_large">
 
                 <RadioButton
                     android:id="@+id/radioButtonInactive"
@@ -151,32 +150,32 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@id/radioButtonInactive"
-                    android:layout_marginStart="16dp"
-                    android:text="Inactive"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:text="@string/inactive"
+                    android:fontFamily="@font/robotomedium"
                     android:textColor="@color/textPrimary"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/text_size_subheading" />
 
             </RelativeLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Pause -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPause"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="1dp"
+            android:layout_marginBottom="@dimen/margin_small"
+            app:cardCornerRadius="@dimen/radius_medium"
+            app:cardElevation="@dimen/elevation_subtle"
+            app:strokeWidth="@dimen/stroke_thin"
+            app:strokeColor="@color/border_gray"
             app:cardBackgroundColor="@color/surface">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="56dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:background="?android:attr/selectableItemBackground">
+                android:layout_height="52dp"
+                android:paddingHorizontal="@dimen/padding_large">
 
                 <RadioButton
                     android:id="@+id/radioButtonPause"
@@ -190,32 +189,32 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@id/radioButtonPause"
-                    android:layout_marginStart="16dp"
-                    android:text="Pause"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:text="@string/pause"
+                    android:fontFamily="@font/robotomedium"
                     android:textColor="@color/textPrimary"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/text_size_subheading" />
 
             </RelativeLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Stop -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardStop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="1dp"
+            android:layout_marginBottom="@dimen/margin_small"
+            app:cardCornerRadius="@dimen/radius_medium"
+            app:cardElevation="@dimen/elevation_subtle"
+            app:strokeWidth="@dimen/stroke_thin"
+            app:strokeColor="@color/border_gray"
             app:cardBackgroundColor="@color/surface">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="56dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:background="?android:attr/selectableItemBackground">
+                android:layout_height="52dp"
+                android:paddingHorizontal="@dimen/padding_large">
 
                 <RadioButton
                     android:id="@+id/radioButtonStop"
@@ -229,14 +228,15 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@id/radioButtonStop"
-                    android:layout_marginStart="16dp"
-                    android:text="Stop"
+                    android:layout_marginStart="@dimen/margin_medium"
+                    android:text="@string/stop"
+                    android:fontFamily="@font/robotomedium"
                     android:textColor="@color/textPrimary"
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/text_size_subheading" />
 
             </RelativeLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
     </RadioGroup>
 
@@ -244,23 +244,21 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/fetchDataButton"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="@dimen/button_standard_height"
         android:layout_below="@id/radioGroupCategories"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/margin_large"
         android:backgroundTint="@color/modern_primary"
-        android:text="Apply Filter"
+        android:text="@string/fetch_data"
         android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:cornerRadius="28dp"
-        app:iconTint="@color/white"
-        app:iconPadding="8dp" />
+        android:textSize="@dimen/text_size_body_large"
+        android:fontFamily="@font/bold"
+        app:cornerRadius="@dimen/radius_medium" />
 
     <!-- Loading Progress -->
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_centerInParent="true"
         android:indeterminateTint="@color/modern_primary"
         android:visibility="gone" />

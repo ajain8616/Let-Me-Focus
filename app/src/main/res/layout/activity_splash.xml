@@ -8,112 +8,118 @@
     android:background="@drawable/gradient_background"
     tools:context=".base.SplashActivity">
 
-    <!-- Animated Background Elements -->
+    <!-- Ambient Floating Blob 1 (Top-End) -->
     <ImageView
         android:id="@+id/bg_blob_1"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:alpha="0.15"
-        android:src="@drawable/bg_blob_1"
+        android:layout_width="@dimen/blob_size_1"
+        android:layout_height="@dimen/blob_size_1"
+        android:alpha="0.14"
+        app:srcCompat="@drawable/bg_blob_1"
+        android:contentDescription="@string/blank"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Ambient Floating Blob 2 (Bottom-Start) -->
     <ImageView
         android:id="@+id/bg_blob_2"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:alpha="0.15"
-        android:src="@drawable/bg_blob_2"
+        android:layout_width="@dimen/blob_size_2"
+        android:layout_height="@dimen/blob_size_2"
+        android:alpha="0.14"
+        app:srcCompat="@drawable/bg_blob_2"
+        android:contentDescription="@string/blank"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Main Content Container -->
+    <!-- Main Hero Center Container -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
+        android:paddingHorizontal="@dimen/padding_screen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.48">
 
-        <!-- App Logo with Flip Animation -->
-        <ImageView
-            android:id="@+id/app_logo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/ic_app_logo"
-            android:contentDescription="@string/app_logo" />
+        <!-- Glowing Glassmorphic App Logo Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="@dimen/circular_shadow_size"
+            android:layout_height="@dimen/circular_shadow_size"
+            app:cardCornerRadius="@dimen/radius_header"
+            app:cardElevation="@dimen/elevation_floating"
+            app:strokeWidth="@dimen/stroke_thin"
+            app:strokeColor="@color/glass_stroke_primary"
+            app:cardBackgroundColor="@color/transparent">
 
-        <!-- App Icon Below Logo -->
+            <ImageView
+                android:id="@+id/app_logo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/icon"
+                android:contentDescription="@string/cd_app_icon" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Legacy View preserved for zero ID breakage -->
         <ImageView
             android:id="@+id/app_icon"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/icon"
-            android:visibility="invisible"
-            android:contentDescription="@string/app_logo"
-            />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:contentDescription="@string/cd_app_icon" />
 
-        <!-- App Name -->
+        <!-- App Name Header -->
         <TextView
             android:id="@+id/app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/margin_xlarge"
             android:text="@string/app_name"
             android:textColor="@color/white"
-            android:textSize="32sp"
-            android:textStyle="bold"
+            android:textSize="@dimen/text_size_hero"
             android:fontFamily="@font/bold"
-            android:visibility="invisible"
-            tools:text="Mindful Minutes" />
+            android:letterSpacing="0.02" />
 
-        <!-- App Tagline -->
+        <!-- Subtitle / Tagline -->
         <TextView
             android:id="@+id/app_tagline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/app_tagline"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/nav_header_subtitle"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_size_subheading"
             android:fontFamily="@font/robotoregular"
-            android:visibility="invisible"
             android:gravity="center"
-            android:paddingStart="32dp"
-            android:paddingEnd="32dp"
-            tools:text="Your Professional Trading Companion" />
+            android:alpha="0.88" />
 
-        <!-- Loading Progress -->
+        <!-- Sleek Minimal Progress Indicator -->
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/loading_progress"
-            android:layout_width="200dp"
-            android:layout_height="4dp"
-            android:layout_marginTop="32dp"
-            android:visibility="invisible"
-            app:trackColor="@color/white"
-            app:trackCornerRadius="2dp"
-            app:indicatorColor="@color/primaryLight" />
+            android:layout_width="160dp"
+            android:layout_height="@dimen/margin_tiny"
+            android:layout_marginTop="@dimen/margin_xxlarge"
+            app:trackColor="@color/glass_stroke_primary"
+            app:trackCornerRadius="@dimen/radius_micro"
+            app:indicatorColor="@color/modern_secondary" />
 
     </LinearLayout>
 
-    <!-- Version Info -->
+    <!-- Version Metadata at Bottom -->
     <TextView
         android:id="@+id/version_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:visibility="invisible"
-        android:text="@string/version_info"
+        android:layout_marginBottom="@dimen/margin_xxlarge"
+        android:text="Version 2.0"
         android:textColor="@color/white"
-        android:textSize="12sp"
-        android:fontFamily="@font/robotoregular"
+        android:textSize="@dimen/text_size_caption"
+        android:fontFamily="@font/robotoligth"
+        android:letterSpacing="0.06"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="Version 1.0.0" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

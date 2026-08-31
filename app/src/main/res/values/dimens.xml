@@ -1,13 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Margins -->
-    <dimen name="margin_standard">8dp</dimen>
-    <dimen name="margin_large">16dp</dimen>
-
-    <!-- Padding -->
-    <dimen name="padding_standard">8dp</dimen>
-    <dimen name="padding_large">16dp</dimen>
-
-    <!-- Text Sizes -->
-    <dimen name="text_size_large">28sp</dimen>
+    <!-- ================================================================= -->
+    <!-- 8dp Grid Metrics: Margins & Spacing                               -->
+    <!-- ================================================================= -->
+    <dimen name="margin_micro">2dp</dimen>
+    <dimen name="margin_tiny">4dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_standard">12dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">20dp</dimen>
+    <dimen name="margin_screen">16dp</dimen>
+    <dimen name="margin_button">24dp</dimen>
+    <dimen name="margin_xlarge">28dp</dimen>
+    <dimen name="margin_xxlarge">32dp</dimen>
+    <dimen name="margin_divider_top">32dp</dimen>
+    <dimen name="margin_header">40dp</dimen>
+    <dimen name="margin_hero">48dp</dimen>
+    <!-- ================================================================= -->
+    <!-- Paddings                                                          -->
+    <!-- ================================================================= -->
+    <dimen name="padding_micro">2dp</dimen>
+    <dimen name="padding_tiny">4dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_standard">12dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">20dp</dimen>
+    <dimen name="padding_screen">20dp</dimen>
+    <dimen name="padding_xlarge">24dp</dimen>
+    <dimen name="padding_hero">40dp</dimen>
+    <dimen name="padding_bottom_shadow">4dp</dimen>
+    <!-- ================================================================= -->
+    <!-- Surface, Header & Corner Radii                                    -->
+    <!-- ================================================================= -->
+    <dimen name="radius_none">0dp</dimen>
+    <dimen name="radius_micro">4dp</dimen>
+    <dimen name="radius_small">8dp</dimen>
+    <dimen name="radius_standard">12dp</dimen>
+    <dimen name="radius_medium">14dp</dimen>
+    <dimen name="radius_large">18dp</dimen>
+    <dimen name="radius_card">20dp</dimen>
+    <dimen name="radius_xlarge">24dp</dimen>
+    <dimen name="radius_header">28dp</dimen>
+    <dimen name="radius_hero">32dp</dimen>
+    <dimen name="radius_pill">100dp</dimen>
+    <dimen name="radius_avatar">48dp</dimen>
+    <dimen name="radius_avatar_outer">52dp</dimen>
+    <dimen name="radius_oval_shadow">48dp</dimen>
+    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="button_corner_radius">28dp</dimen>
+    <dimen name="button_pill_radius">28dp</dimen>
+    <dimen name="badge_corner_radius">12dp</dimen>
+    <dimen name="chip_corner_radius">12dp</dimen>
+    <dimen name="bottom_sheet_corner_radius">28dp</dimen>
+    <dimen name="status_badge_radius">10dp</dimen>
+    <!-- ================================================================= -->
+    <!-- Elevations & Spatial Shadow Depths                                -->
+    <!-- ================================================================= -->
+    <dimen name="elevation_flat">0dp</dimen>
+    <dimen name="elevation_subtle">2dp</dimen>
+    <dimen name="elevation_card">4dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="elevation_floating">8dp</dimen>
+    <dimen name="elevation_modal">16dp</dimen>
+    <!-- ================================================================= -->
+    <!-- Component Sizing & Graphics Metrics                               -->
+    <!-- ================================================================= -->
+    <dimen name="button_standard_height">54dp</dimen>
+    <dimen name="button_height">54dp</dimen>
+    <dimen name="google_btn_height">54dp</dimen>
+    <dimen name="search_bar_height">52dp</dimen>
+    <dimen name="input_field_height">56dp</dimen>
+    <dimen name="nav_header_height">230dp</dimen>
+    <dimen name="appbar_height">64dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="bottom_sheet_handle_width">44dp</dimen>
+    <dimen name="bottom_sheet_handle_height">4dp</dimen>
+    <dimen name="pattern_size">120dp</dimen>
+    <dimen name="progress_ring_size">120dp</dimen>
+    <!-- ================================================================= -->
+    <!-- Icon & Image Component Metrics                                    -->
+    <!-- ================================================================= -->
+    <dimen name="icon_size_micro">14dp</dimen>
+    <dimen name="icon_size_small">18dp</dimen>
+    <dimen name="icon_size_standard">24dp</dimen>
+    <dimen name="icon_size_large">32dp</dimen>
+    <dimen name="icon_button_size">44dp</dimen>
+    <dimen name="status_indicator_size">12dp</dimen>
+    <dimen name="avatar_size">72dp</dimen>
+    <dimen name="avatar_bg_size">96dp</dimen>
+    <dimen name="profile_picture_size">80dp</dimen>
+    <dimen name="avatar_shadow_size">96dp</dimen>
+    <dimen name="circular_shadow_size">96dp</dimen>
+    <dimen name="empty_state_image_size">92dp</dimen>
+    <dimen name="blob_size_1">280dp</dimen>
+    <dimen name="blob_size_2">220dp</dimen>
+    <!-- ================================================================= -->
+    <!-- Borders, Strokes & Rings                                          -->
+    <!-- ================================================================= -->
+    <dimen name="stroke_hairline">1dp</dimen>
+    <dimen name="stroke_thin">1.5dp</dimen>
+    <dimen name="stroke_medium">2dp</dimen>
+    <dimen name="stroke_focused">2dp</dimen>
+    <dimen name="stroke_thick">2.5dp</dimen>
+    <dimen name="stroke_ring_thickness">6dp</dimen>
+    <!-- ================================================================= -->
+    <!-- Typography Font Scales (SP)                                       -->
+    <!-- ================================================================= -->
+    <dimen name="text_size_micro">10sp</dimen>
+    <dimen name="text_size_caption">12sp</dimen>
+    <dimen name="text_size_body_small">13sp</dimen>
+    <dimen name="text_size_body">14sp</dimen>
+    <dimen name="text_size_body_large">15sp</dimen>
+    <dimen name="text_size_subheading">16sp</dimen>
+    <dimen name="text_size_title">18sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_heading">22sp</dimen>
+    <dimen name="text_size_hero">28sp</dimen>
+    <dimen name="text_size_display">34sp</dimen>
 </resources>

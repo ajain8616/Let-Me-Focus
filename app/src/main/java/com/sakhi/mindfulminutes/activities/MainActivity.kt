@@ -6,16 +6,20 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.util.Patterns
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -41,7 +45,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var currentFragment: Fragment
     private lateinit var bottomSheetDialog: BottomSheetDialog
 
-    private val IMAGE_PICK_CODE = 1000
     private val TAG = "MainActivity"
 
     companion object {
@@ -49,6 +52,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         private const val KEY_PROFILE_IMAGE_URI = "profile_image_uri"
         private const val KEY_USER_NAME = "user_name"
         private const val KEY_USER_EMAIL = "user_email"
+    }
+
+    // Modern Android Photo Picker Contract
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            Picasso.get().load(it).into(profileBottomSheetBinding.imgProfilePicture)
+            Picasso.get().load(it).into(navHeaderBinding.avatarImage)
+            saveProfileImageToStorage(it)
+            showSuccess("Profile picture updated successfully")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,12 +77,36 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
         setupToolbar()
-        setupBottomSheet()          // initialize BEFORE loading user data
+        setupBottomSheet()
         setupNavigationDrawer()
         setupClickListeners()
+        setupBackNavigation()
 
-        // Load initial fragment
+        // Handle initial launch or notification tap navigation
         if (savedInstanceState == null && auth.currentUser != null) {
+            handleNotificationIntent(intent)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleNotificationIntent(intent)
+    }
+
+    /**
+     * Handles navigation when the user taps on the live stopwatch notification
+     */
+    private fun handleNotificationIntent(intent: Intent?) {
+        if (auth.currentUser == null) return
+
+        val navigateTo = intent?.getStringExtra("navigate_to")
+        val fragmentParam = intent?.getStringExtra("fragment")
+
+        if (navigateTo == "active_activities" || fragmentParam == "activities") {
+            loadFragment(ActiveActivitiesFragment(), addToBackStack = false)
+            binding.navView.setCheckedItem(R.id.nav_active)
+        } else {
             loadFragment(ActiveActivitiesFragment(), addToBackStack = false)
             binding.navView.setCheckedItem(R.id.nav_active)
         }
@@ -77,11 +114,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.apply {
+            setDisplayShowTitleEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+        }
     }
 
     private fun setupNavigationDrawer() {
-        val toggle = androidx.appcompat.app.ActionBarDrawerToggle(
+        val toggle = ActionBarDrawerToggle(
             this,
             binding.drawerLayout,
             binding.toolbar,
@@ -106,6 +146,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         profileBottomSheetBinding = BottomSheetEditProfileBinding.inflate(layoutInflater)
         bottomSheetDialog.setContentView(profileBottomSheetBinding.root)
 
+        // Ensures translucent acrylic styling without default rectangular sheet frame
+        bottomSheetDialog.window?.findViewById<android.view.View>(com.google.android.material.R.id.design_bottom_sheet)?.let { sheet ->
+            sheet.setBackgroundResource(android.R.color.transparent)
+        }
+
         setupBottomSheetListeners()
     }
 
@@ -126,12 +171,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         profileBottomSheetBinding.imgProfilePicture.setOnClickListener {
             openImagePicker()
         }
+
+        profileBottomSheetBinding.btnChangePhoto.setOnClickListener {
+            openImagePicker()
+        }
     }
 
     private fun setupClickListeners() {
         navHeaderBinding.editProfileButton.setOnClickListener {
             showEditProfileBottomSheet()
         }
+    }
+
+    private fun setupBackNavigation() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true
+                }
+            }
+        })
     }
 
     private fun loadUserData() {
@@ -189,8 +252,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 saveUserProfileToStorage(it.userName, it.userEmail)
 
-                navHeaderBinding.statusChip.text = "Active"
-                navHeaderBinding.statusChip.setChipBackgroundColorResource(R.color.statusInfo)
+                navHeaderBinding.statusChip.text = getString(R.string.active)
+                navHeaderBinding.statusChip.setChipBackgroundColorResource(R.color.statusSuccess)
             }
         }.addOnFailureListener { e ->
             Log.e(TAG, "Failed to load user data: ${e.message}")
@@ -253,7 +316,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             .addOnFailureListener { e ->
                 Log.e(TAG, "Failed to update user data: ${e.message}")
-                showError("Failed to update profile")
+                showError("Failed to update profile in database")
             }
     }
 
@@ -282,22 +345,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun openImagePicker() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        intent.type = "image/*"
-        startActivityForResult(intent, IMAGE_PICK_CODE)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == IMAGE_PICK_CODE && resultCode == RESULT_OK && data != null) {
-            val imageUri = data.data
-            imageUri?.let { uri ->
-                Picasso.get().load(uri).into(profileBottomSheetBinding.imgProfilePicture)
-                Picasso.get().load(uri).into(navHeaderBinding.avatarImage)
-                saveProfileImageToStorage(uri)
-                showSuccess("Profile picture updated locally")
-            }
-        }
+        imagePickerLauncher.launch("image/*")
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -315,6 +363,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun loadFragment(fragment: Fragment, addToBackStack: Boolean = true) {
         currentFragment = fragment
         val transaction = supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+            )
             .replace(R.id.fragment_container, fragment)
 
         if (addToBackStack) transaction.addToBackStack(null)
@@ -323,9 +375,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun showLogoutConfirmation() {
         MaterialAlertDialogBuilder(this)
-            .setTitle("Logout")
-            .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Logout") { _, _ -> logoutUser() }
+            .setTitle(getString(R.string.logout))
+            .setMessage("Are you sure you want to logout from your account?")
+            .setPositiveButton(getString(R.string.logout)) { _, _ -> logoutUser() }
             .setNegativeButton("Cancel", null)
             .show()
     }
@@ -333,7 +385,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun logoutUser() {
         sharedPreferences.edit().clear().apply()
         auth.signOut()
-        startActivity(Intent(this, LoginActivity::class.java))
+        val intent = Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
         finish()
     }
 
@@ -349,35 +404,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    // ✅ New simplified loading indicator
     private fun showLoading(show: Boolean) {
         profileBottomSheetBinding.btnSaveProfile.isEnabled = !show
         profileBottomSheetBinding.btnSaveProfile.text =
-            if (show) "Updating..." else "Update Changes"
+            if (show) "Updating..." else getString(R.string.save)
     }
 
     private fun showSuccess(message: String) {
-        com.google.android.material.snackbar.Snackbar.make(
-            binding.root,
-            message,
-            com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
-        ).setBackgroundTint(getColor(R.color.statusSuccess)).show()
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(ContextCompat.getColor(this, R.color.statusSuccess))
+            .setTextColor(ContextCompat.getColor(this, R.color.white))
+            .show()
     }
 
     private fun showError(message: String) {
-        com.google.android.material.snackbar.Snackbar.make(
-            binding.root,
-            message,
-            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-        ).setBackgroundTint(getColor(R.color.error)).show()
-    }
-
-    override fun onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setBackgroundTint(ContextCompat.getColor(this, R.color.error))
+            .setTextColor(ContextCompat.getColor(this, R.color.white))
+            .show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

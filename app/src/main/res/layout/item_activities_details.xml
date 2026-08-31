@@ -1,70 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="3dp"
-    app:cardUseCompatPadding="true">
+    android:layout_marginHorizontal="@dimen/margin_small"
+    android:layout_marginVertical="@dimen/margin_tiny"
+    app:cardCornerRadius="@dimen/radius_large"
+    app:cardElevation="@dimen/elevation_card"
+    app:strokeWidth="@dimen/stroke_thin"
+    app:strokeColor="@color/border_gray"
+    app:cardBackgroundColor="@color/surface">
 
-    <!-- Gradient background -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/card_gradient_background"
-        android:padding="16dp">
+        android:paddingHorizontal="@dimen/padding_screen"
+        android:paddingVertical="@dimen/padding_medium">
 
         <!-- Activity Header -->
         <RelativeLayout
             android:id="@+id/activityHeader"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_small">
 
             <TextView
                 android:id="@+id/activityNameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/statusIndicator"
-                android:layout_marginEnd="8dp"
-                android:text="Activity Name"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:layout_marginEnd="@dimen/margin_medium"
+                android:layout_centerVertical="true"
+                android:text="@string/activity_name"
+                android:textSize="@dimen/text_size_heading"
+                android:fontFamily="@font/bold"
                 android:textColor="@color/textPrimary"
                 android:letterSpacing="0.01"
-                android:lineHeight="20sp"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
-            <!-- Status Indicator -->
+            <!-- Live Status Indicator -->
             <View
                 android:id="@+id/statusIndicator"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="@dimen/margin_standard"
+                android:layout_height="@dimen/margin_standard"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/status_indicator_active" />
 
         </RelativeLayout>
 
-        <!-- Stats Grid -->
+        <!-- Stats Grid (4 Rows) -->
         <LinearLayout
             android:id="@+id/statsGrid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/activityHeader"
-            android:layout_marginTop="12dp"
             android:orientation="vertical">
 
-            <!-- Row 1 -->
+            <!-- Row 1: Creation Time & Status -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="@dimen/margin_tiny">
 
-                <!-- Creation Time -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -72,31 +73,32 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="8dp"
-                    android:layout_marginEnd="4dp">
+                    android:paddingVertical="@dimen/padding_small"
+                    android:paddingHorizontal="@dimen/padding_medium"
+                    android:layout_marginEnd="@dimen/margin_tiny">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Created"
-                        android:textSize="10sp"
+                        android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/textSecondary"
+                        android:fontFamily="@font/robotomedium"
                         android:letterSpacing="0.02" />
 
                     <TextView
                         android:id="@+id/creationTimeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="00/00/0000"
-                        android:textSize="12sp"
+                        android:text="@string/default_empty_value"
+                        android:textSize="@dimen/text_size_body_small"
                         android:textColor="@color/textPrimary"
-                        android:textStyle="bold"
+                        android:fontFamily="@font/bold"
                         android:maxLines="1"
                         android:ellipsize="end" />
 
                 </LinearLayout>
 
-                <!-- Status -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -104,38 +106,39 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="8dp"
-                    android:layout_marginStart="4dp">
+                    android:paddingVertical="@dimen/padding_small"
+                    android:paddingHorizontal="@dimen/padding_medium"
+                    android:layout_marginStart="@dimen/margin_tiny">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Status"
-                        android:textSize="10sp"
+                        android:text="@string/status"
+                        android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/textSecondary"
+                        android:fontFamily="@font/robotomedium"
                         android:letterSpacing="0.02" />
 
                     <TextView
                         android:id="@+id/statusTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Active"
-                        android:textSize="12sp"
-                        android:textColor="@color/success_dark"
-                        android:textStyle="bold" />
+                        android:text="@string/active"
+                        android:textSize="@dimen/text_size_body_small"
+                        android:textColor="@color/statusSuccess"
+                        android:fontFamily="@font/bold" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Row 2 -->
+            <!-- Row 2: Total Spent Time & Sessions -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="@dimen/margin_tiny">
 
-                <!-- Total Time -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -143,30 +146,30 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="8dp"
-                    android:layout_marginEnd="4dp">
+                    android:paddingVertical="@dimen/padding_small"
+                    android:paddingHorizontal="@dimen/padding_medium"
+                    android:layout_marginEnd="@dimen/margin_tiny">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Time"
-                        android:textSize="10sp"
+                        android:text="@string/label_total_spent_time"
+                        android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/textSecondary"
+                        android:fontFamily="@font/robotomedium"
                         android:letterSpacing="0.02" />
 
                     <TextView
                         android:id="@+id/totalSpentTimeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="00:00:00"
-                        android:textSize="12sp"
-                        android:textColor="@color/textPrimary"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace" />
+                        android:text="@string/timer_default_value"
+                        android:textSize="@dimen/text_size_body_small"
+                        android:textColor="@color/modern_primary"
+                        android:fontFamily="@font/bold" />
 
                 </LinearLayout>
 
-                <!-- Sessions -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -174,15 +177,17 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="8dp"
-                    android:layout_marginStart="4dp">
+                    android:paddingVertical="@dimen/padding_small"
+                    android:paddingHorizontal="@dimen/padding_medium"
+                    android:layout_marginStart="@dimen/margin_tiny">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sessions"
-                        android:textSize="10sp"
+                        android:text="@string/label_count_sessions"
+                        android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/textSecondary"
+                        android:fontFamily="@font/robotomedium"
                         android:letterSpacing="0.02" />
 
                     <TextView
@@ -190,22 +195,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/text_size_body_small"
                         android:textColor="@color/textPrimary"
-                        android:textStyle="bold" />
+                        android:fontFamily="@font/bold" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Row 3 - Additional Stats -->
+            <!-- Row 3: Last Session & Average Time -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="@dimen/margin_tiny">
 
-                <!-- Last Session -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -213,30 +217,30 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="8dp"
-                    android:layout_marginEnd="4dp">
+                    android:paddingVertical="@dimen/padding_small"
+                    android:paddingHorizontal="@dimen/padding_medium"
+                    android:layout_marginEnd="@dimen/margin_tiny">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Last Session"
-                        android:textSize="10sp"
+                        android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/textSecondary"
+                        android:fontFamily="@font/robotomedium"
                         android:letterSpacing="0.02" />
 
                     <TextView
                         android:id="@+id/lastSessionTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="00:00:00"
-                        android:textSize="12sp"
+                        android:text="@string/timer_default_value"
+                        android:textSize="@dimen/text_size_body_small"
                         android:textColor="@color/textPrimary"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace" />
+                        android:fontFamily="@font/bold" />
 
                 </LinearLayout>
 
-                <!-- Average Time -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -244,63 +248,64 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="8dp"
-                    android:layout_marginStart="4dp">
+                    android:paddingVertical="@dimen/padding_small"
+                    android:paddingHorizontal="@dimen/padding_medium"
+                    android:layout_marginStart="@dimen/margin_tiny">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Average Time"
-                        android:textSize="10sp"
+                        android:text="@string/label_mean_time"
+                        android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/textSecondary"
+                        android:fontFamily="@font/robotomedium"
                         android:letterSpacing="0.02" />
 
                     <TextView
                         android:id="@+id/averageTimeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="00:00:00"
-                        android:textSize="12sp"
+                        android:text="@string/timer_default_value"
+                        android:textSize="@dimen/text_size_body_small"
                         android:textColor="@color/textPrimary"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace" />
+                        android:fontFamily="@font/bold" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Row 4 - Today's Time -->
+            <!-- Row 4: Today's Total Time -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!-- Today's Time -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:background="@drawable/stat_item_background"
-                    android:padding="8dp">
+                    android:paddingVertical="@dimen/padding_small"
+                    android:paddingHorizontal="@dimen/padding_medium">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Today's Total Time"
-                        android:textSize="10sp"
+                        android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/textSecondary"
+                        android:fontFamily="@font/robotomedium"
                         android:letterSpacing="0.02" />
 
                     <TextView
                         android:id="@+id/todayTimeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="00:00:00"
-                        android:textSize="12sp"
+                        android:text="@string/timer_default_value"
+                        android:textSize="@dimen/text_size_body_small"
                         android:textColor="@color/modern_primary"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace" />
+                        android:fontFamily="@font/bold" />
 
                 </LinearLayout>
 
@@ -308,7 +313,6 @@
 
         </LinearLayout>
 
-
     </RelativeLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

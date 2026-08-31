@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Background oval (soft variant of primary for subtle contrast) -->
+    <!-- Background Oval (Soft Mint) -->
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/primaryLight" />
+            <solid android:color="@color/modern_primary_light" />
             <size
-                android:width="40dp"
-                android:height="40dp" />
+                android:width="@dimen/icon_button_size"
+                android:height="@dimen/icon_button_size" />
         </shape>
     </item>
 
-    <!-- Border (main brand primary color) -->
-    <item android:left="2dp" android:right="2dp" android:top="2dp" android:bottom="2dp">
+    <!-- Subtle Emerald Border -->
+    <item
+        android:left="@dimen/padding_micro"
+        android:right="@dimen/padding_micro"
+        android:top="@dimen/padding_micro"
+        android:bottom="@dimen/padding_micro">
         <shape android:shape="oval">
             <stroke
-                android:width="3dp"
-                android:color="@color/primary" />
+                android:width="@dimen/stroke_thin"
+                android:color="@color/modern_primary" />
         </shape>
     </item>
 
-    <!-- Vector Icon with Padding (contrasting color for readability) -->
-    <item android:top="5dp" android:left="5dp" android:right="5dp" android:bottom="5dp">
+    <!-- Centered Vector Icon (Deep Emerald) -->
+    <item android:gravity="center">
         <vector
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:width="24dp"
-            android:height="24dp"
+            android:width="@dimen/icon_size_standard"
+            android:height="@dimen/icon_size_standard"
             android:viewportWidth="24"
             android:viewportHeight="24">
             <path
-                android:fillColor="@color/onPrimary"
+                android:fillColor="@color/modern_primary"
                 android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM17,13h-4v4h-2v-4L7,13v-2h4L11,7h2v4h4v2z" />
         </vector>
     </item>

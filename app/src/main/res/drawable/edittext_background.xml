@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/input_background" />
-    <corners android:radius="16dp" />
+    <stroke
+        android:width="@dimen/stroke_thin"
+        android:color="@color/input_stroke" />
+    <corners android:radius="@dimen/radius_large" />
 </shape>

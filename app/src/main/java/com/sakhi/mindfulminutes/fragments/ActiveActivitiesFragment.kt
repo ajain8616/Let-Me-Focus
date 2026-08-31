@@ -13,10 +13,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.sakhi.mindfulminutes.R
 import com.sakhi.mindfulminutes.adapters.ActiveActivityAdapter
 import com.sakhi.mindfulminutes.databinding.FragmentActiveActivitiesBinding
 import com.sakhi.mindfulminutes.model.Activity
@@ -68,10 +72,20 @@ class ActiveActivitiesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupSwipeRefresh()
         setupRecyclerView()
         setupClickListeners()
         setupSearchFunctionality()
         bindStopwatchService()
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setColorSchemeColors(
+            ContextCompat.getColor(requireContext(), R.color.modern_primary)
+        )
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            loadActivities()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -103,7 +117,7 @@ class ActiveActivitiesFragment : Fragment() {
     }
 
     private fun setupServiceListener() {
-        stopwatchService?.addListener { time, formattedTime ->
+        stopwatchService?.addListener { _, _ ->
             // Update the adapter when timer changes
             adapter.updateList(allActivities)
         }
@@ -126,7 +140,6 @@ class ActiveActivitiesFragment : Fragment() {
             hideSearchLayout()
         }
 
-        // Add close button listener for add item layout
         binding.btnCloseAddItem.setOnClickListener {
             hideAddLayout()
         }
@@ -166,10 +179,13 @@ class ActiveActivitiesFragment : Fragment() {
                 allActivities = activities
                 adapter.updateList(activities)
 
-                if (activities.isEmpty()) {
-                    showEmptyState(true)
-                } else {
-                    showEmptyState(false)
+                // Only adjust list visibility if user is not adding or searching
+                if (binding.addItemLayout.visibility != View.VISIBLE && binding.searchItemLayout.visibility != View.VISIBLE) {
+                    if (activities.isEmpty()) {
+                        showEmptyState(true)
+                    } else {
+                        showEmptyState(false)
+                    }
                 }
             } catch (e: Exception) {
                 showError("Failed to load activities: ${e.message}")
@@ -201,6 +217,10 @@ class ActiveActivitiesFragment : Fragment() {
         binding.addItemLayout.visibility = View.VISIBLE
         binding.searchItemLayout.visibility = View.GONE
 
+        // Hide RecyclerView and Empty State while adding
+        binding.activityRecyclerView.visibility = View.GONE
+        binding.emptyState.visibility = View.GONE
+
         binding.itemName.requestFocus()
         showKeyboard(binding.itemName)
     }
@@ -209,11 +229,22 @@ class ActiveActivitiesFragment : Fragment() {
         binding.addItemLayout.visibility = View.GONE
         binding.itemName.text?.clear()
         hideKeyboard()
+
+        // Restore list visibility
+        if (allActivities.isEmpty()) {
+            showEmptyState(true)
+        } else {
+            showEmptyState(false)
+        }
     }
 
     private fun showSearchLayout() {
         binding.searchItemLayout.visibility = View.VISIBLE
         binding.addItemLayout.visibility = View.GONE
+
+        // Hide RecyclerView until user types or searches
+        binding.activityRecyclerView.visibility = View.GONE
+        binding.emptyState.visibility = View.GONE
 
         binding.itemSearch.requestFocus()
         showKeyboard(binding.itemSearch)
@@ -223,7 +254,14 @@ class ActiveActivitiesFragment : Fragment() {
         binding.searchItemLayout.visibility = View.GONE
         binding.itemSearch.text?.clear()
         hideKeyboard()
-        loadActivities() // Reload all activities when search is closed
+
+        // Restore all activities
+        adapter.updateList(allActivities)
+        if (allActivities.isEmpty()) {
+            showEmptyState(true)
+        } else {
+            showEmptyState(false)
+        }
     }
 
     private fun addNewActivity() {
@@ -257,14 +295,13 @@ class ActiveActivitiesFragment : Fragment() {
             val initialInstance = ActivityInstance(
                 id = "0",
                 activityId = activityId,
-                duration = 0L, // Zero duration for initial instance
+                duration = 0L,
                 startTime = currentTime,
                 stopTime = currentTime
             )
 
             repository.addActivityInstanceWithObject(initialInstance)
         } catch (e: Exception) {
-            // Log the error but don't block activity creation
             e.printStackTrace()
         }
     }
@@ -273,8 +310,14 @@ class ActiveActivitiesFragment : Fragment() {
         val query = binding.itemSearch.text.toString().trim().lowercase()
 
         if (query.isEmpty()) {
-            // Show all activities when search is empty
-            adapter.updateList(allActivities)
+            // When search input is empty, keep list hidden while search card is open
+            if (binding.searchItemLayout.visibility == View.VISIBLE) {
+                binding.activityRecyclerView.visibility = View.GONE
+                binding.emptyState.visibility = View.GONE
+            } else {
+                adapter.updateList(allActivities)
+                showEmptyState(allActivities.isEmpty())
+            }
             return
         }
 
@@ -284,7 +327,6 @@ class ActiveActivitiesFragment : Fragment() {
 
         adapter.updateList(filteredActivities)
 
-        // Show empty state if no results found
         if (filteredActivities.isEmpty()) {
             showEmptyState(true, "No activities found for '$query'")
         } else {
@@ -293,7 +335,7 @@ class ActiveActivitiesFragment : Fragment() {
     }
 
     private fun showLoading(show: Boolean) {
-        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        binding.swipeRefreshLayout.isRefreshing = show
     }
 
     private fun showEmptyState(show: Boolean, message: String? = null) {
@@ -301,9 +343,8 @@ class ActiveActivitiesFragment : Fragment() {
             binding.emptyState.visibility = View.VISIBLE
             binding.activityRecyclerView.visibility = View.GONE
 
-            // Update empty state message if provided
             message?.let {
-                val emptyText = binding.emptyState.getChildAt(1) as? android.widget.TextView
+                val emptyText = binding.emptyState.getChildAt(1) as? TextView
                 emptyText?.text = it
             }
         } else {
@@ -313,22 +354,28 @@ class ActiveActivitiesFragment : Fragment() {
     }
 
     private fun showError(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.error))
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            .show()
     }
 
     private fun showSnackbar(message: String) {
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.statusSuccess))
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            .show()
     }
 
-    private fun showKeyboard(view: android.view.View) {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-        imm.showSoftInput(view, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+    private fun showKeyboard(view: View) {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun hideKeyboard() {
         val view = requireActivity().currentFocus
         view?.let {
-            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(it.windowToken, 0)
         }
     }

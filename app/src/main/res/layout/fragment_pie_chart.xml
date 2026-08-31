@@ -7,32 +7,31 @@
     android:background="@color/background"
     tools:context=".fragments.PieChartFragment">
 
-    <!-- Animated Gradient Background -->
+    <!-- Background -->
     <View
         android:id="@+id/background_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradient_background" />
 
-    <!-- Background Decorations -->
+    <!-- Ambient Blobs -->
     <ImageView
         android:id="@+id/bg_blob_1"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_marginTop="-100dp"
-        android:layout_marginEnd="-100dp"
+        android:layout_width="@dimen/blob_size_1"
+        android:layout_height="@dimen/blob_size_1"
+        android:layout_gravity="top|end"
         android:alpha="0.08"
-        android:src="@drawable/bg_blob_1" />
+        android:src="@drawable/bg_blob_1"
+        android:contentDescription="@string/blank" />
 
     <ImageView
         android:id="@+id/bg_blob_2"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_marginBottom="-80dp"
-        android:layout_marginStart="-80dp"
-        android:alpha="0.08"
+        android:layout_width="@dimen/blob_size_2"
+        android:layout_height="@dimen/blob_size_2"
         android:layout_gravity="bottom|start"
-        android:src="@drawable/bg_blob_2" />
+        android:alpha="0.08"
+        android:src="@drawable/bg_blob_2"
+        android:contentDescription="@string/blank" />
 
     <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
@@ -40,32 +39,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/appbar_background_bottom_radius"
-        android:elevation="12dp"
+        android:elevation="@dimen/elevation_floating"
         android:fitsSystemWindows="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="16dp"
+            android:paddingHorizontal="@dimen/padding_screen"
+            android:paddingVertical="@dimen/padding_medium"
             app:layout_scrollFlags="enterAlways|snap">
 
-            <!-- App Title -->
             <TextView
                 android:id="@+id/activityNameView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Activity Distribution"
+                android:text="@string/title_activity_analysis"
                 android:textColor="@color/textPrimary"
-                android:textSize="22sp"
-                android:textStyle="bold"
+                android:textSize="@dimen/text_size_heading"
+                android:fontFamily="@font/bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/actionButtonsLayout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Action Buttons -->
             <LinearLayout
                 android:id="@+id/actionButtonsLayout"
                 android:layout_width="wrap_content"
@@ -77,11 +74,12 @@
 
                 <ImageButton
                     android:id="@+id/refreshButton"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/rounded_button_background"
+                    android:layout_width="@dimen/icon_button_size"
+                    android:layout_height="@dimen/icon_button_size"
+                    android:background="@drawable/rounded_button_background_secondary"
                     android:src="@drawable/ic_reset"
-                    android:contentDescription="Refresh chart"
+                    app:tint="@color/modern_primary"
+                    android:contentDescription="@string/stop"
                     android:scaleType="centerInside" />
             </LinearLayout>
 
@@ -97,84 +95,95 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="16dp">
+                android:padding="@dimen/padding_screen">
 
-                <!-- Filter Buttons with White Background -->
+                <!-- Filter Chips Row -->
                 <LinearLayout
                     android:id="@+id/filterButtonsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="8dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginBottom="@dimen/margin_medium">
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/filterTodayButton"
                         android:layout_width="0dp"
-                        android:layout_height="36dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="@dimen/margin_tiny"
                         android:text="Today"
-                        android:textSize="12sp"
-                        android:background="@drawable/white_button_background"
-                        android:textColor="@color/textPrimary" />
+                        android:textSize="@dimen/text_size_body_small"
+                        android:fontFamily="@font/robotomedium"
+                        android:backgroundTint="@color/surface"
+                        app:strokeWidth="@dimen/stroke_thin"
+                        app:strokeColor="@color/border_gray"
+                        android:textColor="@color/textPrimary"
+                        app:cornerRadius="@dimen/radius_medium" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/filterWeekButton"
                         android:layout_width="0dp"
-                        android:layout_height="36dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:layout_marginHorizontal="4dp"
+                        android:layout_marginHorizontal="@dimen/margin_tiny"
                         android:text="Week"
-                        android:textSize="12sp"
-                        android:background="@drawable/white_button_background"
-                        android:textColor="@color/textPrimary" />
+                        android:textSize="@dimen/text_size_body_small"
+                        android:fontFamily="@font/robotomedium"
+                        android:backgroundTint="@color/surface"
+                        app:strokeWidth="@dimen/stroke_thin"
+                        app:strokeColor="@color/border_gray"
+                        android:textColor="@color/textPrimary"
+                        app:cornerRadius="@dimen/radius_medium" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/filterMonthButton"
                         android:layout_width="0dp"
-                        android:layout_height="36dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="@dimen/margin_tiny"
                         android:text="Month"
-                        android:textSize="12sp"
-                        android:background="@drawable/white_button_background"
-                        android:textColor="@color/textPrimary" />
+                        android:textSize="@dimen/text_size_body_small"
+                        android:fontFamily="@font/robotomedium"
+                        android:backgroundTint="@color/surface"
+                        app:strokeWidth="@dimen/stroke_thin"
+                        app:strokeColor="@color/border_gray"
+                        android:textColor="@color/textPrimary"
+                        app:cornerRadius="@dimen/radius_medium" />
                 </LinearLayout>
 
-                <!-- Stats Card -->
-                <androidx.cardview.widget.CardView
+                <!-- Overview Stats Card -->
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/statsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@color/white"
-                    android:layout_marginEnd="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp">
+                    android:layout_marginBottom="@dimen/margin_large"
+                    app:cardCornerRadius="@dimen/radius_xlarge"
+                    app:cardElevation="@dimen/elevation_card"
+                    app:strokeWidth="@dimen/stroke_thin"
+                    app:strokeColor="@color/border_gray"
+                    app:cardBackgroundColor="@color/surface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="@dimen/padding_large">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Overview"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
+                            android:text="Activity Overview"
+                            android:textSize="@dimen/text_size_title"
+                            android:fontFamily="@font/bold"
                             android:textColor="@color/textPrimary"
-                            android:layout_marginBottom="12dp" />
+                            android:layout_marginBottom="@dimen/margin_medium" />
 
                         <!-- Stats Row 1 -->
                         <LinearLayout
@@ -187,23 +196,28 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:orientation="vertical"
-                                android:gravity="center">
+                                android:gravity="center"
+                                android:background="@drawable/stat_item_background"
+                                android:padding="@dimen/padding_medium"
+                                android:layout_marginEnd="@dimen/margin_tiny">
 
                                 <TextView
                                     android:id="@+id/totalTimeText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="00:00:00"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
+                                    android:text="@string/timer_default_value"
+                                    android:textSize="@dimen/text_size_title"
+                                    android:fontFamily="@font/bold"
                                     android:textColor="@color/modern_primary" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Total Time"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textSecondary" />
+                                    android:text="@string/label_total_spent_time"
+                                    android:textSize="@dimen/text_size_caption"
+                                    android:fontFamily="@font/robotoregular"
+                                    android:textColor="@color/textSecondary"
+                                    android:layout_marginTop="@dimen/margin_micro" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -211,23 +225,28 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:orientation="vertical"
-                                android:gravity="center">
+                                android:gravity="center"
+                                android:background="@drawable/stat_item_background"
+                                android:padding="@dimen/padding_medium"
+                                android:layout_marginStart="@dimen/margin_tiny">
 
                                 <TextView
                                     android:id="@+id/totalSessionsText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/success_dark" />
+                                    android:textSize="@dimen/text_size_title"
+                                    android:fontFamily="@font/bold"
+                                    android:textColor="@color/statusSuccess" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Sessions"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/textSecondary" />
+                                    android:text="@string/label_count_sessions"
+                                    android:textSize="@dimen/text_size_caption"
+                                    android:fontFamily="@font/robotoregular"
+                                    android:textColor="@color/textSecondary"
+                                    android:layout_marginTop="@dimen/margin_micro" />
                             </LinearLayout>
                         </LinearLayout>
 
@@ -236,29 +255,33 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginTop="12dp">
+                            android:layout_marginTop="@dimen/margin_small">
 
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:orientation="vertical"
-                                android:gravity="center">
+                                android:gravity="center"
+                                android:background="@drawable/stat_item_background"
+                                android:padding="@dimen/padding_medium"
+                                android:layout_marginEnd="@dimen/margin_tiny">
 
                                 <TextView
                                     android:id="@+id/activitiesCountText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="0/0"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
+                                    android:textSize="@dimen/text_size_body_large"
+                                    android:fontFamily="@font/bold"
                                     android:textColor="@color/textPrimary" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Activities"
-                                    android:textSize="12sp"
+                                    android:textSize="@dimen/text_size_caption"
+                                    android:fontFamily="@font/robotoregular"
                                     android:textColor="@color/textSecondary" />
                             </LinearLayout>
 
@@ -267,22 +290,26 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:orientation="vertical"
-                                android:gravity="center">
+                                android:gravity="center"
+                                android:background="@drawable/stat_item_background"
+                                android:padding="@dimen/padding_medium"
+                                android:layout_marginHorizontal="@dimen/margin_tiny">
 
                                 <TextView
                                     android:id="@+id/avgSessionText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="00:00"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
+                                    android:textSize="@dimen/text_size_body_large"
+                                    android:fontFamily="@font/bold"
                                     android:textColor="@color/warning_dark" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Avg/Session"
-                                    android:textSize="12sp"
+                                    android:textSize="@dimen/text_size_caption"
+                                    android:fontFamily="@font/robotoregular"
                                     android:textColor="@color/textSecondary" />
                             </LinearLayout>
 
@@ -291,15 +318,18 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:orientation="vertical"
-                                android:gravity="center">
+                                android:gravity="center"
+                                android:background="@drawable/stat_item_background"
+                                android:padding="@dimen/padding_medium"
+                                android:layout_marginStart="@dimen/margin_tiny">
 
                                 <TextView
                                     android:id="@+id/mostActiveText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="-"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold"
+                                    android:text="@string/default_empty_value"
+                                    android:textSize="@dimen/text_size_body_large"
+                                    android:fontFamily="@font/bold"
                                     android:textColor="@color/textPrimary"
                                     android:maxLines="1"
                                     android:ellipsize="end" />
@@ -308,80 +338,81 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Most Active"
-                                    android:textSize="12sp"
+                                    android:textSize="@dimen/text_size_caption"
+                                    android:fontFamily="@font/robotoregular"
                                     android:textColor="@color/textSecondary" />
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- Pie Chart Card -->
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@color/white"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp">
+                    app:cardCornerRadius="@dimen/radius_xlarge"
+                    app:cardElevation="@dimen/elevation_card"
+                    app:strokeWidth="@dimen/stroke_thin"
+                    app:strokeColor="@color/border_gray"
+                    app:cardBackgroundColor="@color/surface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="8dp">
+                        android:padding="@dimen/padding_large">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Time Distribution"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
+                            android:textSize="@dimen/text_size_title"
+                            android:fontFamily="@font/bold"
                             android:textColor="@color/textPrimary"
                             android:gravity="center"
-                            android:layout_marginBottom="8dp" />
+                            android:layout_marginBottom="@dimen/margin_standard" />
 
                         <com.github.mikephil.charting.charts.PieChart
                             android:id="@+id/pieChart"
                             android:layout_width="match_parent"
-                            android:layout_height="400dp"
-                            android:layout_margin="8dp"
-                            android:padding="16dp" />
+                            android:layout_height="320dp" />
 
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- Empty State -->
                 <LinearLayout
                     android:id="@+id/emptyState"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:visibility="gone"
-                    android:layout_margin="16dp">
+                    android:paddingVertical="@dimen/padding_hero">
 
                     <ImageView
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
+                        android:layout_width="@dimen/empty_state_image_size"
+                        android:layout_height="@dimen/empty_state_image_size"
                         android:src="@drawable/error_no_data"
-                        android:contentDescription="No data" />
+                        android:alpha="0.8"
+                        android:contentDescription="@string/default_empty_value" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="@dimen/margin_large"
                         android:text="No activity data available"
-                        android:textSize="16sp"
-                        android:textColor="@color/textSecondary" />
+                        android:textSize="@dimen/text_size_title"
+                        android:fontFamily="@font/bold"
+                        android:textColor="@color/textPrimary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Start tracking activities to see analytics"
-                        android:textSize="14sp"
+                        android:layout_marginTop="@dimen/margin_tiny"
+                        android:text="@string/subtitle_analytics"
+                        android:textSize="@dimen/text_size_body"
+                        android:fontFamily="@font/robotoregular"
                         android:textColor="@color/textSecondary" />
                 </LinearLayout>
             </LinearLayout>
@@ -394,6 +425,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:indeterminateTint="@color/modern_primary"
         android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

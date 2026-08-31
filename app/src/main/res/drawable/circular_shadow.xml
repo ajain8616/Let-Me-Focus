@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Shadow Layer -->
+    <!-- Ambient Shadow Layer -->
     <item>
-        <shape
-            android:shape="oval">
+        <shape android:shape="oval">
             <solid android:color="@android:color/transparent"/>
-            <corners android:radius="44dp"/>
+            <corners android:radius="@dimen/radius_oval_shadow"/>
             <padding
-                android:left="4dp"
-                android:top="4dp"
-                android:right="4dp"
-                android:bottom="4dp"/>
+                android:left="@dimen/padding_tiny"
+                android:top="@dimen/padding_tiny"
+                android:right="@dimen/padding_tiny"
+                android:bottom="@dimen/padding_tiny"/>
             <size
-                android:width="88dp"
-                android:height="88dp"/>
+                android:width="@dimen/circular_shadow_size"
+                android:height="@dimen/circular_shadow_size"/>
             <gradient
-                android:startColor="#33000000"
-                android:endColor="#00000000"
+                android:startColor="@color/shadow_color"
+                android:endColor="@android:color/transparent"
                 android:angle="90"/>
         </shape>
     </item>
 
-    <!-- Inner Circle (Avatar Background) -->
-    <item android:top="0dp" android:left="0dp" android:right="0dp" android:bottom="0dp">
-        <shape
-            android:shape="oval">
-            <solid android:color="@android:color/white"/>
+    <!-- Inner Circle (Avatar Surface) -->
+    <item
+        android:top="@dimen/radius_none"
+        android:left="@dimen/radius_none"
+        android:right="@dimen/radius_none"
+        android:bottom="@dimen/radius_none">
+        <shape android:shape="oval">
+            <solid android:color="@color/surface_white"/>
         </shape>
     </item>
 

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/notificationRootCollapsed"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="@drawable/notification_container_bg"
+    android:paddingStart="@dimen/padding_large"
+    android:paddingEnd="@dimen/padding_medium"
+    android:paddingVertical="@dimen/padding_standard">
+
+    <!-- Preserved ID for RemoteViews compatibility (Hidden) -->
+    <ImageView
+        android:id="@+id/ivNotificationIcon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        android:contentDescription="@string/app_name" />
+
+    <!-- Text Information -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/llNotificationActions"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvNotificationTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/activity_name"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_body_large"
+            android:fontFamily="@font/bold"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/tvNotificationTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/timer_default_value"
+            android:textColor="@color/modern_secondary"
+            android:textSize="@dimen/text_size_title"
+            android:fontFamily="@font/bold"
+            android:letterSpacing="0.04" />
+    </LinearLayout>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:id="@+id/llNotificationActions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnNotificationPauseResume"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:background="@drawable/notification_action_btn_bg"
+            android:src="@drawable/ic_pause"
+            app:tint="@color/modern_secondary"
+            android:scaleType="centerInside"
+            android:padding="@dimen/padding_standard"
+            android:contentDescription="@string/pause" />
+
+        <ImageButton
+            android:id="@+id/btnNotificationStop"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:layout_marginStart="@dimen/margin_small"
+            android:background="@drawable/notification_action_btn_bg"
+            android:src="@drawable/ic_stop"
+            app:tint="@color/error"
+            android:scaleType="centerInside"
+            android:padding="@dimen/padding_standard"
+            android:contentDescription="@string/stop" />
+    </LinearLayout>
+
+</RelativeLayout>

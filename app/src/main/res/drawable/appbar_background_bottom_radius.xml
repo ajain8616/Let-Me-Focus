@@ -2,19 +2,19 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <!-- Glassmorphism background -->
-    <solid android:color="#E8FFFFFF" />
+    <!-- 2026 Acrylic Glassmorphism Surface -->
+    <solid android:color="@color/glass_surface_primary" />
 
-    <!-- Subtle border -->
+    <!-- Luminous Edge Stroke -->
     <stroke
-        android:width="1dp"
-        android:color="#4DFFFFFF" />
+        android:width="@dimen/stroke_thin"
+        android:color="@color/glass_stroke_primary" />
 
-    <!-- Bottom-only rounded corners -->
+    <!-- Ergonomic Bottom Rounded Corners -->
     <corners
-        android:topLeftRadius="0dp"
-        android:topRightRadius="0dp"
-        android:bottomLeftRadius="20dp"
-        android:bottomRightRadius="20dp" />
+        android:topLeftRadius="@dimen/radius_none"
+        android:topRightRadius="@dimen/radius_none"
+        android:bottomLeftRadius="@dimen/radius_header"
+        android:bottomRightRadius="@dimen/radius_header" />
 
 </shape>

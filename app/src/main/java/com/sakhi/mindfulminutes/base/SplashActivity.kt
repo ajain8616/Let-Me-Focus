@@ -1,16 +1,19 @@
 package com.sakhi.mindfulminutes.base
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.animation.doOnEnd
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.sakhi.mindfulminutes.R
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.sakhi.mindfulminutes.activities.LoginActivity
 import com.sakhi.mindfulminutes.activities.MainActivity
 import com.sakhi.mindfulminutes.activities.SignupActivity
@@ -19,152 +22,178 @@ import com.sakhi.mindfulminutes.databinding.ActivitySplashBinding
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashBinding
-    private val splashDelay: Long = 3500 // 3.5 seconds
+    private val splashDuration: Long = 2700
+    private var blobAnimatorSet: AnimatorSet? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
 
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Adjust padding for system bars
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        initializeViews()
-        startSplashAnimation()
+        prepareInitialViewState()
+        startAmbientBlobAnimation()
+        startCinematicEntrance()
     }
 
-    private fun initializeViews() {
-        // Hide elements initially
-        binding.appLogo.visibility = View.VISIBLE
-        binding.appIcon.visibility = View.INVISIBLE
-        binding.appName.visibility = View.INVISIBLE
-        binding.appTagline.visibility = View.INVISIBLE
-        binding.loadingProgress.visibility = View.INVISIBLE
-        binding.versionInfo.visibility = View.INVISIBLE
+    private fun prepareInitialViewState() {
+        val initialOffsetY = 40f
 
-        binding.appIcon.alpha = 0f
-        binding.appName.alpha = 0f
-        binding.appTagline.alpha = 0f
-        binding.loadingProgress.alpha = 0f
-        binding.versionInfo.alpha = 0f
-    }
+        binding.appLogo.apply {
+            alpha = 0f
+            scaleX = 0.4f
+            scaleY = 0.4f
+        }
 
-    private fun startSplashAnimation() {
-        val flipInAnimator = android.animation.AnimatorInflater.loadAnimator(
-            this,
-            R.animator.card_flip_in
-        )
-        flipInAnimator.setTarget(binding.appLogo)
-        flipInAnimator.start()
+        binding.appIcon.apply {
+            visibility = View.GONE
+        }
 
-        flipInAnimator.doOnEnd {
-            showAppIcon()
+        binding.appName.apply {
+            alpha = 0f
+            translationY = initialOffsetY
+        }
+
+        binding.appTagline.apply {
+            alpha = 0f
+            translationY = initialOffsetY
+        }
+
+        binding.loadingProgress.apply {
+            alpha = 0f
+            progress = 0
+            translationY = initialOffsetY
+        }
+
+        binding.versionInfo.apply {
+            alpha = 0f
         }
     }
 
-    private fun showAppIcon() {
-        binding.appIcon.visibility = View.VISIBLE
-        val scaleAnimator = android.animation.AnimatorInflater.loadAnimator(
-            this,
-            R.animator.scale_button
-        )
-        scaleAnimator.setTarget(binding.appIcon)
-        scaleAnimator.start()
+    /**
+     * Ambient floating background blobs for subtle depth
+     */
+    private fun startAmbientBlobAnimation() {
+        val blob1X = ObjectAnimator.ofFloat(binding.bgBlob1, View.TRANSLATION_X, 0f, 35f, 0f).apply {
+            duration = 5500
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+        val blob1Y = ObjectAnimator.ofFloat(binding.bgBlob1, View.TRANSLATION_Y, 0f, -35f, 0f).apply {
+            duration = 4800
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
 
-        binding.appIcon.animate()
-            .alpha(1f)
-            .setDuration(600)
-            .withEndAction { showAppName() }
-            .start()
+        val blob2X = ObjectAnimator.ofFloat(binding.bgBlob2, View.TRANSLATION_X, 0f, -30f, 0f).apply {
+            duration = 5000
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+        val blob2Y = ObjectAnimator.ofFloat(binding.bgBlob2, View.TRANSLATION_Y, 0f, 30f, 0f).apply {
+            duration = 5400
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+
+        blobAnimatorSet = AnimatorSet().apply {
+            playTogether(blob1X, blob1Y, blob2X, blob2Y)
+            start()
+        }
     }
 
-    private fun showAppName() {
-        binding.appName.visibility = View.VISIBLE
+    /**
+     * Staggered Spring & Easing Entrance
+     */
+    private fun startCinematicEntrance() {
+        // 1. Logo Elastic Pop
+        binding.appLogo.animate()
+            .alpha(1f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(950)
+            .setInterpolator(OvershootInterpolator(1.4f))
+            .start()
+
+        // 2. App Name Rise
         binding.appName.animate()
             .alpha(1f)
-            .translationX(0f)
-            .setDuration(800)
-            .withEndAction { showTagline() }
+            .translationY(0f)
+            .setStartDelay(280)
+            .setDuration(700)
+            .setInterpolator(DecelerateInterpolator(2f))
             .start()
-    }
 
-    private fun showTagline() {
-        binding.appTagline.visibility = View.VISIBLE
+        // 3. Tagline Rise
         binding.appTagline.animate()
-            .alpha(1f)
-            .translationX(0f)
-            .setDuration(800)
-            .withEndAction { showLoadingElements() }
+            .alpha(0.9f)
+            .translationY(0f)
+            .setStartDelay(420)
+            .setDuration(700)
+            .setInterpolator(DecelerateInterpolator(2f))
             .start()
-    }
 
-    private fun showLoadingElements() {
-        binding.loadingProgress.visibility = View.VISIBLE
-        binding.versionInfo.visibility = View.VISIBLE
-
-        val scaleAnimator = android.animation.AnimatorInflater.loadAnimator(
-            this,
-            R.animator.scale_button
-        )
-        scaleAnimator.setTarget(binding.loadingProgress)
-        scaleAnimator.start()
-
+        // 4. Progress Indicator & Version Info
         binding.loadingProgress.animate()
             .alpha(1f)
+            .translationY(0f)
+            .setStartDelay(560)
             .setDuration(600)
+            .setInterpolator(DecelerateInterpolator(2f))
             .start()
 
         binding.versionInfo.animate()
-            .alpha(1f)
+            .alpha(0.7f)
+            .setStartDelay(650)
             .setDuration(600)
             .start()
 
-        simulateLoadingProgress()
+        // 5. Smooth Linear Progress Filling
+        startProgressAnimation()
     }
 
-    private fun simulateLoadingProgress() {
-        binding.loadingProgress.setProgress(0, false)
-        binding.loadingProgress.animate()
-            .setDuration(splashDelay - 2000)
-            .withEndAction { binding.loadingProgress.setProgress(100, true) }
-            .start()
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            navigateNext()
-        }, splashDelay)
-    }
-
-    private fun navigateNext() {
-        val flipOutAnimator = android.animation.AnimatorInflater.loadAnimator(
-            this,
-            R.animator.card_flip_out
-        )
-        flipOutAnimator.setTarget(binding.appLogo)
-        flipOutAnimator.start()
-
-        binding.appIcon.animate()
-            .scaleX(0f)
-            .scaleY(0f)
-            .alpha(0f)
-            .setDuration(400)
-            .start()
-
-        flipOutAnimator.doOnEnd {
-            binding.loadingProgress.animate().alpha(0f).setDuration(400).withEndAction {
-                binding.loadingProgress.visibility = View.INVISIBLE
-            }.start()
-            binding.versionInfo.animate().alpha(0f).setDuration(400).withEndAction {
-                binding.versionInfo.visibility = View.INVISIBLE
-                decideNextActivity()
-            }.start()
+    private fun startProgressAnimation() {
+        val progressAnimator = ValueAnimator.ofInt(0, 100).apply {
+            duration = splashDuration - 600
+            startDelay = 600
+            interpolator = FastOutSlowInInterpolator()
+            addUpdateListener { animator ->
+                binding.loadingProgress.progress = animator.animatedValue as Int
+            }
         }
+        progressAnimator.start()
+
+        // Schedule smooth exit transition
+        binding.root.postDelayed({
+            navigateNextWithExitAnimation()
+        }, splashDuration)
+    }
+
+    /**
+     * Cinematic Zoom & Fade Exit
+     */
+    private fun navigateNextWithExitAnimation() {
+        binding.appLogo.animate()
+            .scaleX(1.15f)
+            .scaleY(1.15f)
+            .alpha(0f)
+            .setDuration(350)
+            .setInterpolator(FastOutSlowInInterpolator())
+            .start()
+
+        binding.appName.animate().alpha(0f).setDuration(300).start()
+        binding.appTagline.animate().alpha(0f).setDuration(300).start()
+        binding.loadingProgress.animate().alpha(0f).setDuration(300).start()
+        binding.versionInfo.animate().alpha(0f).setDuration(300).withEndAction {
+            decideNextActivity()
+        }.start()
     }
 
     private fun decideNextActivity() {
@@ -179,12 +208,13 @@ class SplashActivity : AppCompatActivity() {
         }
 
         startActivity(nextIntent)
-        overridePendingTransition(R.animator.slide_in_right, R.animator.slide_out_left)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         finish()
     }
 
-    override fun onPause() {
-        super.onPause()
-        Handler(Looper.getMainLooper()).removeCallbacksAndMessages(null)
+    override fun onDestroy() {
+        super.onDestroy()
+        blobAnimatorSet?.cancel()
+        binding.root.removeCallbacks(null)
     }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Active / Checked item text -> Vibrant Brand Forest Green -->
+    <item android:state_checked="true" android:color="@color/modern_primary" />
+    <item android:state_selected="true" android:color="@color/modern_primary" />
+    <item android:state_pressed="true" android:color="@color/modern_primary" />
+    <!-- Default item text -> High-contrast Dark Charcoal -->
+    <item android:color="@color/textPrimary" />
+</selector>

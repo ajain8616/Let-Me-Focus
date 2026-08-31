@@ -7,23 +7,23 @@
     android:pivotY="50%"
     android:interpolator="@android:anim/linear_interpolator">
 
-    <!-- Modern ring shape with gradient -->
+    <!-- 2026 Fluid Ring Progress -->
     <shape
         android:shape="ring"
-        android:thickness="6dp"
+        android:thickness="@dimen/stroke_ring_thickness"
         android:useLevel="false"
         android:innerRadiusRatio="3">
 
         <size
-            android:width="40dp"
-            android:height="40dp"/>
+            android:width="@dimen/progress_ring_size"
+            android:height="@dimen/progress_ring_size"/>
 
         <gradient
             android:type="sweep"
             android:useLevel="false"
             android:startColor="@color/primary_color"
             android:centerColor="@color/primary_light_color"
-            android:endColor="@color/primary_dark_color"
+            android:endColor="@color/colorAccent"
             android:angle="0"/>
     </shape>
 </animated-rotate>

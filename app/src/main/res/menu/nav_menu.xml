@@ -4,42 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <!-- Activities Section -->
+    <!-- Primary Activities Section -->
     <group
         android:id="@+id/activities_group"
-        android:checkableBehavior="single"
-        android:title="@string/menu_activities">
+        android:checkableBehavior="single">
 
         <item
             android:id="@+id/nav_active"
             android:icon="@drawable/ic_active"
-            android:textColor="@color/white"
             android:title="@string/active_activities" />
 
         <item
             android:id="@+id/nav_details"
             android:icon="@drawable/ic_data_details"
-            android:textColor="@color/white"
             android:title="@string/activities_details" />
 
         <item
             android:id="@+id/nav_analysis"
             android:icon="@drawable/ic_analytics"
-            android:textColor="@color/white"
             android:title="@string/activities_analysis_data" />
 
     </group>
 
-
-    <!-- Other Section -->
+    <!-- Secondary Account Actions Section -->
     <group
-        android:id="@+id/other_group"
-        android:title="@string/menu_other">
+        android:id="@+id/other_group">
 
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_logout"
-            android:textColor="@color/white"
             android:title="@string/logout" />
     </group>
+
 </menu>

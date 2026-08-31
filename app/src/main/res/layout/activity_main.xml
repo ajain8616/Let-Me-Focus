@@ -9,7 +9,7 @@
     tools:context=".activities.MainActivity"
     tools:openDrawer="start">
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -18,7 +18,8 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:background="@drawable/toolbar_gradient"
+            android:elevation="@dimen/elevation_floating">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -26,12 +27,13 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@drawable/toolbar_gradient"
                 app:navigationIcon="@drawable/ic_menu"
+                app:navigationIconTint="@color/white"
                 app:title="@string/app_name"
                 app:titleTextColor="@color/white" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- Main Content Container -->
+        <!-- Fragment Container -->
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
@@ -40,6 +42,7 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+    <!-- Navigation Drawer (High Visibility Icons & Text) -->
     <!-- Navigation Drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
@@ -47,11 +50,16 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:background="@color/surface_white"
         app:headerLayout="@layout/nav_header"
         app:itemBackground="@drawable/nav_item_background"
-        app:itemIconPadding="16dp"
-        app:itemIconTint="@color/nav_icon_color"
+        app:itemIconPadding="@dimen/padding_large"
+        app:itemIconSize="@dimen/icon_size_standard"
+        app:itemIconTint="@color/nav_item_icon_tint"
+        app:itemTextColor="@color/nav_item_text_color"
+        app:itemHorizontalPadding="@dimen/padding_medium"
+        app:itemVerticalPadding="@dimen/padding_tiny"
         app:menu="@menu/nav_menu"
-        app:elevation="16dp" />
+        app:elevation="@dimen/elevation_modal" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

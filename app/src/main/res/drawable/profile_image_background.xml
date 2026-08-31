@@ -5,20 +5,23 @@
         <shape android:shape="oval">
             <solid android:color="@color/shadow_color" />
             <size
-                android:width="120dp"
-                android:height="120dp" />
-            <corners android:radius="60dp" />
+                android:width="@dimen/avatar_shadow_size"
+                android:height="@dimen/avatar_shadow_size" />
+            <corners android:radius="@dimen/radius_avatar_outer" />
         </shape>
     </item>
 
-
-    <item android:top="8dp" android:left="8dp" android:right="8dp" android:bottom="8dp">
+    <item
+        android:top="@dimen/padding_standard"
+        android:left="@dimen/padding_standard"
+        android:right="@dimen/padding_standard"
+        android:bottom="@dimen/padding_standard">
         <shape android:shape="oval">
-            <solid android:color="@color/white" />
+            <solid android:color="@color/surface_white" />
             <size
-                android:width="104dp"
-                android:height="104dp" />
-            <corners android:radius="52dp" />
+                android:width="@dimen/avatar_bg_size"
+                android:height="@dimen/avatar_bg_size" />
+            <corners android:radius="@dimen/radius_avatar" />
         </shape>
     </item>
 

@@ -1,77 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App Core -->
     <string name="app_name">Mindful Minutes</string>
-    <string name="app_tagline">Your Professional Trading Companion</string>
-    <string name="version_info">Version 1.0.0</string>
-    <string name="app_logo">App Logo</string>
     <string name="open_nav">Open Navigation Drawer</string>
     <string name="close_nav">Close Navigation Drawer</string>
-    <!--    <string name="default_web_client_id" translatable="false">1081756889190-ffull8jtkqvva0md5bgaa3li8u518536.apps.googleusercontent.com</string>-->
     <string name="default_web_client_id" translatable="false">1081756889190-ffull8jtkqvva0md5bgaa3li8u518536.apps.googleusercontent.com</string>
-
-    <!-- Menu Items -->
-    <string name="active_activities">Active Activities</string>
-    <string name="activities_details">Activities Details</string>
-    <string name="activities_analysis_data">Activities Analysis Data</string>
-    <string name="activities_filtered_data">Activities Filtered Data</string>
-    <string name="login">Login</string>
-    <string name="signup">Sign Up</string>
-    <string name="logout">Logout</string>
-
-    <!-- Section Titles -->
-    <string name="menu_activities">Activities</string>
-    <string name="menu_authentication">Authentication</string>
-    <string name="menu_other">Other</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="profile_picture">User Profile</string>
-    <string name="welcome_to_letmefocus">Welcome to LetMeFocus!</string>
-    <string name="user_example_com">user@example.com</string>
-    <string name="active_now">Active Now</string>
-    <string name="edit_profile">Edit Profile</string>
 
-    <string name="close">Close</string>
-    <string name="profile_image">Profile Image</string>
-    <string name="edit_profile_image">Edit Profile Image</string>
-    <string name="username">Enter your name</string>
-    <string name="email">Enter your email</string>
-    <string name="save">Save</string>
-    <string name="android_developer">Android Developer</string>
+    <!-- Navigation Header -->
+    <string name="nav_header_title">Mindful Minutes</string>
+    <string name="nav_header_subtitle">Track your daily focus &amp; time</string>
+    <string name="cd_app_icon">App Logo</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Sign in to continue to your account</string>
+    <string name="hint_email">Email Address</string>
+    <string name="hint_password">Password</string>
+    <string name="action_forgot_password">Forgot Password?</string>
+    <string name="action_login">Log In</string>
+    <string name="divider_or">OR</string>
+    <string name="prompt_no_account">Don\'t have an Account? Sign Up</string>
+
+    <!-- Sign Up Screen -->
+    <string name="signup_title">Create Account</string>
+    <string name="signup_subtitle">Start tracking your activities &amp; boost productivity</string>
+    <string name="hint_name">Full Name</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="action_sign_up">Sign Up</string>
+    <string name="prompt_have_account">Already have an account? Log In</string>
+
+    <!-- Activities & Card Labels -->
     <string name="activity_name">Activity Name</string>
-    <string name="blank" />
-    <string name="fetch_data">Fetch Data</string>
-    <string name="stop">Stop</string>
-    <string name="choose_your_category">Choose your category</string>
+    <string name="hint_activity_name">Activity Name</string>
+    <string name="creation_time">Creation Time:</string>
+    <string name="status">Status:</string>
+    <string name="total_spent_time">Total Spent Time:</string>
+    <string name="category_label">Category:</string>
+    <string name="blank"> </string>
+    <string name="timer_default_value">00:00:00</string>
+    <string name="default_empty_value">--</string>
+
+    <!-- Headers & Lists -->
+    <string name="title_active_activities">Active Activities</string>
+    <string name="title_activities_details">Activity Details</string>
+    <string name="title_activity_analysis">Activity Analytics</string>
+    <string name="subtitle_analytics">Visual summary of your recorded time</string>
+    <string name="filtered_activities_list">Filtered Activities</string>
+
+    <!-- Activity Statistics -->
+    <string name="label_start_time">Start Time</string>
+    <string name="label_end_time">End Time</string>
+    <string name="label_mean_time">Mean Time</string>
+    <string name="label_median_time">Median Time</string>
+    <string name="label_count_sessions">Count of Sessions</string>
+    <string name="label_count_time">Count Time</string>
+    <string name="label_maximum_time">Maximum Time</string>
+    <string name="label_minimum_time">Minimum Time</string>
+    <string name="label_total_spent_time">Total Spent Time</string>
+    <string name="label_creation_time">Creation Time:</string>
+
+    <!-- Category Bottom Sheet -->
+    <string name="choose_your_category">Filter by Category</string>
     <string name="complete_list">Complete List</string>
     <string name="active">Active</string>
     <string name="inactive">Inactive</string>
-    <string name="pause">Pause</string>
-    <string name="error">Error!</string>
-    <string name="there_was_an_issue_with_your_registration_nplease_try_again">There was an issue with your registration.\nPlease try again.</string>
-    <string name="success">Success!</string>
-    <string name="your_registration_was_successful">Your registration was successful!</string>
-    <string name="filtered_activities_list">Filtered Activities List</string>
-    <string name="filter_icon">Filter Icon</string>
-    <string name="password">Password</string>
-    <string name="user_email">User Email</string>
-    <string name="forgot_password">Forgot Password?</string>
-    <string name="or_continue_with">━━━━━ Or Continue With ━━━━━</string>
-    <string name="don_t_have_an_account_sign_up">Don\'t have an Account? Sign Up</string>
-    <string name="activity_distribution">Activity Distribution</string>
-    <string name="start_time">Start Time:</string>
-    <string name="mean_time">Mean Time:</string>
-    <string name="median_time">Median Time:</string>
-    <string name="count_time">Count Time:</string>
-    <string name="maximum_time">Maximum Time:</string>
-    <string name="minimum_time">Minimum Time:</string>
-    <string name="pause_time">Pause Time:</string>
-    <string name="end_time">End Time:</string>
-    <string name="total_spent_time">Total Spent Time:</string>
-    <string name="creation_time">Creation Time:</string>
-    <string name="status">Status:</string>
-    <string name="_02d_02d_02d">%02d :%02d:%02d</string>
-    <string name="email_address">Email Address</string>
-    <string name="welcome_back">Welcome Back</string>
-    <string name="sign_in_to_your_trading_account">Sign in to your trading account</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="continue_with_google">Continue with Google</string>
+    <string name="pause">Paused</string>
+    <string name="stop">Stopped</string>
+    <string name="fetch_data">Apply Filter</string>
+
+    <!-- Edit Profile Bottom Sheet -->
+    <string name="username">Username</string>
+    <string name="email">Email Address</string>
+    <string name="save">Save Changes</string>
+    <string name="profile_image">Profile Picture</string>
+
+    <!-- Feedback Bottom Sheets -->
+    <string name="error">Error</string>
+    <string name="there_was_an_issue_with_your_registration_nplease_try_again">An issue occurred with your request.\nPlease check your connection and try again.</string>
+    <string name="success">Success</string>
+    <string name="your_registration_was_successful">Operation completed successfully!</string>
+    <string name="close">Close</string>
+    <string name="filter_icon">Filter Categories</string>
+
+    <!-- Accessibility Descriptions -->
+    <string name="hint_search_activity">Search activity…</string>
+    <string name="cd_clear_search">Clear search input</string>
+    <string name="cd_add_activity">Save activity</string>
+    <string name="cd_close_activity">Close Activity</string>
+    <string name="cd_flip_back">Back to Timer</string>
+    <string name="cd_fab_menu">Toggle actions menu</string>
+    <string name="cd_fab_add">Add new activity</string>
+    <string name="cd_fab_search">Search activities</string>
+
+    <!-- Menu Items -->
+    <string name="nav_active_activities">Active Activities</string>
+    <string name="nav_activities_details">Activities Details</string>
+    <string name="nav_analysis_data">Activities Analysis Data</string>
+    <string name="nav_filtered_data">Activities Filtered Data</string>
+    <string name="nav_login">Login</string>
+    <string name="nav_signup">SignUp</string>
+    <string name="nav_logout">Logout</string>
+    <string name="profile_picture">Profile_image</string>
+    <!-- Menu & Navigation Strings -->
+    <string name="menu_activities">Activities</string>
+    <string name="active_activities">Active Activities</string>
+    <string name="activities_details">Activities Details</string>
+    <string name="activities_analysis_data">Activities Analysis Data</string>
+    <string name="menu_other">Account &amp; Settings</string>
+    <string name="logout">Logout</string>
+    <string name="add_new_activity">Add New Activity</string>
+    <string name="no_activities_found">No activities found</string>
+    <string name="no_activities_subtitle">Tap + above to start tracking your first activity</string>
+
 </resources>

@@ -7,102 +7,102 @@
     android:background="@color/background"
     tools:context=".fragments.ActiveActivitiesFragment">
 
-    <!-- Animated Gradient Background -->
+    <!-- Fluid Ambient Background -->
     <View
         android:id="@+id/background_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradient_background" />
 
-    <!-- Background Decorations - More Subtle -->
+    <!-- Ambient Blur Blobs -->
     <ImageView
         android:id="@+id/bg_blob_1"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:layout_marginTop="-120dp"
-        android:layout_marginEnd="-120dp"
-        android:alpha="0.06"
-        android:src="@drawable/bg_blob_1" />
+        android:layout_width="@dimen/blob_size_1"
+        android:layout_height="@dimen/blob_size_1"
+        android:layout_gravity="top|end"
+        android:alpha="0.08"
+        app:srcCompat="@drawable/bg_blob_1"
+        android:contentDescription="@string/blank" />
 
     <ImageView
         android:id="@+id/bg_blob_2"
-        android:layout_width="220dp"
-        android:layout_height="220dp"
-        android:layout_marginBottom="-100dp"
-        android:layout_marginStart="-100dp"
-        android:alpha="0.06"
+        android:layout_width="@dimen/blob_size_2"
+        android:layout_height="@dimen/blob_size_2"
         android:layout_gravity="bottom|start"
-        android:src="@drawable/bg_blob_2" />
+        android:alpha="0.08"
+        app:srcCompat="@drawable/bg_blob_2"
+        android:contentDescription="@string/blank" />
 
-    <!-- App Bar - More Compact and Professional -->
+    <!-- Frosted Glass App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/appbar_background_bottom_radius"
-        android:elevation="8dp"
+        android:elevation="@dimen/elevation_floating"
         android:fitsSystemWindows="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="12dp"
+            android:paddingHorizontal="@dimen/padding_screen"
+            android:paddingVertical="@dimen/padding_medium"
             app:layout_scrollFlags="enterAlways|snap">
 
-            <!-- App Title -->
+            <!-- Section Title -->
             <TextView
                 android:id="@+id/activityNameView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Activities"
+                android:text="@string/title_active_activities"
                 android:textColor="@color/textPrimary"
-                android:textSize="20sp"
-                android:textStyle="bold"
+                android:textSize="@dimen/text_size_heading"
+                android:fontFamily="@font/bold"
                 android:letterSpacing="0.01"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/actionButtonsLayout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Action Buttons -->
+            <!-- Action Controls (Search & Add) -->
             <LinearLayout
                 android:id="@+id/actionButtonsLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <!-- Search Button -->
+                <!-- Search Toggle Button -->
                 <ImageButton
                     android:id="@+id/searchActionButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="6dp"
-                    android:background="@drawable/rounded_button_background"
-                    android:src="@drawable/ic_search"
-                    android:contentDescription="Search activities"
-                    android:scaleType="centerInside" />
+                    android:layout_width="@dimen/icon_button_size"
+                    android:layout_height="@dimen/icon_button_size"
+                    android:layout_marginEnd="@dimen/margin_small"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_search"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/cd_fab_search" />
 
-                <!-- Add Button -->
+                <!-- Add Activity Toggle Button -->
                 <ImageButton
                     android:id="@+id/addActionButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/rounded_button_background"
-                    android:src="@drawable/ic_add"
-                    android:contentDescription="Add activity"
-                    android:scaleType="centerInside" />
+                    android:layout_width="@dimen/icon_button_size"
+                    android:layout_height="@dimen/icon_button_size"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_add"
+                    android:scaleType="centerInside"
+                    android:contentDescription="@string/cd_fab_add" />
 
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main Content Area -->
+    <!-- Main Scrollable Content Area -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
@@ -118,221 +118,269 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:padding="@dimen/padding_screen">
 
-                <!-- Search Layout - More Compact -->
-                <androidx.cardview.widget.CardView
+                <!-- Interactive Search Card (Clean, No-Icon Input) -->
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/searchItemLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:elevation="12dp"
+                    android:layout_marginBottom="@dimen/margin_standard"
                     android:visibility="gone"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="12dp">
+                    app:cardCornerRadius="@dimen/radius_xlarge"
+                    app:cardElevation="@dimen/elevation_card"
+                    app:strokeWidth="@dimen/stroke_thin"
+                    app:strokeColor="@color/border_gray"
+                    app:cardBackgroundColor="@color/surface">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/background_glass"
-                        android:padding="16dp">
+                        android:background="@drawable/card_gradient_background"
+                        android:padding="@dimen/padding_large">
 
+                        <!-- Header Title -->
+                        <TextView
+                            android:id="@+id/searchItemTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Search Activities"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="@dimen/text_size_title"
+                            android:fontFamily="@font/bold"
+                            android:letterSpacing="0.01"
+                            app:layout_constraintBottom_toBottomOf="@+id/clearButton"
+                            app:layout_constraintEnd_toStartOf="@+id/clearButton"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <!-- Circular Red Dismiss Button -->
+                        <ImageButton
+                            android:id="@+id/clearButton"
+                            android:layout_width="@dimen/icon_size_large"
+                            android:layout_height="@dimen/icon_size_large"
+                            android:background="@drawable/rounded_button_error"
+                            app:srcCompat="@drawable/ic_clear"
+                            app:tint="@color/white"
+                            android:contentDescription="@string/cd_clear_search"
+                            android:padding="@dimen/padding_tiny"
+                            android:scaleType="centerInside"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <!-- Search Input Field -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/searchInputLayout"
                             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            app:boxBackgroundColor="@android:color/transparent"
-                            app:boxCornerRadiusBottomEnd="12dp"
-                            app:boxCornerRadiusBottomStart="12dp"
-                            app:boxCornerRadiusTopEnd="12dp"
-                            app:boxCornerRadiusTopStart="12dp"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            app:boxBackgroundColor="@color/input_background"
+                            app:boxCornerRadiusBottomEnd="@dimen/radius_medium"
+                            app:boxCornerRadiusBottomStart="@dimen/radius_medium"
+                            app:boxCornerRadiusTopEnd="@dimen/radius_medium"
+                            app:boxCornerRadiusTopStart="@dimen/radius_medium"
                             app:boxStrokeColor="@color/modern_primary"
+                            app:boxStrokeWidth="@dimen/stroke_hairline"
+                            app:boxStrokeWidthFocused="@dimen/stroke_medium"
                             app:endIconMode="clear_text"
-                            app:endIconTint="@color/modern_primary"
+                            app:endIconTint="@color/textHint"
                             app:hintTextColor="@color/modern_primary"
-                            app:layout_constraintEnd_toStartOf="@+id/clearButton"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            app:layout_constraintTop_toBottomOf="@id/clearButton">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/itemSearch"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Search activities..."
+                                android:hint="@string/hint_search_activity"
+                                android:fontFamily="@font/robotoregular"
                                 android:textColor="@color/textPrimary"
                                 android:textColorHint="@color/textHint"
-                                android:textSize="15sp" />
+                                android:textSize="@dimen/text_size_body_large"
+                                android:imeOptions="actionSearch"
+                                android:inputType="text"
+                                android:singleLine="true" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <ImageButton
-                            android:id="@+id/clearButton"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/rounded_button_background"
-                            android:src="@drawable/ic_clear"
-                            app:layout_constraintBottom_toBottomOf="@id/searchInputLayout"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="@id/searchInputLayout"
-                            app:tint="@color/white" />
-
                     </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
-                <!-- Add Item Layout - More Compact -->
-                <androidx.cardview.widget.CardView
+                <!-- Interactive Add Activity Card (Clean, No-Icon Input) -->
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/addItemLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:elevation="12dp"
+                    android:layout_marginBottom="@dimen/margin_standard"
                     android:visibility="gone"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="12dp">
+                    app:cardCornerRadius="@dimen/radius_xlarge"
+                    app:cardElevation="@dimen/elevation_card"
+                    app:strokeWidth="@dimen/stroke_thin"
+                    app:strokeColor="@color/border_gray"
+                    app:cardBackgroundColor="@color/surface">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/background_glass"
-                        android:padding="20dp">
+                        android:background="@drawable/card_gradient_background"
+                        android:padding="@dimen/padding_large">
 
-                        <!-- Header with Close Button -->
+                        <!-- Header Title -->
                         <TextView
                             android:id="@+id/addItemTitle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Add New Activity"
+                            android:text="@string/add_new_activity"
                             android:textColor="@color/textPrimary"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
+                            android:textSize="@dimen/text_size_title"
+                            android:fontFamily="@font/bold"
                             android:letterSpacing="0.01"
+                            app:layout_constraintBottom_toBottomOf="@+id/btnCloseAddItem"
                             app:layout_constraintEnd_toStartOf="@+id/btnCloseAddItem"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
+                        <!-- Circular Red Close Button -->
                         <ImageButton
                             android:id="@+id/btnCloseAddItem"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:background="@drawable/button_gradient"
-                            android:src="@drawable/ic_clear"
+                            android:layout_width="@dimen/icon_size_large"
+                            android:layout_height="@dimen/icon_size_large"
+                            android:background="@drawable/rounded_button_error"
+                            app:srcCompat="@drawable/ic_clear"
+                            app:tint="@color/white"
+                            android:contentDescription="@string/close"
+                            android:padding="@dimen/padding_tiny"
+                            android:scaleType="centerInside"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:tint="@color/white" />
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                        <!-- Activity Name -->
+                        <!-- Activity Name Input (No Leading Icon) -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/itemNameInputLayout"
                             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            app:boxBackgroundColor="@android:color/transparent"
-                            app:boxCornerRadiusBottomEnd="12dp"
-                            app:boxCornerRadiusBottomStart="12dp"
-                            app:boxCornerRadiusTopEnd="12dp"
-                            app:boxCornerRadiusTopStart="12dp"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            app:boxBackgroundColor="@color/input_background"
+                            app:boxCornerRadiusBottomEnd="@dimen/radius_medium"
+                            app:boxCornerRadiusBottomStart="@dimen/radius_medium"
+                            app:boxCornerRadiusTopEnd="@dimen/radius_medium"
+                            app:boxCornerRadiusTopStart="@dimen/radius_medium"
                             app:boxStrokeColor="@color/modern_primary"
+                            app:boxStrokeWidth="@dimen/stroke_hairline"
+                            app:boxStrokeWidthFocused="@dimen/stroke_medium"
                             app:endIconMode="clear_text"
-                            app:endIconTint="@color/modern_primary"
+                            app:endIconTint="@color/textHint"
                             app:hintTextColor="@color/modern_primary"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/addItemTitle">
+                            app:layout_constraintTop_toBottomOf="@id/btnCloseAddItem">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/itemName"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Activity Name"
+                                android:hint="@string/hint_activity_name"
+                                android:fontFamily="@font/robotoregular"
                                 android:textColor="@color/textPrimary"
                                 android:textColorHint="@color/textHint"
-                                android:textSize="15sp"
+                                android:textSize="@dimen/text_size_body_large"
                                 android:inputType="textCapWords"
                                 android:singleLine="true" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <!-- Add Activity Button -->
+                        <!-- Add / Save Button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/sendButton"
                             android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_marginTop="20dp"
+                            android:layout_height="@dimen/button_standard_height"
+                            android:layout_marginTop="@dimen/margin_large"
                             android:backgroundTint="@color/modern_primary"
-                            android:text="Add Activity"
+                            android:fontFamily="@font/bold"
+                            android:letterSpacing="0.01"
+                            android:text="@string/cd_add_activity"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:letterSpacing="0.01"
-                            app:cornerRadius="12dp"
+                            android:textSize="@dimen/text_size_body_large"
+                            app:cornerRadius="@dimen/radius_medium"
                             app:iconGravity="textStart"
-                            app:iconPadding="6dp"
+                            app:iconPadding="@dimen/margin_small"
+                            app:iconSize="@dimen/icon_size_standard"
+                            app:iconTint="@color/white"
                             app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.0"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/itemNameInputLayout" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
-                <!-- Empty State View - More Compact -->
+                <!-- Big & Centered Empty State -->
                 <LinearLayout
                     android:id="@+id/emptyState"
                     android:layout_width="match_parent"
-                    android:layout_height="280dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="400dp"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:visibility="gone"
-                    android:padding="20dp">
+                    android:paddingVertical="@dimen/padding_hero"
+                    android:paddingHorizontal="@dimen/padding_screen">
 
                     <ImageView
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:src="@drawable/error_no_data"
-                        android:alpha="0.4" />
+                        android:layout_width="140dp"
+                        android:layout_height="140dp"
+                        app:srcCompat="@drawable/error_no_data"
+                        android:alpha="0.9"
+                        android:scaleType="centerInside"
+                        android:contentDescription="@string/default_empty_value" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="No activities found"
+                        android:layout_marginTop="@dimen/margin_large"
+                        android:text="@string/no_activities_found"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="@dimen/text_size_heading"
+                        android:fontFamily="@font/bold"
+                        android:gravity="center" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_small"
+                        android:text="@string/no_activities_subtitle"
                         android:textColor="@color/textSecondary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Add your first activity to get started"
-                        android:textColor="@color/textHint"
-                        android:textSize="13sp" />
+                        android:fontFamily="@font/robotoregular"
+                        android:textSize="@dimen/text_size_body_large"
+                        android:gravity="center" />
 
                 </LinearLayout>
 
-                <!-- Activities List - Reduced Spacing -->
+                <!-- Activities RecyclerView List -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/activityRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="200dp"
                     android:clipToPadding="false"
-                    android:padding="0dp"
-                    android:clipChildren="true"
-                    android:paddingVertical="0dp"
+                    android:paddingVertical="@dimen/padding_small"
                     tools:listitem="@layout/activity_card_item" />
+
             </LinearLayout>
+
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Loading Progress -->
+    <!-- Indeterminate Progress Indicator -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:indeterminateTint="@color/modern_primary"
         android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

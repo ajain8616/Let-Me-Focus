@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="120dp"
-    android:height="120dp"
+    android:width="@dimen/pattern_size"
+    android:height="@dimen/pattern_size"
     android:viewportWidth="120"
     android:viewportHeight="120">
 
     <path
-        android:fillColor="@color/white"
+        android:fillColor="@color/glass_stroke_primary"
         android:pathData="M0,60 Q30,40 60,60 T120,60 L120,120 L0,120 Z" />
     <path
-        android:fillColor="@color/white"
+        android:fillColor="@color/glass_stroke_secondary"
         android:pathData="M0,90 Q30,70 60,90 T120,90 L120,120 L0,120 Z" />
 </vector>
